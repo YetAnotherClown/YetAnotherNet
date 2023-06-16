@@ -2,4 +2,5 @@
 *.luau liguist-language=Lua
 *.luau eol=lf
 
-pages/** linguist-documentation=false
+pages/** linguist-detectable=false
+lib/** linguist-detectable=true
