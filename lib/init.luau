@@ -36,6 +36,7 @@ local Net = {}
 Net.__index = Net
 
 Net._bridge = {} :: Bridge
+Net.Server = "NET_SERVER"
 
 --[=[
 	@method __iter
