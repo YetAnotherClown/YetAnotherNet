@@ -235,8 +235,6 @@ function Bridge.new()
 	local self = {}
 	setmetatable(self, Bridge)
 
-	self.remote = Instance.new("RemoteEvent")
-
 	if RunService:IsServer() then
 		self.remote = Instance.new("RemoteEvent")
 		self.remote.Parent = script
