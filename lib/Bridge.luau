@@ -224,6 +224,36 @@ end
     Queue a packet to be sent in the outgoing queue
 ]=]
 function Bridge:send(recipient, identifier, data)
+	-- Typecheck recipients
+	if RunService:IsClient() then
+		if recipient ~= "NET_SERVER" then
+			warn("Clients can only send to Net.Server")
+
+			return
+		end
+	elseif RunService:IsServer() then
+		if typeof(recipient) == "table" then
+			for _, player in recipient do
+				if typeof(player) ~= "Instance" or (typeof(player) == "Instance" and not player:IsA("Player")) then
+					warn("Attempt to send a table with a non-player instance as a recipient")
+
+					return
+				end
+			end
+		elseif typeof(recipient) ~= "Instance" or (typeof(recipient) == "Instance" and not recipient:IsA("Player")) then
+			warn("Attempt to send a non-player instance as a recipient")
+
+			return
+		end
+	end
+
+	-- Typecheck identifier
+	if typeof(identifier) ~= "string" then
+		warn("Identifier must be a string")
+
+		return
+	end
+
 	table.insert(self._outgoingQueue, {
 		identifier = identifier,
 		recipient = recipient,
