@@ -18,7 +18,7 @@ export type Identifier = Identifier.Identifier
 	As of v0.1.0, none of these are implemented. All are planned and will be implemented in later versions.
 ]=]
 type Configuration = {
-	Channel: ("Reliable" | "Unreliable")?,
+	Channel: ("ReliableOrdered" | "ReliableUnordered" | "Unreliable")?,
 	DebugMode: boolean?,
 	DebugKey: Enum.KeyCode?,
 	Middleware: ((any) -> any)?,
