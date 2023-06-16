@@ -1,3 +1,5 @@
 * text=auto
 *.luau liguist-language=Lua
 *.luau eol=lf
+
+pages/** linguist-documentation
