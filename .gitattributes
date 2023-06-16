@@ -1,6 +1,7 @@
 * text=auto
-*.luau liguist-language=Lua
+*.luau linguist-language=Lua
 *.luau eol=lf
 
-pages/** linguist-detectable=false
-lib/** linguist-detectable=true
+*.luau linguist-detectable=true
+*.js linguist-detectable=false
+*.css linguist-detectable=false
