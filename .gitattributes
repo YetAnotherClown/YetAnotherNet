@@ -1,2 +1,4 @@
 * text=auto
 *.luau liguist-language=Lua
+*.lua  eol=lf
+*.luau eol=lf
