@@ -2,4 +2,4 @@
 *.luau liguist-language=Lua
 *.luau eol=lf
 
-pages/** linguist-documentation
+pages/** linguist-documentation=false
