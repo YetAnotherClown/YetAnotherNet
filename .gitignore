@@ -1,0 +1,6 @@
+/*.rbxlx.lock
+/*.rbxl.lock
+.vscode
+/example
+example.project.json
+sourcemap.json
