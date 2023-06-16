@@ -7,7 +7,6 @@ classOrder = [
 ]
 
 [docusaurus]
-url = "https://yetanotherclown.github.io/"
 tagline = "A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS."
 
 [[navbar.items]]
@@ -36,7 +35,7 @@ includeReadme = false
 
 [[home.features]]
 title = "Data-Driven"
-description = "Net promotes a Data-Driven structure as opposed to a Event-Driven one."
+description = "Net promotes a Data-Driven structure as opposed to an Event-Driven one."
 
 [[home.features]]
 title = "Optimized Bandwidth"
