@@ -1,0 +1,47 @@
+title = "Net"
+gitSourceBranch = "main"
+classOrder = [
+    "Net",
+    "Bridge",
+    "Loop"
+]
+
+[docusaurus]
+url = "https://yetanotherclown.github.io/"
+tagline = "A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS."
+
+[[navbar.items]]
+href = "https://discord.gg/gMWmuaZEY6"
+label = "Discord"
+position = "right"
+
+[footer]
+style = "dark"
+copyright = "Copyright © 2023 YetAnotherClown. Built with Moonwave and Docusaurus"
+
+[[footer.links]]
+title = "Links"
+
+[[footer.links.items]]
+label = "Clown's Circus Discord"
+href = "https://discord.gg/gMWmuaZEY6"
+
+[[footer.links.items]]
+label = "YetAnotherClown on Github"
+href = "https://github.com/YetAnotherClown"
+
+[home]
+enabled = true
+includeReadme = false
+
+[[home.features]]
+title = "Data-Driven"
+description = "Net promotes a Data-Driven structure as opposed to a Event-Driven one."
+
+[[home.features]]
+title = "Optimized Bandwidth"
+description = "Net automatically structures your data to optimize bandwidth."
+
+[[home.features]]
+title = "Made for ECS"
+description = "First-Class support for ECS Architectures, made for the Matter ECS."

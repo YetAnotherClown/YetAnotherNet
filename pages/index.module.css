@@ -1,0 +1,48 @@
+/* stylelint-disable docusaurus/copyright-header */
+
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+ .heroBanner {
+    padding: 4rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  @media screen and (max-width: 966px) {
+    .heroBanner {
+      padding: 2rem;
+    }
+  }
+  
+  .buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .tagline {
+    font-size: 1.5rem;
+    padding: 0 20rem;
+    margin: 3rem auto;
+  }
+
+  .codeSnippet {
+    filter: drop-shadow(0px 0px 20px rgba(0, 0, 0, 0.7));
+    max-width: 800px;
+  }
+
+  .features {
+    display: flex;
+    align-items: center;
+    padding: 2rem 0;
+    width: 100%;
+  }
+  
+  .featureSvg {
+    height: 200px;
+    width: 200px;
+  }
