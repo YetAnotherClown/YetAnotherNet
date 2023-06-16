@@ -14,10 +14,12 @@ local MyIdentifier = Net.identifier("myIdentifier")
 Net:send(MyIdentifier, ...)
 ```
 
-The first Parameter is an optional one specifying the recipient of the data. This Parameter can be an array of
-Players; ``{ Players }``, a single ``Player``, or ``Net.Server``.
+In the ``Net:send()`` method, the first Parameters you provide should be the Recipients of your packet.
+These can be of types ``{ Players }`` or ``Player`` if called from the Server, or ``Net.Server`` if called from the client.
+If you call from the client, you do not have to provide a Recipient Parameter.
 
-The second Parameter is required for sending data. It is a ``string`` of ``Net.Identifier`` or just a plain string.
-It is recommended you use a ``Net.Identifier`` instead, see [Identifiers](handling-data/compressing-data.md#identifiers) for more.
+The next Parameter after your Recipients should be an Identifier. Identifiers are of type ``Net.Identifier`` or ``string``.
+You must supply an Identifier when sending data and it should always come before you provide your data.
+It is recommended you use a ``Net.Identifier`` instead of a ``string``, see [Identifiers](handling-data/compressing-data.md#identifiers) for more.
 
-Lastly, as a ``tuple``, any other parameter you provide after your Identifier will be sent as data.
+Any other Parameters will be sent as data.
