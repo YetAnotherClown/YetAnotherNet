@@ -14,20 +14,20 @@ Bridge.__index = Bridge
 
 -- A queue of Packets to send next frame
 type OutgoingQueue = {
-    {
-        identifier: string,
-        recipient: Player | "NET_SERVER",
-        data: { any }
-    }
+	{
+		identifier: string,
+		recipient: Player | "NET_SERVER",
+		data: { any },
+	}
 }
 
 -- A queue of Packets received on the current frame
 type IncomingQueue = {
-    {
-        identifier: string,
-        sender: Player | "NET_SERVER",
-        data: { any }
-    }
+	{
+		identifier: string,
+		sender: Player | "NET_SERVER",
+		data: { any },
+	}
 }
 
 Bridge._incomingQueue = {} :: IncomingQueue
@@ -66,43 +66,45 @@ Bridge._outgoingQueue = {} :: OutgoingQueue
 ]=]
 
 -- Packages a Packet to go into a Server Payload
-function addPacketToPayload(payload: {
-    [string]: { 
-        { any }
-    }
-}, packet: {
-    identifier: string,
-    recipient: { Player } | Player | "NET_SERVER",
-    data: { any }
-}, pos)
-    if not payload[packet.identifier] then
-        payload[packet.identifier] = {}
-    end
+function addPacketToPayload(
+	payload: {
+		[string]: { { any } },
+	},
+	packet: {
+		identifier: string,
+		recipient: { Player } | Player | "NET_SERVER",
+		data: { any },
+	},
+	pos
+)
+	if not payload[packet.identifier] then
+		payload[packet.identifier] = {}
+	end
 
-    -- Prevent unsigned overflow
-    if pos < 0 or pos > 65535 then
-        pos = 0
-    end
+	-- Prevent unsigned overflow
+	if pos < 0 or pos > 65535 then
+		pos = 0
+	end
 
-    -- Store the queue position
-    local data = {
-        string.pack("H", pos) -- Limit: 65535
-    }
+	-- Store the queue position
+	local data = {
+		string.pack("H", pos), -- Limit: 65535
+	}
 
-    for _, value in packet.data do
-        table.insert(data, value)
-    end
+	for _, value in packet.data do
+		table.insert(data, value)
+	end
 
-    table.insert(payload[packet.identifier], data)
+	table.insert(payload[packet.identifier], data)
 end
 
 -- Packages a Packet to go into a Client Payload
 function updateClientPayload(clientPackages, player, packet, pos)
-    if not clientPackages[player] then
-        clientPackages[player] = {}
-    end
+	if not clientPackages[player] then
+		clientPackages[player] = {}
+	end
 
-    addPacketToPayload(clientPackages[player], packet, pos)
+	addPacketToPayload(clientPackages[player], packet, pos)
 end
 
 --[=[
@@ -112,48 +114,46 @@ end
     Sends all queued outgoing packets over the Remote.
 ]=]
 function Bridge:_processOutgoingQueue()
-    local serverPayload = {} :: {
-        [string]: { 
-            { any }
-        }
-    }
-    local clientPayloads = {} :: {
-        [Player]: {
-            [string]: { 
-                { any }
-            }
-        }
-    }
-    local snapshot = self._outgoingQueue
-    self._outgoingQueue = {}
+	local serverPayload = {} :: {
+		[string]: { { any } },
+	}
+	local clientPayloads = {} :: {
+		[Player]: {
+			[string]: { { any } },
+		},
+	}
+	local snapshot = self._outgoingQueue
+	self._outgoingQueue = {}
 
-    -- Add each packet to it's respective payload
-    for pos, packet in snapshot :: {
-        {
-            identifier: string,
-            recipient: { Player } | Player | "NET_SERVER",
-            data: { any }
-        }
-    } do
-        if typeof(packet.recipient) == "table" then
-            for _, player in packet.recipient do
-                updateClientPayload(clientPayloads, player, packet, pos)
-            end
-        elseif typeof(packet.recipient) == "Player" then
-            updateClientPayload(clientPayloads, packet.recipient, packet, pos)
-        else
-            addPacketToPayload(serverPayload, packet, pos)
-        end
-    end
+	-- Add each packet to it's respective payload
+	for pos, packet in
+		snapshot :: {
+			{
+				identifier: string,
+				recipient: { Player } | Player | "NET_SERVER",
+				data: { any },
+			}
+		}
+	do
+		if typeof(packet.recipient) == "table" then
+			for _, player in packet.recipient do
+				updateClientPayload(clientPayloads, player, packet, pos)
+			end
+		elseif typeof(packet.recipient) == "Player" then
+			updateClientPayload(clientPayloads, packet.recipient, packet, pos)
+		else
+			addPacketToPayload(serverPayload, packet, pos)
+		end
+	end
 
-    -- Send the Payload over the RemoteEvent
-    if RunService:IsClient() then
-        self.remote:FireServer(serverPayload)
-    elseif RunService:IsServer() then
-        for player, payload in clientPayloads do
-            self.remote:FireClient(player, payload)
-        end
-    end
+	-- Send the Payload over the RemoteEvent
+	if RunService:IsClient() then
+		self.remote:FireServer(serverPayload)
+	elseif RunService:IsServer() then
+		for player, payload in clientPayloads do
+			self.remote:FireClient(player, payload)
+		end
+	end
 end
 
 --[=[
@@ -165,30 +165,31 @@ end
     @param sender Player | "NET_SERVER"
     @param payload Payload
 ]=]
-function Bridge:_processIncoming(sender, payload: {
-    [string]: { 
-        { any }
-    }
-})
-    -- Unpack each packet and add it to the queue
-    for identifier, packets in payload do
-        for _, rawData in packets do
-            local pos = string.unpack("H", rawData[1]) -- Limit: 65535
+function Bridge:_processIncoming(
+	sender,
+	payload: {
+		[string]: { { any } },
+	}
+)
+	-- Unpack each packet and add it to the queue
+	for identifier, packets in payload do
+		for _, rawData in packets do
+			local pos = string.unpack("H", rawData[1]) -- Limit: 65535
 
-            local data = {}
-            for i = 2, #rawData do
-                table.insert(data, rawData[i])
-            end
+			local data = {}
+			for i = 2, #rawData do
+				table.insert(data, rawData[i])
+			end
 
-            local packet = {
-                identifier = identifier,
-                sender = sender,
-                data = data
-            }
+			local packet = {
+				identifier = identifier,
+				sender = sender,
+				data = data,
+			}
 
-            table.insert(self._incomingQueue, pos, packet)
-        end
-    end
+			table.insert(self._incomingQueue, pos, packet)
+		end
+	end
 end
 
 --[=[
@@ -198,12 +199,12 @@ end
     Updates the incoming queue and snapshot and calls ``Bridge:_processOutgoingQueue()``.
 ]=]
 function Bridge:step()
-    -- Update queue & Snapshot
-    self._snapshot = self._incomingQueue
-    self._incomingQueue = {}
+	-- Update queue & Snapshot
+	self._snapshot = self._incomingQueue
+	self._incomingQueue = {}
 
-    -- Send outgoing 
-    self:_processOutgoingQueue()
+	-- Send outgoing
+	self:_processOutgoingQueue()
 end
 
 --[=[
@@ -213,7 +214,7 @@ end
     Returns a snapshot of the incoming queue.
 ]=]
 function Bridge:snapshot()
-    return table.clone(self._snapshot)
+	return table.clone(self._snapshot)
 end
 
 --[=[
@@ -223,35 +224,35 @@ end
     Queue a packet to be sent in the outgoing queue
 ]=]
 function Bridge:send(recipient, identifier, data)
-    table.insert(self._outgoingQueue, {
-        identifier = identifier,
-        recipient = recipient,
-        data = data
-    })
+	table.insert(self._outgoingQueue, {
+		identifier = identifier,
+		recipient = recipient,
+		data = data,
+	})
 end
 
 function Bridge.new()
-    local self = {}
-    setmetatable(self, Bridge)
+	local self = {}
+	setmetatable(self, Bridge)
 
-    self.remote = Instance.new("RemoteEvent")
+	self.remote = Instance.new("RemoteEvent")
 
-    if RunService:IsServer() then
-        self.remote = Instance.new("RemoteEvent")
-        self.remote.Parent = script
+	if RunService:IsServer() then
+		self.remote = Instance.new("RemoteEvent")
+		self.remote.Parent = script
 
-        self.remote.OnServerEvent:Connect(function(player, package)
-            self:_processIncoming(player, package)
-        end)
-    elseif RunService:IsClient() then
-        self.remote = script:WaitForChild("RemoteEvent")
+		self.remote.OnServerEvent:Connect(function(player, package)
+			self:_processIncoming(player, package)
+		end)
+	elseif RunService:IsClient() then
+		self.remote = script:WaitForChild("RemoteEvent")
 
-        self.remote.OnClientEvent:Connect(function(package)
-            self:_processIncoming("NET_SERVER", package)
-        end)
-    end
+		self.remote.OnClientEvent:Connect(function(package)
+			self:_processIncoming("NET_SERVER", package)
+		end)
+	end
 
-    return self
+	return self
 end
 
 export type Bridge = typeof(Bridge.new())

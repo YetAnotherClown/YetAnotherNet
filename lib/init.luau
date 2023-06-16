@@ -22,7 +22,7 @@ type Configuration = {
 	DebugMode: boolean?,
 	DebugKey: Enum.KeyCode?,
 	Middleware: ((any) -> any)?,
-	Ratelimit: number?
+	Ratelimit: number?,
 }
 
 --[=[
@@ -278,7 +278,7 @@ function Net:start(loop: any, event: string, priorityOverride: number?)
 	loop:scheduleSystem({
 		system = handleNetworking,
 		event = event,
-		priority = priorityOverride or -1
+		priority = priorityOverride or -1,
 	})
 
 	return nil
