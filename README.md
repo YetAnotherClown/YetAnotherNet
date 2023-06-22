@@ -89,9 +89,10 @@ For more help, check out [the Rojo documentation](https://rojo.space/docs).
 - [x] Filter useless returns in query results (e.g. `player` when doing ``Net:query(Player)``, `sender` when doing ``Net:query(Net.Server)``, `identifier` when doing ``Net:query(identifier)``.) We already know what these values are, as we are querying for those specific items.
 - [x] Stable Core API
 - [x] Compress `Identifier` strings
-- [ ] ReliableUnordered Channel
+- [X] ReliableUnordered Channel
 - [ ] Rate limiting for `Net` or `Identifier`
 - [ ] Middleware
+- [ ] Debugger
 
 ## Planned Features
 
