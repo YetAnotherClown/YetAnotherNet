@@ -26,10 +26,11 @@ return identifiers
 ```
 
 And then in the same script you initialize your Matter Systems, you can create a new Net object
-with unique configuration by using the ``Net.new()`` function.
+with unique configuration by using the ``Net.new()`` function. For example, you can change the Event and
+the Priority the Net System is ran on in Configuration with the ``Event`` and ``Priority`` Parameters.
 
 In order to use Net with Matter you must also use the ``Net:start()`` method and pass in your Matter
-loop and the name of the event to run on. The event should be Heartbeat.
+loop.
 
 You should have only one Net object for every loop, though you shouldn't, in most cases, have more than one
 loop.
@@ -43,11 +44,9 @@ local NetLib = require(Net)
 
 -- Create a new Net Server/Client
 local Net = NetLib.new({
-  Channel: ReliableOrdered | ReliableUnordered | Unreliable, -- Future proofing
-  DebugMode: boolean -- Tools for debugging
-  DebugKey: KeyCode -- Future addition for a Debug Panel
-  Middleware: (sender, identifier, ...) -> any -- Ran before a packet is queried
-  RateLimit: number -- Amount of invocations a second
+  Channel: "ReliableOrdered"
+  Event: "default",
+  Priority: -1
 })
 
 -- Create your identifiers before initializing any netcode
@@ -56,7 +55,7 @@ local identifiers = require("Identifiers.lua")
 local world = World.new()
 local loop = Loop.new(world, Net)
 
-Net:start(loop, "default") -- Initializes the net, adding it to your loop.
+Net:start(loop) -- Initializes the net, adding it to your loop.
 
 local systems = {}
 for _, child in script.systems:GetChildren() do
@@ -118,13 +117,7 @@ local RunService = game:GetService("RunService")
 local NetLib = require(Net)
 
 -- Create a new Net Server/Client
-local Net = NetLib.new({
-  Channel: ReliableOrdered | ReliableUnordered | Unreliable, -- Future proofing
-  DebugMode: boolean -- Tools for debugging
-  DebugKey: KeyCode -- Future addition for a Debug Panel
-  Middleware: (sender, identifier, ...) -> any -- Ran before a packet is queried
-  RateLimit: number -- Amount of invocations a second
-})
+local Net = NetLib.new()
 
 -- Create your identifiers before initializing any netcode
 local identifiers = require("Identifiers.lua")

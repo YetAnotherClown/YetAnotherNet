@@ -9,21 +9,27 @@ export type Identifier = Identifier.Identifier
 --[=[
 	@interface Configuration
 	@within Net
-	@field Channel "Reliable" | "Unreliable" -- Default: Reliable
+	@field Channel "ReliableOrdered" | "ReliableUnordered" | "Unreliable" -- Default: ReliableUnordered
 	@field DebugMode boolean -- Enable Debug Features?
 	@field DebugKey KeyCode -- The key to open the Debug Panel
+	@field Event string -- The event to schedule Net on in your Matter Loop -- Default: "default"
 	@field Middleware (sender, identifier, ...) -> any -- Ran before a packet is queried
+	@field Priority number -- The priority to schedule Net as in your Matter Loop -- Default: -1
 	@field Ratelimit number -- Amount of allowed invocations a frame
 
 	@tag Future Feature
 
-	As of v0.1.0, none of these are implemented. All are planned and will be implemented in later versions.
+	As of v0.2.0, the only two configuration parameters that are implemented are Event and Priority.
+	All other parameters will be implemented at a later date. With the exception of Middleware & Ratelimiting,
+	most of these parameters should not change and remain stable API.
 ]=]
 type Configuration = {
 	Channel: ("ReliableOrdered" | "ReliableUnordered" | "Unreliable")?,
 	DebugMode: boolean?,
 	DebugKey: Enum.KeyCode?,
+	Event: string?,
 	Middleware: ((any) -> any)?,
+	Priority: number?,
 	Ratelimit: number?,
 }
 
@@ -342,33 +348,31 @@ end
 	This ensures that your netcode runs first every frame.
 
 	:::note
-	Please make sure that the event you provided is the same index you used for your ``RunService.Heartbeat`` event in your ``Loop:begin()`` method.
+	Please make sure that the event you set in the Configuration, or the default, is the same index you used for your ``RunService.Heartbeat`` event in your ``Loop:begin()`` method.
 
 	Your netcode is meant to run on the heartbeat, like most systems. In some cases you may want to run your netcode on different events, in this case
 	it is acceptable to change it to a different event.
-	You should have different netcodes for each event in this case.
+	You should have different Net objects for each event in this case.
 	:::
 
 	:::warning
 	The ``start`` method assumes your systems are ordered from ``0`` to ``inf``.
-	If you have any systems that run on a priority below zero, you should either change your system's priority or manually set the priority in the ``start`` method.
+	If you have any systems that run on a priority below zero, you should either change your system's priority or manually set the priority in the Configuration.
 
 	If your netcode runs after any system, it may cause undesired behavior.
 	:::
 
-	@param loop Loop -- An optional First Parameter that specifies a recipient of Player, { Player }, or ``Net.Server``. If not specified, the packet will be sent to the server.
-	@param event string -- The Index of the Event you want Net to use in your ``Loop:begin()`` method.
-	@param priorityOverride number -- A optional override for the priority of the Net System/
+	@param loop Loop -- A Matter Loop
 ]=]
-function Net:start(loop: any, event: string, priorityOverride: number?)
+function Net:start(loop: any)
 	local function handleNetworking()
 		self._bridge:step()
 	end
 
 	loop:scheduleSystem({
 		system = handleNetworking,
-		event = event,
-		priority = priorityOverride or -1,
+		event = self._configuration.Event,
+		priority = self._configuration.Priority or -1,
 	})
 
 	return nil
@@ -387,11 +391,12 @@ end
 
 	@param configuration Configuration?
 ]=]
-function Net.new()
+function Net.new(configuration: Configuration?)
 	local self = {}
 	setmetatable(self, Net)
 
 	self._bridge = Bridge.new() :: Bridge
+	self._configuration = configuration or {}
 
 	return self
 end
