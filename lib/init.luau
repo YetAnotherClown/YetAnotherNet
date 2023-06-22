@@ -22,6 +22,16 @@ export type Identifier = Identifier.Identifier
 	As of v0.2.0, the only two configuration parameters that are implemented are Event and Priority.
 	All other parameters will be implemented at a later date. With the exception of Middleware & Ratelimiting,
 	most of these parameters should not change and remain stable API.
+
+	### Channel
+
+	**ReliableOrdered**: Ensures the order in which Packets were sent at the cost of a few bytes. It is not recommended
+	that this is used. In most cases, ``ReliableUnordered`` should work.
+
+	**ReliableUnordered**: Does not ensure the order in which Packets are sent. However, Packets will be ordered properly
+	per Identifier only. This should work in most cases and does not have any overhead.
+
+	**Unreliable**: Anticipated feature that Roblox may add, this is here for planning and is not yet available.
 ]=]
 type Configuration = {
 	Channel: ("ReliableOrdered" | "ReliableUnordered" | "Unreliable")?,
@@ -395,7 +405,7 @@ function Net.new(configuration: Configuration?)
 	local self = {}
 	setmetatable(self, Net)
 
-	self._bridge = Bridge.new() :: Bridge
+	self._bridge = Bridge.new(configuration) :: Bridge
 	self._configuration = configuration or {}
 
 	return self

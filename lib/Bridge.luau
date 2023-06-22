@@ -66,7 +66,7 @@ Bridge._outgoingQueue = {} :: OutgoingQueue
 ]=]
 
 -- Packages a Packet to go into a Server Payload
-function addPacketToPayload(
+function Bridge:_addPacketToPayload(
 	payload: {
 		[string]: { { any } },
 	},
@@ -81,15 +81,18 @@ function addPacketToPayload(
 		payload[packet.identifier] = {}
 	end
 
-	-- Prevent unsigned overflow
-	if pos < 0 or pos > 65535 then
-		pos = 0
-	end
+	local data = {}
 
-	-- Store the queue position
-	local data = {
-		string.pack("H", pos), -- Limit: 65535
-	}
+	-- Implement ReliableOrdered Channel for precise ordering
+	if self._configuration and self._configuration.Channel == "ReliableOrdered" then
+		-- Prevent unsigned overflow
+		if pos < 0 or pos > 65535 then
+			pos = 0
+		end
+
+		-- Store the queue position
+		table.insert(data, string.pack("H", pos)) -- Limit: 65535
+	end
 
 	for _, value in packet.data do
 		table.insert(data, value)
@@ -99,12 +102,12 @@ function addPacketToPayload(
 end
 
 -- Packages a Packet to go into a Client Payload
-function updateClientPayload(clientPackages, player, packet, pos)
+function Bridge:_updateClientPayload(clientPackages, player, packet, pos)
 	if not clientPackages[player] then
 		clientPackages[player] = {}
 	end
 
-	addPacketToPayload(clientPackages[player], packet, pos)
+	self:_addPacketToPayload(clientPackages[player], packet, pos)
 end
 
 --[=[
@@ -137,12 +140,12 @@ function Bridge:_processOutgoingQueue()
 	do
 		if typeof(packet.recipient) == "table" then
 			for _, player in packet.recipient do
-				updateClientPayload(clientPayloads, player, packet, pos)
+				self:_updateClientPayload(clientPayloads, player, packet, pos)
 			end
 		elseif typeof(packet.recipient) == "Player" then
-			updateClientPayload(clientPayloads, packet.recipient, packet, pos)
+			self:_updateClientPayload(clientPayloads, packet.recipient, packet, pos)
 		else
-			addPacketToPayload(serverPayload, packet, pos)
+			self:_addPacketToPayload(serverPayload, packet, pos)
 		end
 	end
 
@@ -174,11 +177,18 @@ function Bridge:_processIncoming(
 	-- Unpack each packet and add it to the queue
 	for identifier, packets in payload do
 		for _, rawData in packets do
-			local pos = string.unpack("H", rawData[1]) -- Limit: 65535
-
+			local pos = #self._incomingQueue + 1
 			local data = {}
-			for i = 2, #rawData do
-				table.insert(data, rawData[i])
+
+			-- Implement ReliableOrdered Channel
+			if self._configuration and self._configuration.Channel == "ReliableOrdered" then
+				pos = string.unpack("H", rawData[1]) -- Limit: 65535
+
+				for i = 2, #rawData do
+					table.insert(data, rawData[i])
+				end
+			else
+				data = rawData -- No extra arguments stored
 			end
 
 			local packet = {
@@ -261,9 +271,11 @@ function Bridge:send(recipient, identifier, data)
 	})
 end
 
-function Bridge.new()
+function Bridge.new(configuration: { any }?)
 	local self = {}
 	setmetatable(self, Bridge)
+
+	self._configuration = configuration
 
 	if RunService:IsServer() then
 		self.remote = Instance.new("RemoteEvent")
