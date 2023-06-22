@@ -395,7 +395,8 @@ end
 	Creates a new Net object with unique configuration.
 
 	:::warning
-	You should limit the amount of Net objects you create, each object runs on a separate RemoteEvent.
+	You should limit the amount of Net objects you create, each object runs on a separate RemoteEvent based on it's
+	Channel and Event. Net Objects with the same Channel and Event will run on the same RemoteEvent.
 	Net achieves it's performance gains by primarily reducing the overhead of RemoteEvent calls.
 	:::
 
