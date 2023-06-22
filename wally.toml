@@ -1,7 +1,7 @@
 [package]
 name = "yetanotherclown/net"
-description = "A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS."
-version = "0.1.1"
+description = "A Data-Driven Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for the Matter ECS."
+version = "0.2.0"
 license = "MIT"
 authors = ["YetAnotherClown"]
 realm = "shared"
