@@ -3,6 +3,11 @@
 
 > A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS.
 
+### WARNING
+
+Net is an experimental library, expect bugs and major design changes. While the API
+should remain the same, there is no guarantee.
+
 ### Networking on Roblox
 
 Roblox promotes a design behavior where in order to achieve networking, developers must create
