@@ -11,15 +11,16 @@ const FEATURES = [
     title: "Data-Driven",
     description: (
       <>
-        Net promotes a Data-Driven structure as opposed to a Event-Driven one.
+        Net promotes a Data-Driven design by choice, as opposed to an Event-Driven one.
       </>
     )
   },
   {
-    title: "Optimized Bandwidth",
+    title: "Abstractions & Optimizations",
     description: (
       <>
-        Net automatically structures your data to optimize bandwidth.
+        No more creating new RemoteEvents, Net handles it all and reduces the Overhead of
+        sending RemoteEvent calls.
       </>
     )
   },
