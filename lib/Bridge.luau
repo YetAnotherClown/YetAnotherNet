@@ -275,17 +275,23 @@ function Bridge.new(configuration: { any }?)
 	local self = {}
 	setmetatable(self, Bridge)
 
-	self._configuration = configuration
+	self._configuration = configuration or {}
+
+	local channel = self._configuration.Channel or "ReliableUnordered"
+	local event = self._configuration.Event or "default"
+
+	local remoteKey = channel .. "@" .. event
 
 	if RunService:IsServer() then
-		self.remote = Instance.new("RemoteEvent")
+		self.remote = script:FindFirstChild(remoteKey) or Instance.new("RemoteEvent")
+		self.remote.Name = remoteKey
 		self.remote.Parent = script
 
 		self.remote.OnServerEvent:Connect(function(player, package)
 			self:_processIncoming(player, package)
 		end)
 	elseif RunService:IsClient() then
-		self.remote = script:WaitForChild("RemoteEvent")
+		self.remote = script:WaitForChild(remoteKey)
 
 		self.remote.OnClientEvent:Connect(function(package)
 			self:_processIncoming("NET_SERVER", package)
