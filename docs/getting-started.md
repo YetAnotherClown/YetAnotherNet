@@ -46,7 +46,6 @@ local NetLib = require(Net)
 local Net = NetLib.new({
   Channel: "ReliableOrdered"
   Event: "default",
-  Priority: -1
 })
 
 -- Create your identifiers before initializing any netcode

@@ -14,7 +14,6 @@ export type Identifier = Identifier.Identifier
 	@field DebugKey KeyCode -- The key to open the Debug Panel
 	@field Event string -- The event to schedule Net on in your Matter Loop -- Default: "default"
 	@field Middleware (sender, identifier, ...) -> any -- Ran before a packet is queried
-	@field Priority number -- The priority to schedule Net as in your Matter Loop -- Default: -1
 	@field Ratelimit number -- Amount of allowed invocations a frame
 
 	@tag Future Feature
@@ -39,7 +38,6 @@ type Configuration = {
 	DebugKey: Enum.KeyCode?,
 	Event: string?,
 	Middleware: ((any) -> any)?,
-	Priority: number?,
 	Ratelimit: number?,
 }
 
@@ -340,22 +338,15 @@ end
 	the ``Net:start()`` method is the equivalent of scheduling the ``Bridge:step()`` function to run first on the ``RunService.Heartbeat``
 	event.
 
-	To use it outside of any ECS, you could use the following code:
-	```lua
-	RunService.Heartbeat:Connect(function()
-		Net._bridge:step()
-	end)
-	```
-
-	Otherwise, you can use the ``Bridge:step()`` method to integrate it into other ECS libraries.
+	For more information on this, see the [Bridge API](https://yetanotherclown.github.io/Net/api/Bridge)
 ]=]
 
 --[=[
 	@method start
 	@within Net
 	
-	Initializes your Net Server by scheduling it on your Matter Loop.
-	This ensures that your netcode runs first every frame.
+	Initializes your Net Server by adding middleware to your Matter Loop.
+	This ensures that your netcode runs last every frame.
 
 	:::note
 	Please make sure that the event you set in the Configuration, or the default, is the same index you used for your ``RunService.Heartbeat`` event in your ``Loop:begin()`` method.
@@ -365,27 +356,33 @@ end
 	You should have different Net objects for each event in this case.
 	:::
 
-	:::warning
-	The ``start`` method assumes your systems are ordered from ``0`` to ``inf``.
-	If you have any systems that run on a priority below zero, you should either change your system's priority or manually set the priority in the Configuration.
-
-	If your netcode runs after any system, it may cause undesired behavior.
-	:::
-
 	@param loop Loop -- A Matter Loop
 ]=]
 function Net:start(loop: any)
-	local function handleNetworking()
-		self._bridge:step()
-	end
+	local hasSeenEvent = false -- Have we seen the event already
 
-	loop:scheduleSystem({
-		system = handleNetworking,
-		event = self._configuration.Event,
-		priority = self._configuration.Priority or -1,
-	})
+	-- Performs queue tasks after each frame finishes
+	loop:addMiddleware(function(nextFn, eventName)
+		return function()
+			-- Each Net object should run on one event
+			-- Otherwise it may cause undesired behavior
+			if eventName ~= self._configuration.Event then
+				nextFn()
+				return
+			end
 
-	return nil
+			-- Middleware runs before and after each frame,
+			-- We only want it to run after each frame.
+			if hasSeenEvent then
+				self._bridge:step()
+			end
+			hasSeenEvent = not hasSeenEvent
+
+			nextFn()
+		end
+	end)
+
+	return
 end
 
 --[=[
