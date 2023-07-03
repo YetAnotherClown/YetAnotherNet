@@ -10,7 +10,7 @@ and send it through a RemoteEvent at the start of a new frame.
 
 To send data using Net, you can use the ``Net:send()`` method. For example,
 ```lua
-local MyIdentifier = Net.identifier("myIdentifier")
+local MyIdentifier = identifiers.MyIdentifier
 Net:send(MyIdentifier, ...)
 ```
 

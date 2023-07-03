@@ -16,13 +16,13 @@ using the Net library.
 ```lua title="identifiers.luau"
 local Net = require(Net)
 
-local identifiers = {
+local IDENTIFIERS = {
   ["ExampleOne"] = Net.identifier("ExampleOne"),
   ["ExampleTwo"] = Net.identifier("ExampleTwo")
 }
 -- Laid out for strict typing
 
-return identifiers
+return IDENTIFIERS
 ```
 
 And then in the same script you initialize your Matter Systems, you can create a new Net object
@@ -40,10 +40,10 @@ local Matter = require(Matter)
 local World = Matter.World
 local Loop = Matter.Loop
 
-local NetLib = require(Net)
+local Net = require(Net)
 
 -- Create a new Net Server/Client
-local Net = NetLib.new({
+local net = Net.new({
   Channel: "ReliableOrdered"
   Event: "default",
 })
@@ -52,9 +52,9 @@ local Net = NetLib.new({
 local identifiers = require("Identifiers.lua")
 
 local world = World.new()
-local loop = Loop.new(world, Net)
+local loop = Loop.new(world, net)
 
-Net:start(loop) -- Initializes the net, adding it to your loop.
+net:start(loop) -- Initializes the net, adding it to your loop.
 
 local systems = {}
 for _, child in script.systems:GetChildren() do
@@ -82,12 +82,12 @@ local identifiers = require("identifier.luau")
 local ExampleIdentifier = identifiers.ExampleOne
 
 local function exampleSystem(world, net)
-    -- Query through every networking call that frame from Clients
+    -- Query through every networking call that frame on the Server
     for i, player, args... in net:query(ExampleIdentifier) do
         -- Do something
     end
 
-    -- Query through every networking call that frame from the Server
+    -- Query through every networking call that frame on the Client
     for i, args... in net:query(ExampleIdentifier) do
         -- Do something
     end
@@ -113,16 +113,16 @@ Below is a simple example of creating custom scheduling behavior using ``Bridge:
 ```lua
 local RunService = game:GetService("RunService")
 
-local NetLib = require(Net)
+local Net = require(Net)
 
 -- Create a new Net Server/Client
-local Net = NetLib.new()
+local net = NetLib.new()
 
 -- Create your identifiers before initializing any netcode
 local identifiers = require("Identifiers.lua")
 
 RunService.Heartbeat:Connect(function()
-    Net._bridge:step() -- The Bridge:step() method processes the incoming and outgoing queues
+    net._bridge:step() -- The Bridge:step() method processes the incoming and outgoing queues
 end)
 ```
 

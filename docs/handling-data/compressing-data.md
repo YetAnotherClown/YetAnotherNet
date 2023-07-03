@@ -26,7 +26,7 @@ For more technical details on how Identifiers work, Identifiers are stored in a 
 based on the position in which they are being packed. The global table looks something like:
 
 ```lua
-local identifiers = {
+local IDENTIFIERS = {
     [Index] = PackedString
 }
 ```

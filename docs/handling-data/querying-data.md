@@ -16,7 +16,7 @@ specific Types into the ``Net:query()`` method to filter them out.
 
 For example,
 ```lua
-local MyIdentifier = Net.identifier("myIdentifier")
+local MyIdentifier = identifiers.MyIdentifier
 
 for i, sender, args... in Net:query(MyIdentifier) do
     -- Retrieves all packets with the specified identifier
@@ -37,8 +37,8 @@ multiple Identifiers or Players? When a table or tuple of Players, or a tuple of
 the iterator will return the sender and identifier respectfully as neither is known beforehand.
 
 ```lua
-local MyIdentifier = Net.identifier("myIdentifier")
-local MyOtherIdentifier = Net.identifier("myIdentifier")
+local MyIdentifier = identifiers.MyIdentifier
+local MyOtherIdentifier = Identifiers.MyOtherIdentifier
 
 for i, identifier, args... in Net:query(MyIdentifier, MyOtherIdentifier) do
     -- Retrieves all packets of the specified identifiers
