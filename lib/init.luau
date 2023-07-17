@@ -112,10 +112,14 @@ function Net:__iter(filter: (k: number, v: any) -> (number?, any?)?, returnFilte
 
 		local packet = snapshot[i]
 		if packet then
-			return if returnFilter then returnFilter(i, packet.sender, packet.identifier, packet.data) else i,
-				packet.sender,
-				packet.identifier,
-				unpack(packet.data)
+			if returnFilter then
+				return returnFilter(i, packet.sender, packet.identifier, packet.data)
+			else
+				return i,
+					packet.sender,
+					packet.identifier,
+					unpack(packet.data)
+			end
 		end
 
 		return
