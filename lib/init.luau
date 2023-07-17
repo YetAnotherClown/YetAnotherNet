@@ -148,6 +148,10 @@ local parseQueryParams = {
 	end,
 
 	string = function(queryParams: QueryParams, identifier: string)
+		if identifier == "NET_SERVER" then
+			return
+		end
+
 		table.insert(queryParams.identifiers, identifier)
 	end,
 }
