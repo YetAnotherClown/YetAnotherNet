@@ -180,7 +180,12 @@ function Net:query(...: { Players } | Player | Identifier | any)
 	-- Build the iterator function with Filters
 	local iter = self:__iter(function(v)
 		-- Filter Sender
-		if not queryParams.multipleSenders and v.sender and not table.find(queryParams.senders, v.sender) then
+		if
+			not RunService:IsClient()
+			and not queryParams.multipleSenders
+			and v.sender
+			and not table.find(queryParams.senders, v.sender)
+		then
 			return
 		end
 
