@@ -128,6 +128,7 @@ end
 
 -- The varying Parameter Types used for queries
 type QueryParams = {
+	multipleSenders: boolean,
 	senders: { "NET_SERVER" | Player },
 	identifiers: { Identifier },
 }
@@ -139,6 +140,8 @@ local parseQueryParams = {
 	end,
 
 	table = function(queryParams: QueryParams, players: { Player })
+		queryParams.multipleSenders = true
+
 		for _, player in players do
 			table.insert(queryParams.senders, player)
 		end
@@ -163,6 +166,7 @@ local parseQueryParams = {
 ]=]
 function Net:query(...: { Players } | Player | Identifier | any)
 	local queryParams = {
+		multipleSenders = false,
 		senders = {},
 		identifiers = {},
 	} :: QueryParams
@@ -176,7 +180,7 @@ function Net:query(...: { Players } | Player | Identifier | any)
 	-- Build the iterator function with Filters
 	local iter = self:__iter(function(v)
 		-- Filter Sender
-		if not table.find(queryParams.senders, v.sender) then
+		if not queryParams.multipleSenders and v.sender and not table.find(queryParams.senders, v.sender) then
 			return
 		end
 
@@ -205,7 +209,7 @@ function Net:query(...: { Players } | Player | Identifier | any)
         ]]
 
 		-- If not already known, return the sender
-		if #queryParams.senders ~= 1 and not (RunService:IsClient() and #queryParams.senders == 0) then
+		if queryParams.multipleSenders or #queryParams.senders ~= 1 and not (RunService:IsClient() and #queryParams.senders == 0) then
 			table.insert(package, sender)
 		end
 
