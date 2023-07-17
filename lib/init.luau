@@ -205,7 +205,7 @@ function Net:query(...: { Players } | Player | Identifier | any)
         ]]
 
 		-- If not already known, return the sender
-		if #queryParams.senders ~= 1 then
+		if #queryParams.senders ~= 1 and not (RunService:IsClient() and #queryParams.senders == 0) then
 			table.insert(package, sender)
 		end
 
