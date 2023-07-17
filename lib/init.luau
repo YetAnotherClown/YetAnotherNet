@@ -363,7 +363,7 @@ function Net:start(loop: any)
 
 	-- Performs queue tasks after each frame finishes
 	loop:addMiddleware(function(nextFn, eventName)
-		return function()
+		local function networkingMiddleware()
 			-- Each Net object should run on one event
 			-- Otherwise it may cause undesired behavior
 			if eventName ~= self._configuration.Event then
@@ -380,6 +380,8 @@ function Net:start(loop: any)
 
 			nextFn()
 		end
+
+		return networkingMiddleware
 	end)
 
 	return
