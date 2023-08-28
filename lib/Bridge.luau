@@ -142,7 +142,7 @@ function Bridge:_processOutgoingQueue()
 			for _, player in packet.recipient do
 				self:_updateClientPayload(clientPayloads, player, packet, pos)
 			end
-		elseif typeof(packet.recipient) == "Player" then
+		elseif typeof(packet.recipient) == "Instance" and packet.recipient:IsA("Player") then
 			self:_updateClientPayload(clientPayloads, packet.recipient, packet, pos)
 		else
 			self:_addPacketToPayload(serverPayload, packet, pos)
