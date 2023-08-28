@@ -103,6 +103,7 @@ function Net:__iter(filter: (k: number, v: any) -> (number?, any?)?, returnFilte
 				table.insert(filteredSnapshot, v)
 			end
 		end
+
 		snapshot = filteredSnapshot
 	end
 
