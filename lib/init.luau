@@ -375,8 +375,6 @@ end
 	@param loop Loop -- A Matter Loop
 ]=]
 function Net:start(loop: any)
-	local hasSeenEvent = false -- Have we seen the event already
-
 	-- Performs queue tasks after each frame finishes
 	loop:addMiddleware(function(nextFn, eventName)
 		local function networkingMiddleware()
@@ -387,12 +385,8 @@ function Net:start(loop: any)
 				return
 			end
 
-			-- Middleware runs before and after each frame,
-			-- We only want it to run after each frame.
-			if hasSeenEvent then
-				self._bridge:step()
-			end
-			hasSeenEvent = not hasSeenEvent
+			-- Middleware runs before/after each frame,
+			self._bridge:step()
 
 			nextFn()
 		end
