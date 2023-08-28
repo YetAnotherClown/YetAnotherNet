@@ -94,17 +94,18 @@ function Net:__iter(filter: (k: number, v: any) -> (number?, any?)?, returnFilte
 	local snapshot = self._bridge:snapshot()
 	local i = 0
 
-	-- Filters take in a key-value pair, the filter can remove this pair by returning ``k, nil``.
-	if filter then
-		for k, v in snapshot do
-			v = filter(v)
-
-			if v then
-				snapshot[k] = v
-			else
-				table.remove(snapshot, k)
+	-- Filters take in a key-value pair, the filter can remove this pair by not adding it to the filtered_snapshot array.
+	do
+		local filtered_snapshot = {}
+		if filter then
+			for k, v in snapshot do
+				local filtered = filter(v)
+				if filtered then
+					table.insert(filtered_snapshot, v)
+				end
 			end
 		end
+		snapshot = filtered_snapshot
 	end
 
 	return function()
