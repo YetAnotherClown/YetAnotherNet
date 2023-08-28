@@ -35,6 +35,8 @@ loop.
 You should have only one Net object for every loop, though you shouldn't, in most cases, have more than one
 loop.
 
+This same setup should be ran on both the Client and the Server with the same configuration in order to work.
+
 ```lua title="init.server.luau / init.client.luau"
 local Matter = require(Matter)
 local World = Matter.World
