@@ -95,18 +95,16 @@ function Net:__iter(filter: (k: number, v: any) -> (number?, any?)?, returnFilte
 	local i = 0
 
 	-- Filters take in a key-value pair, the filter can remove this pair by not adding it to the filtered_snapshot array.
-	do
-		local filtered_snapshot = {}
-		if filter then
-			for k, v in snapshot do
-				local filtered = filter(v)
-				if filtered then
-					table.insert(filtered_snapshot, v)
-				end
+	local filteredSnapshot = {}
+	if filter then
+		for k, v in snapshot do
+			local filtered = filter(v)
+			if filtered then
+				table.insert(filteredSnapshot, v)
 			end
 		end
-		snapshot = filtered_snapshot
 	end
+	snapshot = filteredSnapshot
 
 	return function()
 		i += 1
