@@ -99,7 +99,7 @@ function Net:__iter(filter: (k: number, v: any) -> (number?, any?)?, returnFilte
 		local filteredSnapshot = {}
 
 		for k, v in snapshot do
-			local filtered = filter(v)
+			local filtered = filter(k, v)
 
 			if filtered then
 				table.insert(filteredSnapshot, v)
@@ -184,7 +184,7 @@ function Net:query(...: { Players } | Player | Identifier | any)
 	end
 
 	-- Build the iterator function with Filters
-	local iter = self:__iter(function(v)
+	local iter = self:__iter(function(_, v)
 		-- Filter Sender
 		if
 			not RunService:IsClient()
