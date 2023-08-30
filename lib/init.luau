@@ -137,7 +137,14 @@ type QueryParams = {
 
 -- Query different Parameter Types
 local parseQueryParams = {
-	Player = function(queryParams: QueryParams, player: Player)
+	Instance = function(queryParams: QueryParams, player: Player)
+		-- Player should be a Player
+		if typeof(player) ~= "Instance" then
+			return
+		elseif not player:IsA("Player") then
+			return
+		end
+		
 		table.insert(queryParams.senders, player)
 	end,
 
