@@ -144,7 +144,7 @@ local parseQueryParams = {
 		elseif not player:IsA("Player") then
 			return
 		end
-		
+
 		table.insert(queryParams.senders, player)
 	end,
 
@@ -152,6 +152,13 @@ local parseQueryParams = {
 		queryParams.multipleSenders = true
 
 		for _, player in players do
+			-- Player should be a Player
+			if typeof(player) ~= "Instance" then
+				continue
+			elseif not player:IsA("Player") then
+				continue
+			end
+
 			table.insert(queryParams.senders, player)
 		end
 	end,
