@@ -204,6 +204,7 @@ function Net:query(...: { Players } | Player | Identifier | any)
 			not RunService:IsClient()
 			and not queryParams.multipleSenders
 			and v.sender
+			and #queryParams.senders > 0
 			and not table.find(queryParams.senders, v.sender)
 		then
 			return
