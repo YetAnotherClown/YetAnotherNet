@@ -71,7 +71,7 @@ end
 
 ```toml
 [dependencies]
-Net = "yetanotherclown/net@0.2.5"
+Net = "yetanotherclown/net@0.3.0"
 ```
 
 ### Building with Rojo

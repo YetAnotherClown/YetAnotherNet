@@ -10,7 +10,7 @@ dependencies = [["TestEZ", "roblox/testez@0.4.1"]]
 [[package]]
 name = "evaera/matter-example"
 version = "0.1.0"
-dependencies = [["Matter", "evaera/matter@0.6.2"], ["Net", "yetanotherclown/net@0.2.5"], ["Plasma", "evaera/plasma@0.4.1"], ["Rewire", "sayhisam1/rewire@0.3.0"]]
+dependencies = [["Matter", "evaera/matter@0.6.2"], ["Net", "yetanotherclown/net@0.3.0"], ["Plasma", "evaera/plasma@0.4.1"], ["Rewire", "sayhisam1/rewire@0.3.0"]]
 
 [[package]]
 name = "evaera/plasma"
@@ -29,5 +29,5 @@ dependencies = []
 
 [[package]]
 name = "yetanotherclown/net"
-version = "0.2.5"
+version = "0.3.0"
 dependencies = []
