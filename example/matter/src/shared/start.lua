@@ -28,7 +28,7 @@ local function start(containers)
 	-- Set up Networking
 
 	local net = Net.new({
-		Channel = "UnreliableOrdered",
+		Channel = "Reliable",
 		Event = "default",
 	})
 

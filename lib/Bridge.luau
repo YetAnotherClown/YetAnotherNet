@@ -59,10 +59,7 @@ Bridge._outgoingQueue = {} :: OutgoingQueue
     It is structured in a way to minimize overhead when calling RemoteEvents.
 
     By default, each queue will be ordered. This is a design choice in order to promote
-    predictable and data-driven networking. To make the queue unordered, set the ``Channel``
-    to ``ReliableUnordered`` in the Configuration.
-
-    As of v0.1.0, the ``ReliableUnordered`` Channel is not implemented.
+    predictable and data-driven networking.
 ]=]
 
 -- Packages a Packet to go into a Server Payload
@@ -74,25 +71,13 @@ function Bridge:_addPacketToPayload(
 		identifier: string,
 		recipient: { Player } | Player | "NET_SERVER",
 		data: { any },
-	},
-	pos
+	}
 )
 	if not payload[packet.identifier] then
 		payload[packet.identifier] = {}
 	end
 
 	local data = {}
-
-	-- Implement ReliableOrdered Channel for precise ordering
-	if self._configuration and self._configuration.Channel == "ReliableOrdered" then
-		-- Prevent unsigned overflow
-		if pos < 0 or pos > 65535 then
-			pos = 0
-		end
-
-		-- Store the queue position
-		table.insert(data, string.pack("H", pos)) -- Limit: 65535
-	end
 
 	for _, value in packet.data do
 		table.insert(data, value)
@@ -176,20 +161,8 @@ function Bridge:_processIncoming(
 )
 	-- Unpack each packet and add it to the queue
 	for identifier, packets in payload do
-		for _, rawData in packets do
+		for _, data in packets do
 			local pos = #self._incomingQueue + 1
-			local data = {}
-
-			-- Implement ReliableOrdered Channel
-			if self._configuration and self._configuration.Channel == "ReliableOrdered" then
-				pos = string.unpack("H", rawData[1]) -- Limit: 65535
-
-				for i = 2, #rawData do
-					table.insert(data, rawData[i])
-				end
-			else
-				data = rawData -- No extra arguments stored
-			end
 
 			local packet = {
 				identifier = identifier,
@@ -277,7 +250,7 @@ function Bridge.new(configuration: { any }?)
 
 	self._configuration = configuration or {}
 
-	local channel = self._configuration.Channel or "ReliableUnordered"
+	local channel = self._configuration.Channel or "Reliable"
 	local event = self._configuration.Event or "default"
 
 	local remoteKey = channel .. "@" .. event

@@ -9,7 +9,7 @@ export type Identifier = Identifier.Identifier
 --[=[
 	@interface Configuration
 	@within Net
-	@field Channel "ReliableOrdered" | "ReliableUnordered" | "Unreliable" -- Default: ReliableUnordered
+	@field Channel "Reliable" | "Unreliable" -- Default: Reliable
 	@field DebugMode boolean -- Enable Debug Features?
 	@field DebugKey KeyCode -- The key to open the Debug Panel
 	@field Event string -- The event to schedule Net on in your Matter Loop -- Default: "default"
@@ -24,16 +24,12 @@ export type Identifier = Identifier.Identifier
 
 	### Channel
 
-	**ReliableOrdered**: Ensures the order in which Packets were sent at the cost of a few bytes. It is not recommended
-	that this is used. In most cases, ``ReliableUnordered`` should work.
-
-	**ReliableUnordered**: Does not ensure the order in which Packets are sent. However, Packets will be ordered properly
-	per Identifier only. This should work in most cases and does not have any overhead.
+	**Reliable**: All packets will be sent and received per frame in order.
 
 	**Unreliable**: Anticipated feature that Roblox may add, this is here for planning and is not yet available.
 ]=]
 type Configuration = {
-	Channel: ("ReliableOrdered" | "ReliableUnordered" | "Unreliable")?,
+	Channel: ("Reliable" | "Unreliable")?,
 	DebugMode: boolean?,
 	DebugKey: Enum.KeyCode?,
 	Event: string?,
