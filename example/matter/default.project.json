@@ -1,0 +1,51 @@
+{
+  "name": "AttackOfTheKillerRoombas",
+  "tree": {
+    "$className": "DataModel",
+    "Workspace": {
+      "$className": "Workspace",
+      "Terrain": {
+        "$path": "example/assets/terrain.rbxm"
+      },
+      "Level": {
+        "$path": "example/assets/level.rbxm"
+      }
+    },
+    "Lighting": {
+      "$className": "Lighting",
+      "$path": "example/assets/lighting.rbxm"
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "Game": {
+        "$path": "example/src/server"
+      }
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+
+      "Assets": {
+        "$path": "example/assets/assets.rbxm"
+      },
+      "Packages": {
+        "$className": "Folder",
+        "$path": "example/Packages"
+      },
+      "Shared": {
+        "$path": "example/src/shared"
+      },
+      "Client": {
+        "$path": "example/src/client"
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "Game": {
+          "$path": "example/src/game.client.lua"
+        }
+      }
+    }
+  }
+}

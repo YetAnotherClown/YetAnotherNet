@@ -1,0 +1,11 @@
+[package]
+name = "evaera/matter-example"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+Matter = "evaera/matter@0.6.2"
+Plasma = "evaera/plasma@0.4.1"
+Rewire = "sayhisam1/rewire@0.3.0"
+Net = "yetanotherclown/net@0.2.5"
