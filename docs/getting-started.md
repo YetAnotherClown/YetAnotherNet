@@ -52,7 +52,7 @@ local Net = require(Net)
 
 -- Create a new Net Server/Client
 local net = Net.new({
-  Channel: "ReliableOrdered"
+  Channel: "UnreliableOrdered"
   Event: "default",
 })
 
