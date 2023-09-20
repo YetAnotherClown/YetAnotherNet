@@ -8,8 +8,8 @@
 See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started."><meta data-rh="true" property="og:description" content="A Networking Library, inspired by BridgeNet2 &amp; Bevy_Renet, made for ECS.
 
 See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started."><link data-rh="true" rel="canonical" href="https://YetAnotherClown.github.io/Net/api/Net"><link data-rh="true" rel="alternate" href="https://YetAnotherClown.github.io/Net/api/Net" hreflang="en"><link data-rh="true" rel="alternate" href="https://YetAnotherClown.github.io/Net/api/Net" hreflang="x-default"><link rel="stylesheet" href="/Net/assets/css/styles.20a3284f.css">
-<link rel="preload" href="/Net/assets/js/runtime~main.33365cec.js" as="script">
-<link rel="preload" href="/Net/assets/js/main.4cffaaef.js" as="script">
+<link rel="preload" href="/Net/assets/js/runtime~main.19f14f04.js" as="script">
+<link rel="preload" href="/Net/assets/js/main.a952e442.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -44,7 +44,7 @@ See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started
   per Identifier only. This should work in most cases and does not have any overhead.
 </p>
 <p><strong>Unreliable</strong>: Anticipated feature that Roblox may add, this is here for planning and is not yet available.</p>
-</div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/YetAnotherClown/Net/blob/main/lib/init.luau#L421"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Net<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>configuration<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/Net/api/Net#Configuration">Configuration?</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/YetAnotherClown/Net/blob/main/lib/init.luau#L432"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Net<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>configuration<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/Net/api/Net#Configuration">Configuration?</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Creates a new Net object with unique configuration.</p>
 <div class="admonition admonition-warning alert alert--danger">
   <div class="admonition-heading">
@@ -60,17 +60,17 @@ See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started
     </p>
   </div>
 </div>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="query"><code style="text-decoration:none">query</code><a href="#query" class="hash-link" aria-label="Direct link to query" title="Direct link to query">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/YetAnotherClown/Net/blob/main/lib/init.luau#L171"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Net<!-- -->:</code><code class="green_DgR4">query</code><code>(</code><code>) → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code>pos<!-- -->: </code><code class="blue_P4bS">number</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>sender<!-- -->: </code><code class="green_DgR4">(</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Player" target="_blank" rel="noopener noreferrer">Player<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="blue_P4bS">string</code><code class="green_DgR4">)</code><code class="blue_P4bS">?</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>identifier<!-- -->: </code><code class="green_DgR4">(</code><code class="blue_P4bS">string</code><code class="green_DgR4">)</code><code class="blue_P4bS">?</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>packetData<!-- -->: </code><code class="blue_P4bS">any...</code></div><code class="purple_ieR2">)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="query"><code style="text-decoration:none">query</code><a href="#query" class="hash-link" aria-label="Direct link to query" title="Direct link to query">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/YetAnotherClown/Net/blob/main/lib/init.luau#L187"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Net<!-- -->:</code><code class="green_DgR4">query</code><code>(</code><code>) → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code>pos<!-- -->: </code><code class="blue_P4bS">number</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>sender<!-- -->: </code><code class="green_DgR4">(</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Player" target="_blank" rel="noopener noreferrer">Player<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="blue_P4bS">string</code><code class="green_DgR4">)</code><code class="blue_P4bS">?</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>identifier<!-- -->: </code><code class="green_DgR4">(</code><code class="blue_P4bS">string</code><code class="green_DgR4">)</code><code class="blue_P4bS">?</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>packetData<!-- -->: </code><code class="blue_P4bS">any...</code></div><code class="purple_ieR2">)</code></div><div>
 <p>
   Allows for iteration of all packets of the previous frame with support for QueryParameters.
   QueryParameters can be <code>Player</code>, <code>{Players}</code>, or <code>Identifier</code>.
   When provided, related return values will not be returned.
 </p>
 <p>See <a href="https://yetanotherclown.github.io/Net/docs/querying-data" target="_blank">Querying Data</a> for more information.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="send"><code style="text-decoration:none">send</code><a href="#send" class="hash-link" aria-label="Direct link to send" title="Direct link to send">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/YetAnotherClown/Net/blob/main/lib/init.luau#L314"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Net<!-- -->:</code><code class="green_DgR4">send</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="send"><code style="text-decoration:none">send</code><a href="#send" class="hash-link" aria-label="Direct link to send" title="Direct link to send">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/YetAnotherClown/Net/blob/main/lib/init.luau#L331"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Net<!-- -->:</code><code class="green_DgR4">send</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Sends data to a recipient or the server if not specified under a unique identifier.</p>
 <p>See <a href="https://yetanotherclown.github.io/Net/docs/sending-data" target="_blank">Sending Data</a> for more information.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="start"><code style="text-decoration:none">start</code><a href="#start" class="hash-link" aria-label="Direct link to start" title="Direct link to start">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/YetAnotherClown/Net/blob/main/lib/init.luau#L378"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Net<!-- -->:</code><code class="green_DgR4">start</code><code>(</code><div class="inset_uKQm"><div><code>loop<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/Net/api/Loop">Loop</a></code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="start"><code style="text-decoration:none">start</code><a href="#start" class="hash-link" aria-label="Direct link to start" title="Direct link to start">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/YetAnotherClown/Net/blob/main/lib/init.luau#L395"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Net<!-- -->:</code><code class="green_DgR4">start</code><code>(</code><div class="inset_uKQm"><div><code>loop<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/Net/api/Loop">Loop</a></code><span class="inlineDescription_G7Er">-- <span>
 <p>A Matter Loop</p>
 </span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
@@ -126,7 +126,7 @@ See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 171,
+                &quot;line&quot;: 187,
                 &quot;path&quot;: &quot;lib/init.luau&quot;
             }
         },
@@ -137,7 +137,7 @@ See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 314,
+                &quot;line&quot;: 331,
                 &quot;path&quot;: &quot;lib/init.luau&quot;
             }
         },
@@ -154,7 +154,7 @@ See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 378,
+                &quot;line&quot;: 395,
                 &quot;path&quot;: &quot;lib/init.luau&quot;
             }
         },
@@ -171,7 +171,7 @@ See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 421,
+                &quot;line&quot;: 432,
                 &quot;path&quot;: &quot;lib/init.luau&quot;
             }
         }
@@ -229,7 +229,7 @@ See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started
         &quot;path&quot;: &quot;lib/init.luau&quot;
     }
 }</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a><ul><li><a href="#Configuration" class="table-of-contents__link toc-highlight">Configuration</a></li></ul></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#query" class="table-of-contents__link toc-highlight">:query</a></li><li><a href="#send" class="table-of-contents__link toc-highlight">:send</a></li><li><a href="#start" class="table-of-contents__link toc-highlight">:start</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="col footer__col"><div class="footer__title">Links</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://discord.gg/gMWmuaZEY6" target="_blank" rel="noopener noreferrer" class="footer__link-item">Clown&#x27;s Circus Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li><li class="footer__item"><a href="https://github.com/YetAnotherClown" target="_blank" rel="noopener noreferrer" class="footer__link-item">YetAnotherClown on Github<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2023 YetAnotherClown. Built with Moonwave and Docusaurus</div></div></div></footer></div>
-<script src="/Net/assets/js/runtime~main.33365cec.js"></script>
-<script src="/Net/assets/js/main.4cffaaef.js"></script>
+<script src="/Net/assets/js/runtime~main.19f14f04.js"></script>
+<script src="/Net/assets/js/main.a952e442.js"></script>
 </body>
 </html>
