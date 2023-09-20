@@ -4,6 +4,12 @@ sidebar_position: 2
 
 # Getting Started
 
+:::tip
+Check out the adapted version of the Matter Example game to see how it's used in a real game.
+
+See all of Net's [example projects](https://github.com/YetAnotherClown/Net/tree/main/examples) in the repository.
+:::
+
 ### Setting up with Matter
 
 Being made for the Matter ECS, Net provides a simple method for scheduling the Netcode to run
