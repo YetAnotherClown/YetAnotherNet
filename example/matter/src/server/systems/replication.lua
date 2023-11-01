@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Components = require(ReplicatedStorage.Shared.components)
+local Identifiers = require(ReplicatedStorage.Shared.identifiers)
 local useEvent = require(ReplicatedStorage.Packages.Matter).useEvent
-local identifiers = require(ReplicatedStorage.Shared.identifiers)
 
 local REPLICATED_COMPONENTS = {
 	"Roomba",
@@ -35,7 +35,7 @@ local function replication(world, _state, _ui, net)
 		end
 
 		print("Sending initial payload to", player)
-		net:send(player, identifiers.Replication, payload)
+		net:send(player, Identifiers.Replication, payload)
 	end
 
 	local changes = {}
@@ -56,7 +56,7 @@ local function replication(world, _state, _ui, net)
 	end
 
 	if next(changes) then
-		net:send(Players:GetPlayers(), identifiers.Replication, changes)
+		net:send(Players:GetPlayers(), Identifiers.Replication, changes)
 	end
 end
 
