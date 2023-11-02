@@ -32,8 +32,8 @@ return IDENTIFIERS
 ```
 
 And then in the same script you initialize your Matter Systems, you can create a new Net object
-with unique configuration by using the ``Net.new()`` function. For example, you can change the Event and
-the Priority the Net System is ran on in Configuration with the ``Event`` and ``Priority`` Parameters.
+with unique configuration by using the ``Net.new()`` function. For example, you can change the Event
+the Matter middleware for Net runs on in Configuration with the ``Event`` parameter.
 
 In order to use Net with Matter you must also use the ``Net:start()`` method and pass in your Matter
 loop.

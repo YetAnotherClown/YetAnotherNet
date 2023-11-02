@@ -18,7 +18,7 @@ export type Identifier = Identifier.Identifier
 
 	@tag Future Feature
 
-	As of v0.2.0, the only two configuration parameters that are implemented are Event and Priority.
+	As of v0.2.0, the only configuration parameter that is implemented is Event.
 	All other parameters will be implemented at a later date. With the exception of Middleware & Ratelimiting,
 	most of these parameters should not change and remain stable API.
 
