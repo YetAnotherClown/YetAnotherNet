@@ -1,6 +1,10 @@
 {
-    "name": "Net",
-    "tree": {
-      "$path": "lib"
+  "name": "net",
+  "tree": {
+    "$path": "lib",
+    "Remotes": {
+      "$className": "Folder",
+      "$ignoreUnknownInstances": true
     }
   }
+}

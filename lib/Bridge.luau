@@ -256,9 +256,9 @@ function Bridge.new(configuration: { any }?)
 	local remoteKey = channel .. "@" .. event
 
 	if RunService:IsServer() then
-		self.remote = script:FindFirstChild(remoteKey) or Instance.new("RemoteEvent")
+		self.remote = script.Parent.Remotes:FindFirstChild(remoteKey) or Instance.new("RemoteEvent")
 		self.remote.Name = remoteKey
-		self.remote.Parent = script
+		self.remote.Parent = script.Parent.Remotes
 
 		local function processIncoming(player, package)
 			self:_processIncoming(player, package)
@@ -266,7 +266,7 @@ function Bridge.new(configuration: { any }?)
 
 		self.remote.OnServerEvent:Connect(processIncoming)
 	elseif RunService:IsClient() then
-		self.remote = script:WaitForChild(remoteKey)
+		self.remote = script.Parent.Remotes:WaitForChild(remoteKey)
 
 		local function processIncoming(package)
 			self:_processIncoming("NET_SERVER", package)
