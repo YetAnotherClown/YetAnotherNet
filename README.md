@@ -43,17 +43,17 @@ obvious to create and use a Data-Driven Networking Library as opposed to a Event
 
 In a [Matter](https://github.com/evaera/matter) System:
 ```lua
-local identifiers = require("identifier.luau")
-local ExampleIdentifier = identifiers.ExampleOne
+local Identifiers = require("identifiers.luau")
+local ExampleIdentifier = Identifiers.ExampleOne
 
 local function exampleSystem(world, net)
-    -- Query through every networking call that frame from Clients
-    for i, player, args... in net:query(ExampleIdentifier) do
+    -- Query through every networking call that frame on the Server
+    for i, player, identifier, ...data in net:query(ExampleIdentifier) do
         -- Do something
     end
 
-    -- Query through every networking call that frame from the Server
-    for i, args... in net:query(ExampleIdentifier) do
+    -- Query through every networking call that frame on the Client
+    for i, _, identifier, ...data in net:query(ExampleIdentifier) do
         -- Do something
     end
 
@@ -61,7 +61,7 @@ local function exampleSystem(world, net)
     net:send(ExampleIdentifier, ...)
 
     -- Send data to a Client from the Server
-    net:send(Player, ExampleIdentifier, ...)
+    net:send(ExampleIdentifier, ...):to(Player)
 end
 ```
 
@@ -73,6 +73,8 @@ end
 [dependencies]
 Net = "yetanotherclown/net@0.4.0"
 ```
+
+Note: Wally does not export types automatically, if you wish to use Strict Typing with Net, install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman.
 
 ### Building with Rojo
 
@@ -86,13 +88,14 @@ For more help, check out [the Rojo documentation](https://rojo.space/docs).
 ## Todo for 1.0.0
 
 - [x] Basic Functionality
-- [x] Filter useless returns in query results (e.g. `player` when doing ``Net:query(Player)``, `sender` when doing ``Net:query(Net.Server)``, `identifier` when doing ``Net:query(identifier)``.) We already know what these values are, as we are querying for those specific items.
 - [x] Stable Core API
-- [x] Compress `Identifier` strings
-- [ ] Rate limiting for `Net` or `Identifier`
+- [x] Strict Typing
+- [ ] Void ``sender`` return argument when querying on the Client, with respect for Strict Typing
+- [ ] Rate limiting
 - [ ] Middleware
 - [ ] Debugger
 
 ## Planned Features
 
-- [ ] Unreliable Channel -- For if when Roblox as unreliable remotes
+- [ ] Unreliable Channel -- When released on Roblox
+- [ ] Internal Use of Buffers -- When released on Roblox
