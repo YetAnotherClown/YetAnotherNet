@@ -38,6 +38,25 @@ type Configuration = {
 	Ratelimit: number?,
 }
 
+export type NetImpl = {
+	Server: "NET_SERVER",
+
+	_bridge: Bridge.Bridge,
+	_configuration: Configuration,
+
+	__index: NetImpl,
+	__iter: (self: Net) -> QueryResult,
+
+	query: (self: Net, ...string) -> QueryResult,
+	send: (self: Net, identifier: string, ...any) -> Bridge.SendRequest?,
+	start: (self: Net, loop: any) -> (),
+
+	identifier: (index: string) -> Identifier,
+	new: (configuration: Configuration) -> Net,
+}
+
+export type Net = typeof(setmetatable({}, {} :: NetImpl))
+
 --[=[
 	@class Net
 
@@ -45,11 +64,41 @@ type Configuration = {
 
 	See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started.
 ]=]
-local Net = {}
+local Net: NetImpl = {} :: NetImpl
 Net.__index = Net
 
-Net._bridge = {} :: Bridge
 Net.Server = "NET_SERVER"
+
+export type QueryResultImpl = {
+	_snapshot: {
+		{
+			identifier: string,
+			sender: Player | "NET_SERVER",
+			data: { any },
+		}
+	},
+	_identifiers: { string },
+	_senders: { Player | "NET_SERVER" },
+
+	__index: QueryResultImpl,
+	__iter: (self: QueryResult) -> () -> (number?, Player? | string?, string?, ...any),
+	from: (self: QueryResult, ...(Player | "NET_SERVER")) -> QueryResult,
+	of: (self: QueryResult, ...string) -> QueryResult,
+
+	new: (
+		snapshot: {
+			{
+				identifier: string,
+				sender: Player | "NET_SERVER",
+				data: { any },
+			}
+		},
+		identifiers: { string? }?,
+		senders: { { Player } | Player | "NET_SERVER" }?
+	) -> QueryResult,
+}
+
+export type QueryResult = typeof(setmetatable({}, {} :: QueryResultImpl))
 
 --[=[
 	@class QueryResult
@@ -182,37 +231,6 @@ function QueryResult.new(snapshot, identifiers, senders): QueryResult
 	}, QueryResult)
 end
 
-export type QueryResultImpl = {
-	_snapshot: {
-		{
-			identifier: string,
-			sender: Player | "NET_SERVER",
-			data: { any },
-		}
-	},
-	_identifiers: { string },
-	_senders: { Player | "NET_SERVER" },
-
-	__index: QueryResultImpl,
-	__iter: (self: QueryResult) -> () -> (number?, Player? | string?, string?, ...any),
-	from: (self: QueryResult, ...(Player | "NET_SERVER")) -> QueryResult,
-	of: (self: QueryResult, ...string) -> QueryResult,
-
-	new: (
-		snapshot: {
-			{
-				identifier: string,
-				sender: Player | "NET_SERVER",
-				data: { any },
-			}
-		},
-		identifiers: { string? }?,
-		senders: { { Player } | Player | "NET_SERVER" }?
-	) -> QueryResult,
-}
-
-export type QueryResult = typeof(setmetatable({}, QueryResult))
-
 --[=[
 	@method __iter
 	@within Net
@@ -258,7 +276,7 @@ end
 
 	See [Sending Data](https://yetanotherclown.github.io/Net/docs/sending-data) for more information.
 ]=]
-function Net:send(identifier: string, ...: any): Bridge.SendRequest
+function Net:send(identifier: string, ...: any): Bridge.SendRequest?
 	return self._bridge:send(
 		RunService:IsClient() and Net.Server or Players:GetPlayers(), -- Recipients
 		identifier, -- Identifier
@@ -346,7 +364,5 @@ function Net.new(configuration: Configuration?)
 
 	return self
 end
-
-export type Net = typeof(Net.new())
 
 return Net

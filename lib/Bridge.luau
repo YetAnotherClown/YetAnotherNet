@@ -1,5 +1,34 @@
 local RunService = game:GetService("RunService")
 
+export type BridgeImpl = {
+	remote: RemoteEvent,
+
+	_configuration: { [string]: any },
+	_outgoingQueue: OutgoingQueue,
+	_incomingQueue: IncomingQueue,
+	_snapshot: IncomingQueue,
+
+	__index: BridgeImpl,
+
+	_addPacketToPayload: (self: Bridge, { [string]: any }, Packet) -> (),
+	_updateClientPayload: (
+		self: Bridge,
+		clientPackages: { [Player]: { [string]: any } },
+		player: Player,
+		packet: Packet
+	) -> (),
+	_processOutgoingQueue: (self: Bridge) -> (),
+	_processIncoming: (self: Bridge, sender: Player | "NET_SERVER", payload: Payload) -> (),
+
+	step: (self: Bridge) -> (),
+	snapshot: (self: Bridge) -> IncomingQueue,
+	send: (self: Bridge, recipient: Recipient, identifier: string, ...any) -> SendRequest?,
+
+	new: ({ [string]: any }?) -> Bridge,
+}
+
+export type Bridge = typeof(setmetatable({}, {} :: BridgeImpl))
+
 --[=[
 	@class Bridge
 	@private
@@ -9,17 +38,19 @@ local RunService = game:GetService("RunService")
 	The following API can be used by Advanced Users if they wish to not use the ``Net:start()`` method
 	or to bypass the ``Bridge:step()`` method in favor of custom behavior.
 ]=]
-local Bridge = {}
+local Bridge: BridgeImpl = {} :: BridgeImpl
 Bridge.__index = Bridge
 
--- A queue of Packets to send next frame
-type OutgoingQueue = {
-	{
-		identifier: string,
-		recipient: Player | "NET_SERVER",
-		data: { any },
-	}
+type Recipient = { Player } | Player | "NET_SERVER"
+
+type Packet = {
+	identifier: string,
+	recipient: Recipient,
+	data: { any },
 }
+
+-- A queue of Packets to send next frame
+type OutgoingQueue = { Packet }
 
 -- A queue of Packets received on the current frame
 type IncomingQueue = {
@@ -29,11 +60,6 @@ type IncomingQueue = {
 		data: { any },
 	}
 }
-
-Bridge._incomingQueue = {} :: IncomingQueue
-Bridge._snapshot = {} :: IncomingQueue
-
-Bridge._outgoingQueue = {} :: OutgoingQueue
 
 --[=[
 	@interface orderedPayload
@@ -63,16 +89,7 @@ Bridge._outgoingQueue = {} :: OutgoingQueue
 ]=]
 
 -- Packages a Packet to go into a Server Payload
-function Bridge:_addPacketToPayload(
-	payload: {
-		[string]: { { any } },
-	},
-	packet: {
-		identifier: string,
-		recipient: { Player } | Player | "NET_SERVER",
-		data: { any },
-	}
-)
+function Bridge:_addPacketToPayload(payload: { [string]: any }, packet: Packet)
 	if not payload[packet.identifier] then
 		payload[packet.identifier] = {}
 	end
@@ -84,16 +101,24 @@ function Bridge:_addPacketToPayload(
 	end
 
 	table.insert(payload[packet.identifier], data)
+
+	return
 end
 
 -- Packages a Packet to go into a Client Payload
-function Bridge:_updateClientPayload(clientPackages, player, packet, pos)
+function Bridge:_updateClientPayload(clientPackages: { [Player]: { [string]: any } }, player: Player, packet: Packet)
 	if not clientPackages[player] then
 		clientPackages[player] = {}
 	end
 
-	self:_addPacketToPayload(clientPackages[player], packet, pos)
+	self:_addPacketToPayload(clientPackages[player], packet)
+
+	return
 end
+
+type Payload = {
+	[string]: { { any } },
+}
 
 --[=[
 	@method _processOutgoingQueue
@@ -102,35 +127,31 @@ end
 	Sends all queued outgoing packets over the Remote.
 ]=]
 function Bridge:_processOutgoingQueue()
-	local serverPayload = {} :: {
-		[string]: { { any } },
-	}
+	local serverPayload = {} :: Payload
 	local clientPayloads = {} :: {
-		[Player]: {
-			[string]: { { any } },
-		},
+		[Player]: Payload,
 	}
 	local snapshot = self._outgoingQueue
 	self._outgoingQueue = {}
 
 	-- Add each packet to it's respective payload
-	for pos, packet in
+	for _, packet in
 		snapshot :: {
 			{
 				identifier: string,
-				recipient: { Player } | Player | "NET_SERVER",
+				recipient: Recipient,
 				data: { any },
 			}
 		}
 	do
 		if typeof(packet.recipient) == "table" then
 			for _, player in packet.recipient do
-				self:_updateClientPayload(clientPayloads, player, packet, pos)
+				self:_updateClientPayload(clientPayloads, player, packet)
 			end
 		elseif typeof(packet.recipient) == "Instance" and packet.recipient:IsA("Player") then
-			self:_updateClientPayload(clientPayloads, packet.recipient, packet, pos)
+			self:_updateClientPayload(clientPayloads, packet.recipient, packet)
 		else
-			self:_addPacketToPayload(serverPayload, packet, pos)
+			self:_addPacketToPayload(serverPayload, packet)
 		end
 	end
 
@@ -153,12 +174,7 @@ end
 	@param sender Player | "NET_SERVER"
 	@param payload Payload
 ]=]
-function Bridge:_processIncoming(
-	sender,
-	payload: {
-		[string]: { { any } },
-	}
-)
+function Bridge:_processIncoming(sender: Player | "NET_SERVER", payload: Payload)
 	-- Unpack each packet and add it to the queue
 	for identifier, packets in payload do
 		for _, data in packets do
@@ -200,6 +216,18 @@ function Bridge:snapshot()
 	return table.clone(self._snapshot)
 end
 
+export type SendRequestImpl = {
+	_outgoingQueue: OutgoingQueue,
+	_bridge: Bridge,
+	_position: number,
+
+	__index: SendRequestImpl,
+
+	to: (self: SendRequest, recipient: Recipient) -> (),
+}
+
+export type SendRequest = typeof(setmetatable({}, {} :: SendRequestImpl))
+
 --[=[
 	@class SendRequest
 	@since v0.4.0
@@ -217,7 +245,7 @@ SendRequest.__index = SendRequest
 
 	@param recipient { Player } | Player | "NET_SERVER"
 ]=]
-function SendRequest:to(recipient: { Player } | Player | "NET_SERVER")
+function SendRequest:to(recipient: Recipient)
 	if RunService:IsClient() then
 		warn("You should not use the SendRequest:to() method on the Client")
 		return
@@ -239,29 +267,7 @@ function SendRequest:to(recipient: { Player } | Player | "NET_SERVER")
 	return
 end
 
-export type SendRequestImpl = {
-	_outgoingQueue: OutgoingQueue,
-	_bridge: Bridge,
-	_position: number,
-
-	__index: SendRequestImpl,
-
-	to: (self: SendRequest, recipient: { Player } | Player | "NET_SERVER") -> nil,
-}
-
-export type SendRequest = typeof(setmetatable({}, SendRequest))
-
---[=[
-	@method send
-	@within Bridge
-
-	Queue a packet to be sent in the outgoing queue.
-
-	Returns a [SendRequest] which allows for the specification of the recipient(s).
-
-	@return SendRequest
-]=]
-function Bridge:send(recipient, identifier, data)
+function Bridge:send(recipient, identifier, data): SendRequest?
 	-- Typecheck recipients
 	if RunService:IsClient() then
 		if recipient ~= "NET_SERVER" then
@@ -292,26 +298,41 @@ function Bridge:send(recipient, identifier, data)
 		return
 	end
 
+	if typeof(recipient) == "string" and recipient ~= "NET_SERVER" then
+		return
+	end
+
 	table.insert(self._outgoingQueue, {
 		identifier = identifier,
 		recipient = recipient,
 		data = data,
 	})
 
-	return setmetatable({
+	local sendRequest = {
 		_position = #self._outgoingQueue,
 		_bridge = self,
-	}, SendRequest) :: SendRequest
+	}
+	setmetatable(sendRequest, SendRequest)
+
+	return sendRequest :: SendRequest
 end
 
-function Bridge.new(configuration: { any }?)
+function Bridge.new(configuration: any?)
 	local self = {}
 	setmetatable(self, Bridge)
 
-	self._configuration = configuration or {}
+	self._incomingQueue = {} :: IncomingQueue
+	self._snapshot = {} :: IncomingQueue
 
-	local channel = self._configuration.Channel or "Reliable"
-	local event = self._configuration.Event or "default"
+	self._outgoingQueue = {} :: OutgoingQueue
+
+	self._configuration = configuration or {
+		Channel = "Reliable",
+		Event = "default",
+	}
+
+	local channel = self._configuration.Channel
+	local event = self._configuration.Event
 
 	local remoteKey = channel .. "@" .. event
 
@@ -337,7 +358,5 @@ function Bridge.new(configuration: { any }?)
 
 	return self
 end
-
-export type Bridge = typeof(Bridge.new())
 
 return Bridge
