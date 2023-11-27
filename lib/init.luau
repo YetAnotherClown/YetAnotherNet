@@ -51,204 +51,198 @@ Net._bridge = {} :: Bridge
 Net.Server = "NET_SERVER"
 
 --[=[
+	@class QueryResult
+	@since v0.4.0
+
+	An iterable object returned as the result of [Net:query] that can filter snapshots
+	by Identifiers and Senders.
+
+	See [Querying Data](https://yetanotherclown.github.io/Net/docs/querying-data) for more information.
+]=]
+local QueryResult: QueryResultImpl = {} :: QueryResultImpl
+QueryResult.__index = QueryResult
+
+--[=[
+	@method __iter
+	@within QueryResult
+	
+	Iterating over a QueryResult will return the Packets in it's Snapshot that
+	match the supplied Identifiers from [Net:query] and the supplied Senders
+	from [QueryResult:from].
+
+	Usage:
+	```lua
+	for pos, sender, identifier, ... in net:query(...identifiers):from(...senders) do
+		-- Do something
+	end
+	```
+
+	@return number
+	@return Player | string
+	@return string
+	@return ...any
+]=]
+function QueryResult:__iter()
+	local senders = self._senders
+	local identifiers = self._identifiers
+
+	local snapshot = self._snapshot
+	local i = 1
+
+	local function iterator(): (number?, (Player | string)?, string?, ...any)
+		local packet = snapshot[i]
+		if not packet then
+			return
+		end
+
+		-- Return all packets if no Identifiers are supplied, or filter by Identifiers
+		local filterIdentifiers = #identifiers > 0
+		local isIdentifierAllowed = filterIdentifiers and table.find(identifiers, packet.identifier) or true
+
+		-- Return all packets if no Senders are supplied, or filter by Senders
+		local filterSenders = #senders > 0
+		local isSenderAllowed = not filterSenders and table.find(senders, packet.sender) or true
+
+		-- Don't return packet if filtered
+		if not isIdentifierAllowed or not isSenderAllowed then
+			return
+		end
+
+		-- Tick for next packet
+		i += 1
+
+		return i, packet.sender, packet.identifier, unpack(packet.data)
+	end
+
+	return iterator
+end
+
+--[=[
+	@method from
+	@within QueryResult
+	
+	Filters Packets from the QueryResult's Snapshot based on the provided Senders.
+
+	@param senders ...sender -- The Senders to filter
+	@return QueryResult
+]=]
+function QueryResult:from(...)
+	local senders = {} :: { { Player } | Player | "NET_SERVER" }
+
+	local params = { ... }
+	for _, param in params do
+		if typeof(param) == "table" then
+			for _, player in param do
+				table.insert(senders, player)
+			end
+
+			continue
+		end
+
+		table.insert(senders, param)
+	end
+	return self.new(self._snapshot, self._identifiers, senders)
+end
+
+--[=[
+	@method of
+	@within QueryResult
+	@private
+
+	:::caution
+		This method may change in later versions, it is advised you only supply Identifiers
+		by using [Net:query] and avoid using this method.
+	:::
+	
+	Filters Packets from the QueryResult's Snapshot based on the provided Identifiers.
+
+	@param identifiers ...identifier -- The Identifiers to filter
+	@return QueryResult
+]=]
+function QueryResult:of(...: string)
+	return self.new(self._snapshot, { ... }, self._senders)
+end
+
+--[=[
+	@function new
+	@within QueryResult
+	@private
+
+	Creates a new QueryResult with the supplied Snapshot.
+
+	@param snapshot { identifier: string, sender: Player | "NET_SERVER", data: { any } } -- The Identifiers to filter
+	@return QueryResult
+]=]
+function QueryResult.new(snapshot, identifiers, senders): QueryResult
+	return setmetatable({
+		_snapshot = snapshot,
+		_identifiers = identifiers or {},
+		_senders = senders or {},
+	}, QueryResult)
+end
+
+export type QueryResultImpl = {
+	_snapshot: {
+		{
+			identifier: string,
+			sender: Player | "NET_SERVER",
+			data: { any },
+		}
+	},
+	_identifiers: { string },
+	_senders: { Player | "NET_SERVER" },
+
+	__index: QueryResultImpl,
+	__iter: (self: QueryResult) -> () -> (number?, Player? | string?, string?, ...any),
+	from: (self: QueryResult, ...(Player | "NET_SERVER")) -> QueryResult,
+	of: (self: QueryResult, ...string) -> QueryResult,
+
+	new: (
+		snapshot: {
+			{
+		identifier: string,
+		sender: Player | "NET_SERVER",
+		data: { any },
+			}
+		},
+		identifiers: { string? }?,
+		senders: { { Player } | Player | "NET_SERVER" }?
+	) -> QueryResult,
+}
+
+export type QueryResult = typeof(setmetatable({}, QueryResult))
+
+--[=[
 	@method __iter
 	@within Net
 	@private
-	@tag Internal Use Only
 	
-	Creates an iterator function that creates a snapshot and iterates over it; 
-	filtering out key-value pairs of the snapshot when a filter is provided, and filtering out 
-	the return results of the iterator function when a returnFilter is provided.
+	Creates a QueryResult that returns all Packets in the current frame's snapshot.
+	See [Net:query] to filter Identifiers and Senders.
 
-	```lua
-	type FilteredResults = (
-		pos: number?,
-		sender: (Player | string)?,
-		identifier: Identifier?,
-		packetData: any?...
-	)
-
-	Net:__iter(
-		filter: (
-			k: number,
-			v: any
-		) -> (
-			number?,
-			any?
-		)?,
-		returnFilter: (
-			pos: number,
-			sender: (Player | string),
-			identifier: string,
-			packetData: {any}
-		) -> FilteredResults
-	) -> () -> FilteredResults
-
-	@return (pos: number?, sender: (Player | string)?, identifier: string?, packetData: any?...)
+	@return QueryResult
 ]=]
-function Net:__iter(filter: (k: number, v: any) -> (number?, any?)?, returnFilter)
+function Net:__iter(): QueryResult
 	local snapshot = self._bridge:snapshot()
-	local i = 0
-
-	-- When a filter is supplied, a new snapshot is created containing only filtered key-pair values
-	if filter then
-		local filteredSnapshot = {}
-
-		for k, v in snapshot do
-			local filtered = filter(k, v)
-
-			if filtered then
-				table.insert(filteredSnapshot, v)
-			end
-		end
-
-		snapshot = filteredSnapshot
-	end
-
-	return function()
-		i += 1
-
-		local packet = snapshot[i]
-		if packet then
-			if returnFilter then
-				return returnFilter(i, packet.sender, packet.identifier, packet.data)
-			else
-				return i,
-					packet.sender,
-					packet.identifier,
-					unpack(packet.data)
-			end
-		end
-
-		return
-	end
+	return QueryResult.new(snapshot)
 end
-
--- The varying Parameter Types used for queries
-type QueryParams = {
-	multipleSenders: boolean,
-	senders: { "NET_SERVER" | Player },
-	identifiers: { Identifier },
-}
-
--- Query different Parameter Types
-local parseQueryParams = {
-	Instance = function(queryParams: QueryParams, player: Player)
-		-- Player should be a Player
-		if typeof(player) ~= "Instance" then
-			return
-		elseif not player:IsA("Player") then
-			return
-		end
-
-		table.insert(queryParams.senders, player)
-	end,
-
-	table = function(queryParams: QueryParams, players: { Player })
-		queryParams.multipleSenders = true
-
-		for _, player in players do
-			-- Player should be a Player
-			if typeof(player) ~= "Instance" then
-				continue
-			elseif not player:IsA("Player") then
-				continue
-			end
-
-			table.insert(queryParams.senders, player)
-		end
-	end,
-
-	string = function(queryParams: QueryParams, identifier: string)
-		if identifier == "NET_SERVER" then
-			return
-		end
-
-		table.insert(queryParams.identifiers, identifier)
-	end,
-}
 
 --[=[
 	@method query
 	@within Net
 	
-	Allows for iteration of all packets of the previous frame with support for QueryParameters.
-	QueryParameters can be ``Player``, ``{Players}``, or ``Identifier``.
-	When provided, related return values will not be returned.
+	Allows for iteration of all packets of the previous frame.
+
+	You can filter by Identifiers by adding them as function parameters. You can also filter by Senders
+	by chaining the ``QueryResult:from()`` method onto the query method.
 
 	See [Querying Data](https://yetanotherclown.github.io/Net/docs/querying-data) for more information.
 
-	@return () -> (pos: number, sender: (Player | string)?, identifier: (string)?, packetData: any...)
+	@return QueryResult
 ]=]
-function Net:query(...: { Players } | Player | Identifier | any)
-	local queryParams = {
-		multipleSenders = false,
-		senders = {},
-		identifiers = {},
-	} :: QueryParams
-
-	-- Parse each appropriate Parameter Type
-	for _, param in { ... } do
-		local parser = parseQueryParams[typeof(param)]
-		parser(queryParams, param)
-	end
-
-	-- Build the iterator function with Filters
-	local iter = self:__iter(function(_, v)
-		-- Filter Sender
-		if
-			not RunService:IsClient()
-			and not queryParams.multipleSenders
-			and v.sender
-			and #queryParams.senders > 0
-			and not table.find(queryParams.senders, v.sender)
-		then
-			return
-		end
-
-		-- Filter Identifier
-		if not table.find(queryParams.identifiers, v.identifier) then
-			return
-		end
-
-		return v
-	end, function(i, sender, identifier, data)
-		local package = { i }
-
-		--[[
-            With how the query method works, the Sender and Identifier
-            may already be known to the caller. That is if they have
-            provided them within the Query Parameters.
-
-            It becomes obvious who the sender is or what identifier they
-            are listening to if they have only provide one of either.
-            If they have provided multiple, we return who the sender or
-            what the identifier is.
-
-            { Players }, Identifier -> Position, Player, Data
-            Player, Identifier, Identifier -> Position, Identifier, Data
-            _ -> Position, Sender, Identifier, Data
-        ]]
-
-		-- If not already known, return the sender
-		if queryParams.multipleSenders or #queryParams.senders ~= 1 and not (RunService:IsClient() and #queryParams.senders == 0) then
-			table.insert(package, sender)
-		end
-
-		-- If not already known, return the identifier
-		if #queryParams.identifiers ~= 1 then
-			table.insert(package, identifier)
-		end
-
-		-- Return all data
-		for _, v in data do
-			table.insert(package, v)
-		end
-
-		return table.unpack(package)
-	end)
-
-	return iter
+function Net:query(...: Identifier): QueryResult
+	local snapshot = self._bridge:snapshot()
+	return QueryResult.new(snapshot, { ... })
 end
 
 -- The varying Parameter Types used for sending data

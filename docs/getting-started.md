@@ -91,12 +91,12 @@ local ExampleIdentifier = identifiers.ExampleOne
 
 local function exampleSystem(world, net)
     -- Query through every networking call that frame on the Server
-    for i, player, args... in net:query(ExampleIdentifier) do
+    for i, player, identifier, args... in net:query(ExampleIdentifier) do
         -- Do something
     end
 
     -- Query through every networking call that frame on the Client
-    for i, args... in net:query(ExampleIdentifier) do
+    for i, _, identifier, args... in net:query(ExampleIdentifier) do
         -- Do something
     end
 
