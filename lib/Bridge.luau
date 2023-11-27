@@ -1,13 +1,13 @@
 local RunService = game:GetService("RunService")
 
 --[=[
-    @class Bridge
-    @private
+	@class Bridge
+	@private
 
-    Handles all incoming and outgoing packets from a RemoteEvent.
+	Handles all incoming and outgoing packets from a RemoteEvent.
 
-    The following API can be used by Advanced Users if they wish to not use the ``Net:start()`` method
-    or to bypass the ``Bridge:step()`` method in favor of custom behavior.
+	The following API can be used by Advanced Users if they wish to not use the ``Net:start()`` method
+	or to bypass the ``Bridge:step()`` method in favor of custom behavior.
 ]=]
 local Bridge = {}
 Bridge.__index = Bridge
@@ -36,30 +36,30 @@ Bridge._snapshot = {} :: IncomingQueue
 Bridge._outgoingQueue = {} :: OutgoingQueue
 
 --[=[
-    @interface orderedPayload
-    @within Bridge
-    @field [Identifier] { { QueuePosition, any... } }
+	@interface orderedPayload
+	@within Bridge
+	@field [Identifier] { { QueuePosition, any... } }
 
-    A Payload represents a singular table that will be sent over the RemoteEvent.
-    It is structured in a way to minimize overhead when calling RemoteEvents.
+	A Payload represents a singular table that will be sent over the RemoteEvent.
+	It is structured in a way to minimize overhead when calling RemoteEvents.
 
-    In order to guarantee the order of the queue, an additional value is packed
-    into the packet data. In order to minimize overhead, the value is represented
-    in a similar way as Identifiers.
+	In order to guarantee the order of the queue, an additional value is packed
+	into the packet data. In order to minimize overhead, the value is represented
+	in a similar way as Identifiers.
 ]=]
 
 --[=[
-    @interface unorderedPayload
-    @within Bridge
-    @field [Identifier] { { any... } }
+	@interface unorderedPayload
+	@within Bridge
+	@field [Identifier] { { any... } }
 
-    @tag Future Feature
+	@tag Future Feature
 
-    A Payload represents a singular table that will be sent over the RemoteEvent.
-    It is structured in a way to minimize overhead when calling RemoteEvents.
+	A Payload represents a singular table that will be sent over the RemoteEvent.
+	It is structured in a way to minimize overhead when calling RemoteEvents.
 
-    By default, each queue will be ordered. This is a design choice in order to promote
-    predictable and data-driven networking.
+	By default, each queue will be ordered. This is a design choice in order to promote
+	predictable and data-driven networking.
 ]=]
 
 -- Packages a Packet to go into a Server Payload
@@ -96,10 +96,10 @@ function Bridge:_updateClientPayload(clientPackages, player, packet, pos)
 end
 
 --[=[
-    @method _processOutgoingQueue
-    @within Bridge
+	@method _processOutgoingQueue
+	@within Bridge
 
-    Sends all queued outgoing packets over the Remote.
+	Sends all queued outgoing packets over the Remote.
 ]=]
 function Bridge:_processOutgoingQueue()
 	local serverPayload = {} :: {
@@ -145,13 +145,13 @@ function Bridge:_processOutgoingQueue()
 end
 
 --[=[
-    @method _processIncoming
-    @within Bridge
+	@method _processIncoming
+	@within Bridge
 
-    Processes an incoming packet, adding it to the incoming queue.
+	Processes an incoming packet, adding it to the incoming queue.
 
-    @param sender Player | "NET_SERVER"
-    @param payload Payload
+	@param sender Player | "NET_SERVER"
+	@param payload Payload
 ]=]
 function Bridge:_processIncoming(
 	sender,
@@ -176,10 +176,10 @@ function Bridge:_processIncoming(
 end
 
 --[=[
-    @method step
-    @within Bridge
+	@method step
+	@within Bridge
 
-    Updates the incoming queue and snapshot and calls ``Bridge:_processOutgoingQueue()``.
+	Updates the incoming queue and snapshot and calls ``Bridge:_processOutgoingQueue()``.
 ]=]
 function Bridge:step()
 	-- Update queue & Snapshot
@@ -191,20 +191,75 @@ function Bridge:step()
 end
 
 --[=[
-    @method snapshot
-    @within Bridge
+	@method snapshot
+	@within Bridge
 
-    Returns a snapshot of the incoming queue.
+	Returns a snapshot of the incoming queue.
 ]=]
 function Bridge:snapshot()
 	return table.clone(self._snapshot)
 end
 
 --[=[
-    @method send
-    @within Bridge
+	@class SendRequest
+	@since v0.4.0
 
-    Queue a packet to be sent in the outgoing queue
+	Allows for modification of queued packets before they're sent.
+]=]
+local SendRequest: SendRequestImpl = {} :: SendRequestImpl
+SendRequest.__index = SendRequest
+
+--[=[
+	@method to
+	@within SendRequest
+
+	Modifies the recipients of the packet to the one(s) provided in the parameter.
+
+	@param recipient { Player } | Player | "NET_SERVER"
+]=]
+function SendRequest:to(recipient: { Player } | Player | "NET_SERVER")
+	if RunService:IsClient() then
+		warn("You should not use the SendRequest:to() method on the Client")
+		return
+	end
+
+	local position = self._position
+	local bridge = self._bridge
+
+	local packet = bridge._outgoingQueue[position]
+	local newPacket = {
+		identifier = packet.identifier,
+		recipient = recipient,
+		data = packet.data,
+	}
+
+	table.remove(bridge._outgoingQueue, position)
+	table.insert(bridge._outgoingQueue, newPacket)
+
+	return
+end
+
+export type SendRequestImpl = {
+	_outgoingQueue: OutgoingQueue,
+	_bridge: Bridge,
+	_position: number,
+
+	__index: SendRequestImpl,
+
+	to: (self: SendRequest, recipient: { Player } | Player | "NET_SERVER") -> nil,
+}
+
+export type SendRequest = typeof(setmetatable({}, SendRequest))
+
+--[=[
+	@method send
+	@within Bridge
+
+	Queue a packet to be sent in the outgoing queue.
+
+	Returns a [SendRequest] which allows for the specification of the recipient(s).
+
+	@return SendRequest
 ]=]
 function Bridge:send(recipient, identifier, data)
 	-- Typecheck recipients
@@ -242,6 +297,11 @@ function Bridge:send(recipient, identifier, data)
 		recipient = recipient,
 		data = data,
 	})
+
+	return setmetatable({
+		_position = #self._outgoingQueue,
+		_bridge = self,
+	}, SendRequest) :: SendRequest
 end
 
 function Bridge.new(configuration: { any }?)

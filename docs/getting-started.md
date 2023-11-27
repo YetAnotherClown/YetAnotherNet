@@ -86,8 +86,8 @@ And, because we passed in our Net object into our Loop, we can use it in any of 
 using ``Net:send()`` and query it using ``Net:query()``.
 
 ```lua title="systems/exampleSystem.luau"
-local identifiers = require("identifier.luau")
-local ExampleIdentifier = identifiers.ExampleOne
+local Identifiers = require("identifiers.luau")
+local ExampleIdentifier = Identifiers.ExampleOne
 
 local function exampleSystem(world, net)
     -- Query through every networking call that frame on the Server
@@ -104,7 +104,7 @@ local function exampleSystem(world, net)
     net:send(ExampleIdentifier, ...)
 
     -- Send data to a Client from the Server
-    net:send(Player, ExampleIdentifier, ...)
+    net:send(ExampleIdentifier, ...):to(Player)
 end
 ```
 

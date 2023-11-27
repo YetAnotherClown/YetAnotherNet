@@ -1,4 +1,5 @@
 local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 
 local Bridge = require(script.Bridge)
 export type Bridge = Bridge.Bridge
@@ -200,9 +201,9 @@ export type QueryResultImpl = {
 	new: (
 		snapshot: {
 			{
-		identifier: string,
-		sender: Player | "NET_SERVER",
-		data: { any },
+				identifier: string,
+				sender: Player | "NET_SERVER",
+				data: { any },
 			}
 		},
 		identifiers: { string? }?,
@@ -245,107 +246,24 @@ function Net:query(...: Identifier): QueryResult
 	return QueryResult.new(snapshot, { ... })
 end
 
--- The varying Parameter Types used for sending data
-type SendParams = {
-	recipient: "NET_SERVER" | { Player } | Player,
-	identifier: Identifier,
-	data: { any },
-}
-
--- Send different Parameter Types
-local parseSendParams = {
-	Instance = function(sendParams: SendParams, player: Player)
-		-- Player should be a Player
-		if typeof(player) ~= "Instance" then
-			return
-		elseif not player:IsA("Player") then
-			return
-		end
-
-		if typeof(sendParams.recipient) == "Instance" then
-			-- Combine both Players into a table
-			sendParams.recipient = { sendParams.recipient, player }
-		elseif typeof(sendParams.recipient) == "table" then
-			-- Add the Player to the preexisting table
-			table.insert(sendParams.recipient, player)
-		else
-			-- Set the recipient as the player
-			sendParams.recipient = player
-		end
-	end,
-
-	table = function(sendParams: SendParams, players: { Player })
-		-- Each Player should be a Player
-		for _, player in players do
-			if typeof(player) ~= "Instance" then
-				return
-			elseif not player:IsA("Player") then
-				return
-			end
-		end
-
-		if typeof(sendParams.recipient) == "Instance" then
-			-- Add the player to the new table, then set that table as the recipient
-			table.insert(players, sendParams.recipient)
-			sendParams.recipient = players
-		elseif typeof(sendParams.recipient) == "table" then
-			-- Combine both tables of Players
-			for _, player in players do
-				table.insert(sendParams.recipient, player)
-			end
-		else
-			-- Set the Players as the recipient
-			sendParams.recipient = players
-		end
-	end,
-
-	string = function(sendParams: SendParams, identifierOrNetServer: string)
-		if identifierOrNetServer == "NET_SERVER" then
-			-- Net.Server is a recipient
-			sendParams.recipient = identifierOrNetServer
-		else
-			-- Only one Identifier can be used when sending data
-			sendParams.identifier = identifierOrNetServer
-		end
-	end,
-}
-
 --[=[
 	@method send
 	@within Net
 	
-	Sends data to a recipient or the server if not specified under a unique identifier.
+	Sends data to all clients or to specific recipients under a given identifier.
+
+	By default, [Net:send] will send the data to all Clients. You can specify which
+	Clients to receive the data by chaining [SendRequest:to] and passing
+	``{ Player }``, ``Player``, or ``Net.Server``.
 
 	See [Sending Data](https://yetanotherclown.github.io/Net/docs/sending-data) for more information.
 ]=]
-function Net:send(...)
-	local sendParams = {
-		identifier = nil,
-		recipient = nil,
-		data = {},
-	} :: SendParams
-
-	-- Parse each appropriate Parameter Type
-	for _, param in { ... } do
-		-- SendParams end after the Identifier is given
-		if sendParams.identifier then
-			table.insert(sendParams.data, param)
-
-			continue
-		end
-
-		-- Parse the SendParams
-		local parser = parseSendParams[typeof(param)]
-		parser(sendParams, param)
-	end
-
-	-- Fill in recipient for the Client
-	if RunService:IsClient() then
-		sendParams.recipient = "NET_SERVER"
-	end
-
-	-- Queue the data on the Bridge
-	self._bridge:send(sendParams.recipient, sendParams.identifier, sendParams.data)
+function Net:send(identifier: string, ...: any): Bridge.SendRequest
+	return self._bridge:send(
+		RunService:IsClient() and Net.Server or Players:GetPlayers(), -- Recipients
+		identifier, -- Identifier
+		{ ... } -- Data
+	)
 end
 
 -- Identifiers are globally unique
