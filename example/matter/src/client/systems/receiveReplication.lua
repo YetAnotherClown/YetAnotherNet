@@ -11,7 +11,7 @@ local function receiveReplication(world, state, _ui, net)
 		end
 	end
 
-	for _, entities in net:query(Identifiers.Replication) do
+	for _, _, _, entities in net:query(Identifiers.Replication) do
 		for serverEntityId, componentMap in entities do
 			local clientEntityId = entityIdMap[serverEntityId]
 
@@ -71,5 +71,5 @@ end
 
 return {
 	system = receiveReplication,
-	priority = 1
+	priority = 1,
 }

@@ -35,7 +35,7 @@ local function replication(world, _state, _ui, net)
 		end
 
 		print("Sending initial payload to", player)
-		net:send(player, Identifiers.Replication, payload)
+		net:send(Identifiers.Replication, payload):to(player)
 	end
 
 	local changes = {}
@@ -56,7 +56,7 @@ local function replication(world, _state, _ui, net)
 	end
 
 	if next(changes) then
-		net:send(Players:GetPlayers(), Identifiers.Replication, changes)
+		net:send(Identifiers.Replication, changes):to(Players:GetPlayers())
 	end
 end
 
