@@ -131,7 +131,7 @@ export default function Home() {
               Basic Usage
             </h2>
 
-            Net provides a very simple API for Sending and Querying data, allowing for filtering through QueryParams and simple and efficient Namespacing with Identifiers.<br />
+            Net provides a very simple API for Sending and Querying data, allowing for filtering through QueryResults and simple and efficient Namespacing with Routes.<br />
             <br />
             See <a href={useBaseUrl("/docs/intro")}>the Introduction</a> for a more in-depth guide.
           </p>

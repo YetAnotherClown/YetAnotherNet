@@ -44,7 +44,7 @@ obvious to create and use a Data-Driven Networking Library as opposed to a Event
 In a [Matter](https://github.com/evaera/matter) System:
 ```lua
 local routes = require("routes.luau")
-local ExampleRoute = Identifiers.ExampleOne
+local ExampleRoute = routes.ExampleOne
 
 local function exampleSystem(world)
     -- Query through every networking call that frame on the Server

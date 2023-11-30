@@ -92,7 +92,7 @@ end
 	@since v0.4.0
 
 	An iterable object returned as the result of [Net:query] that can filter snapshots
-	by Identifiers and Senders.
+	by Identifier and Senders.
 
 	:::note
 	Due to certain limitations with the Luau Type System, iterating over the QueryResult Object
