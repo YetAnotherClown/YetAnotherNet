@@ -1,17 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Components = require(ReplicatedStorage.Shared.components)
-local Identifiers = require(ReplicatedStorage.Shared.identifiers)
+local routes = require(ReplicatedStorage.Shared.routes)
 
 local entityIdMap = {}
 
-local function receiveReplication(world, state, _ui, net)
+local function receiveReplication(world, state, _ui)
 	local function debugPrint(...)
 		if state.debugEnabled then
 			print("Replication>", ...)
 		end
 	end
 
-	for _, _, _, entities in net:query(Identifiers.Replication) do
+	for _, _, entities in routes.MatterReplication:query() do
 		for serverEntityId, componentMap in entities do
 			local clientEntityId = entityIdMap[serverEntityId]
 

@@ -7,7 +7,7 @@ local Plasma = require(Packages.Plasma)
 local HotReloader = require(Packages.Rewire).HotReloader
 local Net = require(Packages.Net)
 local components = require(script.Parent.components)
-local _identifiers = require(script.Parent.identifiers)
+local routes = require(script.Parent.routes)
 
 local function start(containers)
 	local world = Matter.World.new()
@@ -25,16 +25,10 @@ local function start(containers)
 		return model and model.model or nil
 	end
 
-	-- Set up Networking
+	local loop = Matter.Loop.new(world, state, debugger:getWidgets())
 
-	local net = Net.new({
-		Channel = "Reliable",
-		Event = "default",
-	})
-
-	local loop = Matter.Loop.new(world, state, debugger:getWidgets(), net)
-
-	net:start(loop)
+	-- Hook Net to middleware
+	Net.start(loop, routes)
 
 	-- Set up hot reloading
 
@@ -103,7 +97,7 @@ local function start(containers)
 		end)
 	end
 
-	return world, state, net
+	return world, state
 end
 
 return start

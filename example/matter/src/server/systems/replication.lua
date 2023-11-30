@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Components = require(ReplicatedStorage.Shared.components)
-local Identifiers = require(ReplicatedStorage.Shared.identifiers)
+local routes = require(ReplicatedStorage.Shared.routes)
 local useEvent = require(ReplicatedStorage.Packages.Matter).useEvent
 
 local REPLICATED_COMPONENTS = {
@@ -19,7 +19,7 @@ for _, name in REPLICATED_COMPONENTS do
 	replicatedComponents[Components[name]] = true
 end
 
-local function replication(world, _state, _ui, net)
+local function replication(world, _state, _ui)
 	for _, player in useEvent(Players, "PlayerAdded") do
 		local payload = {}
 
@@ -35,7 +35,7 @@ local function replication(world, _state, _ui, net)
 		end
 
 		print("Sending initial payload to", player)
-		net:send(Identifiers.Replication, payload):to(player)
+		routes.MatterReplication:send(payload):to(player)
 	end
 
 	local changes = {}
@@ -56,7 +56,7 @@ local function replication(world, _state, _ui, net)
 	end
 
 	if next(changes) then
-		net:send(Identifiers.Replication, changes):to(Players:GetPlayers())
+		routes.MatterReplication:send(changes)
 	end
 end
 

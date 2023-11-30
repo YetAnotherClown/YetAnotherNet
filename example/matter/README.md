@@ -10,6 +10,8 @@ To build:
 
 Then, open `example.rbxl` and play. Enjoy.
 
+Note: Wally does not export types automatically, please install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman and run it.
+
 ## Hot reloading
 
 This example game supports hot reloading, which lets you edit your systems and see the changes you've made in real time,
