@@ -12,57 +12,57 @@ See all of Net's [example projects](https://github.com/YetAnotherClown/Net/tree/
 
 ### Setting up with Matter
 
-Being made for the Matter ECS, Net provides a simple method for scheduling the Netcode to run
+Being made for the Matter ECS, Net provides a simple method for scheduling your Routes to run
 on your Matter Loop.
 
-Firstly, similar to how you would setup your components with Matter, create a ``identifiers.luau`` ModuleScript
-to strictly declare your Net identifiers. Identifiers are global and should be the first thing you make when
-using the Net library.
+Firstly, create a ``routes.luau`` ModuleScript in ReplicatedStorage to strictly declare your Routes.
 
-```lua title="identifiers.luau"
-local Net = require(Net)
+```lua title="routes.luau"
+local Net = require("Net.luau")
+type Net<U...> = Net.Net<U...>
 
-local IDENTIFIERS = {
-  ["ExampleOne"] = Net.identifier("ExampleOne"),
-  ["ExampleTwo"] = Net.identifier("ExampleTwo")
+local defaultConfiguration = {
+  Channel = "Reliable",
+  Event = "default",
 }
--- Laid out for strict typing
 
-return IDENTIFIERS
+-- Payload for replicating Entities
+type EntityPayload = {
+    [string]: { -- EntityId
+        [string]: { -- Component name
+            data: ComponentInstance<T>
+        }
+    }
+}
+
+-- Replicate Matter Components
+local MatterReplication: Net<EntityPayload> = Net.new(defaultConfiguration)
+
+-- Signal that the Player has loaded
+local PlayerLoaded: Net<boolean> = Net.new(defaultConfiguration)
+
+return {
+  MatterReplication = MatterReplication,
+  PlayerLoaded = PlayerLoaded,
+}
 ```
 
-And then in the same script you initialize your Matter Systems, you can create a new Net object
-with unique configuration by using the ``Net.new()`` function. For example, you can change the Event
-the Matter middleware for Net runs on in Configuration with the ``Event`` parameter.
-
-In order to use Net with Matter you must also use the ``Net:start()`` method and pass in your Matter
-loop.
-
-You should have only one Net object for every loop, though you shouldn't, in most cases, have more than one
-loop.
-
-This same setup should be ran on both the Client and the Server with the same configuration in order to work.
+And now in the same script where you create your Matter Loop, you can run the ``Net.start({ Net })``
+function to schedule your Routes to run on Matter's Middleware.
 
 ```lua title="init.server.luau / init.client.luau"
-local Matter = require(Matter)
+local Matter = require("Matter.luau")
 local World = Matter.World
 local Loop = Matter.Loop
 
-local Net = require(Net)
-
--- Create a new Net Server/Client
-local net = Net.new({
-  Channel: "Reliable"
-  Event: "default",
-})
-
--- Create your identifiers before initializing any netcode
-local identifiers = require("Identifiers.lua")
+local Net = require("Net.luau")
+local routes = require("routes.luau")
 
 local world = World.new()
 local loop = Loop.new(world, net)
 
-net:start(loop) -- Initializes the net, adding it to your loop.
+-- Schedules your Routes
+Net.start(loop, routes)
 
 local systems = {}
 for _, child in script.systems:GetChildren() do
@@ -71,67 +71,53 @@ for _, child in script.systems:GetChildren() do
     end
 end
 
-loop:scheduleSystems(systems) -- Schedule systems after running Net:start()
+loop:scheduleSystems(systems) -- Schedule systems after running ``Net.start()``
 
--- Begin the loop and make sure the eventName string you passed into Net:start() is in the event table
+-- Begin the loop and make sure the ``Event`` key in your Routes configuration are added here
 loop:begin({
     default = RunService.Heartbeat
 })
 ```
 
-Finally, in a Matter System we can use our ``identifiers.luau`` ModuleScript to access our Identifiers and
-use them within our System.
-
-And, because we passed in our Net object into our Loop, we can use it in any of our Systems. We can send data
-using ``Net:send()`` and query it using ``Net:query()``.
+Finally, in a Matter System we can use our ``routes.luau`` ModuleScript to access our Routes and
+use them within our Systems.
 
 ```lua title="systems/exampleSystem.luau"
-local Identifiers = require("identifiers.luau")
-local ExampleIdentifier = Identifiers.ExampleOne
+local routes = require("routes.luau")
+local PlayerLoaded = routes.PlayerLoaded
 
-local function exampleSystem(world, net)
+local function exampleSystem(world)
     -- Query through every networking call that frame on the Server
-    for i, player, identifier, args... in net:query(ExampleIdentifier) do
+    for i, player, ...data in PlayerLoaded:query() do
         -- Do something
     end
 
     -- Query through every networking call that frame on the Client
-    for i, _, identifier, args... in net:query(ExampleIdentifier) do
+    for i, _, ...data in PlayerLoaded:query() do
         -- Do something
     end
 
     -- Send data from the Client to the Server
-    net:send(ExampleIdentifier, ...)
+    PlayerLoaded:send(...)
 
     -- Send data to a Client from the Server
-    net:send(ExampleIdentifier, ...):to(Player)
+    PlayerLoaded:send(...):to(Player)
 end
 ```
 
 ### Other Setups
 
-Is Matter not for you? It is possible to use Net outside of Matter by bypassing the ``Net:start()`` method and
-scheduling it with your own code using the internal mechanics of your Net object's ``Bridge``.
+Is Matter not for you? It is possible to use Net outside of Matter by creating a Hook using ``Net.createHook({ Net })``
+which is identical to the ``Net.start(loop, { Net })`` function. This function will return another function which you can
+call whenever you want to process your Routes' queues and send/receive your Packets on the Server or Client.
 
-Please note that if you aren't using Net within an ECS it is strongly discouraged that you use it. You should
-consider using alternatives like BridgeNet2.
-
-Below is a simple example of creating custom scheduling behavior using ``Bridge:step()``.
-
+Below is a simple example of creating custom scheduling behavior using ``Net.createHook({ Net })``,
 ```lua
 local RunService = game:GetService("RunService")
 
-local Net = require(Net)
+local Net = require("Net.luau")
+local routes = require("routes.luau")
 
--- Create a new Net Server/Client
-local net = NetLib.new()
-
--- Create your identifiers before initializing any netcode
-local identifiers = require("Identifiers.lua")
-
-RunService.Heartbeat:Connect(function()
-    net._bridge:step() -- The Bridge:step() method processes the incoming and outgoing queues
-end)
+local hook = Net.createHook({ routes })
+RunService.Heartbeat:Connect(hook)
 ```
-
-For more information on this, see the [Bridge API](https://yetanotherclown.github.io/Net/api/Bridge).

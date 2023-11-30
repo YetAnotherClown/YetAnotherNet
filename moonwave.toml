@@ -2,7 +2,6 @@ title = "Net"
 gitSourceBranch = "main"
 classOrder = [
     "Net",
-    "Bridge",
     "Loop"
 ]
 

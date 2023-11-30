@@ -43,25 +43,25 @@ obvious to create and use a Data-Driven Networking Library as opposed to a Event
 
 In a [Matter](https://github.com/evaera/matter) System:
 ```lua
-local Identifiers = require("identifiers.luau")
-local ExampleIdentifier = Identifiers.ExampleOne
+local routes = require("routes.luau")
+local ExampleRoute = Identifiers.ExampleOne
 
-local function exampleSystem(world, net)
+local function exampleSystem(world)
     -- Query through every networking call that frame on the Server
-    for i, player, identifier, ...data in net:query(ExampleIdentifier) do
+    for i, player, ...data in ExampleRoute:query() do
         -- Do something
     end
 
     -- Query through every networking call that frame on the Client
-    for i, _, identifier, ...data in net:query(ExampleIdentifier) do
+    for i, _, ...data in ExampleRoute:query() do
         -- Do something
     end
 
     -- Send data from the Client to the Server
-    net:send(ExampleIdentifier, ...)
+    ExampleRoute:send(...)
 
     -- Send data to a Client from the Server
-    net:send(ExampleIdentifier, ...):to(Player)
+    ExampleRoute:send(...):to(Player)
 end
 ```
 
@@ -71,7 +71,7 @@ end
 
 ```toml
 [dependencies]
-Net = "yetanotherclown/net@0.4.0"
+Net = "yetanotherclown/net@0.5.0"
 ```
 
 Note: Wally does not export types automatically, if you wish to use Strict Typing with Net, install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman.
@@ -90,6 +90,7 @@ For more help, check out [the Rojo documentation](https://rojo.space/docs).
 - [x] Basic Functionality
 - [x] Stable Core API
 - [x] Strict Typing
+- [x] Unreliable Channel
 - [ ] Void ``sender`` return argument when querying on the Client, with respect for Strict Typing
 - [ ] Rate limiting
 - [ ] Middleware
@@ -97,5 +98,4 @@ For more help, check out [the Rojo documentation](https://rojo.space/docs).
 
 ## Planned Features
 
-- [ ] Unreliable Channel -- When released on Roblox
 - [ ] Internal Use of Buffers -- When released on Roblox

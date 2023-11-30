@@ -2,7 +2,16 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
 local Bridge = require(script.Bridge)
-export type Bridge = Bridge.Bridge
+type Bridge = Bridge.Bridge
+
+type Recipient = Bridge.Recipient
+type IncomingPacket = Bridge.IncomingPacket
+type OutgoingPacket = Bridge.OutgoingPacket
+
+type IncomingQueue = Bridge.IncomingQueue
+type OutgoingQueue = Bridge.OutgoingQueue
+
+type NetServer = Bridge.NetServer
 
 local Identifier = require(script.Identifier)
 export type Identifier = Identifier.Identifier
@@ -11,94 +20,72 @@ export type Identifier = Identifier.Identifier
 	@interface Configuration
 	@within Net
 	@field Channel "Reliable" | "Unreliable" -- Default: Reliable
-	@field DebugMode boolean -- Enable Debug Features?
-	@field DebugKey KeyCode -- The key to open the Debug Panel
-	@field Event string -- The event to schedule Net on in your Matter Loop -- Default: "default"
-	@field Middleware (sender, identifier, ...) -> any -- Ran before a packet is queried
+	@field Event string -- The event to schedule the Route on in your Matter Loop -- Default: "default"
 	@field Ratelimit number -- Amount of allowed invocations a frame
 
-	@tag Future Feature
-
-	As of v0.2.0, the only configuration parameter that is implemented is Event.
-	All other parameters will be implemented at a later date. With the exception of Middleware & Ratelimiting,
-	most of these parameters should not change and remain stable API.
+	:::note
+	As of v0.5.0, Ratelimiting is not implemented. This feature will come in future versions.
+	:::
 
 	### Channel
 
 	**Reliable**: All packets will be sent and received per frame in order.
-
-	**Unreliable**: Anticipated feature that Roblox may add, this is here for planning and is not yet available.
+	**Unreliable**: Packets may be dropped but will be received in order.
 ]=]
-type Configuration = {
+export type Configuration = {
 	Channel: ("Reliable" | "Unreliable")?,
-	DebugMode: boolean?,
-	DebugKey: Enum.KeyCode?,
 	Event: string?,
-	Middleware: ((any) -> any)?,
 	Ratelimit: number?,
 }
 
-export type NetImpl = {
-	Server: "NET_SERVER",
+--[=[
+	@class SendRequest
+	@since v0.4.0
 
-	_bridge: Bridge.Bridge,
-	_configuration: Configuration,
+	Allows for modification of queued packets before they're sent.
+]=]
+type SendRequestImpl = {
+	_outgoingQueue: { OutgoingPacket },
+	_position: number,
 
-	__index: NetImpl,
-	__iter: (self: Net) -> QueryResult,
+	__index: SendRequestImpl,
 
-	query: (self: Net, ...string) -> QueryResult,
-	send: (self: Net, identifier: string, ...any) -> Bridge.SendRequest?,
-	start: (self: Net, loop: any) -> (),
-
-	identifier: (index: string) -> Identifier,
-	new: (configuration: Configuration) -> Net,
+	to: (self: SendRequest, recipient: Recipient) -> (),
 }
 
-export type Net = typeof(setmetatable({}, {} :: NetImpl))
+export type SendRequest = typeof(setmetatable({}, {} :: SendRequestImpl))
+
+local SendRequest: SendRequestImpl = {} :: SendRequestImpl
+SendRequest.__index = SendRequest
 
 --[=[
-	@class Net
+	@method to
+	@within SendRequest
 
-	A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS.
+	Modifies the recipients of the packet to the one(s) provided in the parameter.
 
-	See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started.
+	@param recipient { Player } | Player | "NET_SERVER"
 ]=]
-local Net: NetImpl = {} :: NetImpl
-Net.__index = Net
+function SendRequest:to(recipient: Recipient)
+	if RunService:IsClient() then
+		warn("You should not use the SendRequest:to() method on the Client")
+		return
+	end
 
-Net.Server = "NET_SERVER"
+	local position = self._position
 
-export type QueryResultImpl = {
-	_snapshot: {
-		{
-			identifier: string,
-			sender: Player | "NET_SERVER",
-			data: { any },
-		}
-	},
-	_identifiers: { string },
-	_senders: { Player | "NET_SERVER" },
+	local packet = self._outgoingQueue[position]
+	local newPacket = {
+		channel = packet.channel,
+		identifier = packet.identifier,
+		recipient = recipient,
+		data = packet.data,
+	}
 
-	__index: QueryResultImpl,
-	__iter: (self: QueryResult) -> () -> (number?, Player? | string?, string?, ...any),
-	from: (self: QueryResult, ...(Player | "NET_SERVER")) -> QueryResult,
-	of: (self: QueryResult, ...string) -> QueryResult,
+	self._outgoingQueue[position] = newPacket
 
-	new: (
-		snapshot: {
-			{
-				identifier: string,
-				sender: Player | "NET_SERVER",
-				data: { any },
-			}
-		},
-		identifiers: { string? }?,
-		senders: { { Player } | Player | "NET_SERVER" }?
-	) -> QueryResult,
-}
-
-export type QueryResult = typeof(setmetatable({}, {} :: QueryResultImpl))
+	return
+end
 
 --[=[
 	@class QueryResult
@@ -107,64 +94,83 @@ export type QueryResult = typeof(setmetatable({}, {} :: QueryResultImpl))
 	An iterable object returned as the result of [Net:query] that can filter snapshots
 	by Identifiers and Senders.
 
-	See [Querying Data](https://yetanotherclown.github.io/Net/docs/querying-data) for more information.
+	:::note
+	Due to certain limitations with the Luau Type System, iterating over the QueryResult Object
+	will not return typed values. In order to fix this, call ``:__iter()`` on the QueryResult Object.
+
+	For example:
+	```lua
+	for i, sender, ... in net:query():__iter() do
+		-- Do something
+	end
+	```
+	:::
+
+	See [Querying Data](https://yetanotherclown.github.io/Net/docs/intro#querying-data) for more information.
 ]=]
-local QueryResult: QueryResultImpl = {} :: QueryResultImpl
+type QueryResultImpl<U...> = {
+	_snapshot: { IncomingPacket },
+	_identifier: Identifier,
+	_senders: { Player | NetServer },
+
+	__index: QueryResultImpl<U...>,
+	__iter: (self: QueryResult<U...>) -> () -> (number?, (Player | NetServer)?, U...),
+
+	from: (self: QueryResult<U...>, ...(Player | NetServer)) -> QueryResult<U...>,
+
+	new: (snapshot: { IncomingPacket }, identifier: Identifier, senders: { Recipient }?) -> QueryResult<U...>,
+}
+
+export type QueryResult<U...> = typeof(setmetatable({}, {} :: QueryResultImpl<U...>))
+
+local QueryResult: QueryResultImpl<...any> = {} :: QueryResultImpl<...any>
 QueryResult.__index = QueryResult
 
 --[=[
 	@method __iter
 	@within QueryResult
 	
-	Iterating over a QueryResult will return the Packets in it's Snapshot that
-	match the supplied Identifiers from [Net:query] and the supplied Senders
-	from [QueryResult:from].
+	Iterating over a QueryResult will return the Packets in the QueryResult's Snapshot that
+	match the supplied Senders from [QueryResult:from].
 
 	Usage:
 	```lua
-	for pos, sender, identifier, ... in net:query(...identifiers):from(...senders) do
+	for pos, sender, ... in net:query():from(...senders) do
 		-- Do something
 	end
 	```
 
 	@return number
 	@return Player | string
-	@return string
 	@return ...any
 ]=]
 function QueryResult:__iter()
 	local senders = self._senders
-	local identifiers = self._identifiers
+	local identifier = self._identifier
 
 	local snapshot = self._snapshot
 	local i = 1
 
-	local function iterator(): (number?, (Player | string)?, string?, ...any)
+	return function()
 		local packet = snapshot[i]
 		if not packet then
 			return
 		end
-
-		-- Return all packets if no Identifiers are supplied, or filter by Identifiers
-		local filterIdentifiers = #identifiers > 0
-		local isIdentifierAllowed = filterIdentifiers and table.find(identifiers, packet.identifier) or true
 
 		-- Return all packets if no Senders are supplied, or filter by Senders
 		local filterSenders = #senders > 0
 		local isSenderAllowed = not filterSenders and table.find(senders, packet.sender) or true
 
 		-- Don't return packet if filtered
-		if not isIdentifierAllowed or not isSenderAllowed then
+		if packet.identifier ~= identifier or not isSenderAllowed then
 			return
 		end
 
 		-- Tick for next packet
 		i += 1
 
-		return i, packet.sender, packet.identifier, unpack(packet.data)
+		return i, packet.sender, unpack(packet.data)
 	end
-
-	return iterator
 end
 
 --[=[
@@ -191,26 +197,7 @@ function QueryResult:from(...)
 
 		table.insert(senders, param)
 	end
-	return self.new(self._snapshot, self._identifiers, senders)
-end
-
---[=[
-	@method of
-	@within QueryResult
-	@private
-
-	:::caution
-		This method may change in later versions, it is advised you only supply Identifiers
-		by using [Net:query] and avoid using this method.
-	:::
-	
-	Filters Packets from the QueryResult's Snapshot based on the provided Identifiers.
-
-	@param identifiers ...identifier -- The Identifiers to filter
-	@return QueryResult
-]=]
-function QueryResult:of(...: string)
-	return self.new(self._snapshot, { ... }, self._senders)
+	return self.new(self._snapshot, self._identifier, senders)
 end
 
 --[=[
@@ -220,30 +207,64 @@ end
 
 	Creates a new QueryResult with the supplied Snapshot.
 
-	@param snapshot { identifier: string, sender: Player | "NET_SERVER", data: { any } } -- The Identifiers to filter
 	@return QueryResult
 ]=]
-function QueryResult.new(snapshot, identifiers, senders): QueryResult
+function QueryResult.new(snapshot, identifier, senders)
 	return setmetatable({
 		_snapshot = snapshot,
-		_identifiers = identifiers or {},
+		_identifier = identifier,
 		_senders = senders or {},
 	}, QueryResult)
 end
+
+--[=[
+	@class Net
+
+	A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS.
+
+	See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started.
+]=]
+type NetImpl<U...> = {
+	Server: NetServer,
+	_identifier: Identifier,
+	_configuration: Configuration,
+	_outgoingQueue: { OutgoingPacket },
+	_snapshot: IncomingQueue,
+
+	__index: NetImpl<U...>,
+	__iter: (self: Net<U...>) -> QueryResult<U...>,
+
+	_queuePackets: (Net<U...>, Bridge) -> (),
+	send: (self: Net<U...>, U...) -> SendRequest,
+	query: (self: Net<U...>) -> QueryResult<U...>,
+
+	start: (loop: any, { Net<U...> }) -> (),
+	createHook: ({ Net<U...> }) -> () -> (),
+
+	new: (Configuration) -> Net<U...>,
+}
+
+export type Net<U...> = typeof(setmetatable({} :: {
+	_configuration: Configuration,
+}, {} :: NetImpl<U...>))
+
+local Net: NetImpl<...any> = {} :: NetImpl<...any>
+Net.__index = Net
 
 --[=[
 	@method __iter
 	@within Net
 	@private
 	
-	Creates a QueryResult that returns all Packets in the current frame's snapshot.
-	See [Net:query] to filter Identifiers and Senders.
+	Creates a QueryResult that returns all Packets in the current frame's snapshot
+	from the Route's identifier.
+	
+	See [Net:query] to filter by Senders.
 
 	@return QueryResult
 ]=]
-function Net:__iter(): QueryResult
-	local snapshot = self._bridge:snapshot()
-	return QueryResult.new(snapshot)
+function Net:__iter()
+	return QueryResult.new(self._snapshot, self._identifier)
 end
 
 --[=[
@@ -251,42 +272,109 @@ end
 	@within Net
 	
 	Allows for iteration of all packets of the previous frame.
+	You can filter by Senders by chaining the ``QueryResult:from()`` method onto the query method.
 
-	You can filter by Identifiers by adding them as function parameters. You can also filter by Senders
-	by chaining the ``QueryResult:from()`` method onto the query method.
+	:::note
+	Due to certain limitations with the Luau Type System, iterating over the QueryResult Object
+	will not return typed values. In order to fix this, call ``:__iter()`` on the QueryResult Object.
 
-	See [Querying Data](https://yetanotherclown.github.io/Net/docs/querying-data) for more information.
+	For example:
+	```lua
+	for i, sender, ... in net:query():__iter() do
+		-- Do something
+	end
+	```
+	:::
+
+	See [Querying Data](https://yetanotherclown.github.io/Net/docs/intro#querying-data) for more information.
 
 	@return QueryResult
 ]=]
-function Net:query(...: Identifier): QueryResult
-	local snapshot = self._bridge:snapshot()
-	return QueryResult.new(snapshot, { ... })
+function Net:query()
+	return self:__iter()
 end
 
 --[=[
 	@method send
 	@within Net
 	
-	Sends data to all clients or to specific recipients under a given identifier.
+	Sends data to all clients or to specific recipients from the Route's identifier.
 
 	By default, [Net:send] will send the data to all Clients. You can specify which
 	Clients to receive the data by chaining [SendRequest:to] and passing
 	``{ Player }``, ``Player``, or ``Net.Server``.
 
-	See [Sending Data](https://yetanotherclown.github.io/Net/docs/sending-data) for more information.
+	See [Sending Data](https://yetanotherclown.github.io/Net/docs/intro#sending-data) for more information.
 ]=]
-function Net:send(identifier: string, ...: any): Bridge.SendRequest?
-	return self._bridge:send(
-		RunService:IsClient() and Net.Server or Players:GetPlayers(), -- Recipients
-		identifier, -- Identifier
-		{ ... } -- Data
-	)
+function Net:send(...)
+	local packet = {
+		channel = self._configuration.Channel,
+		data = { ... },
+		identifier = self._identifier,
+		recipient = Players:GetPlayers(),
+	} :: OutgoingPacket
+	table.insert(self._outgoingQueue, packet)
+
+	local sendRequest = {
+		_outgoingQueue = self._outgoingQueue,
+		_position = #self._outgoingQueue,
+	}
+	setmetatable(sendRequest, SendRequest)
+
+	return sendRequest
 end
 
--- Identifiers are globally unique
-function Net.identifier(index)
-	return Identifier(index)
+--[=[
+	@method _queuePackets
+	@within Net
+	@private
+	
+	Processes the Route's internal queue and sends it to the supplied Bridge.
+	Doing this will reset the internal queue.
+]=]
+function Net:_queuePackets(bridge: Bridge)
+	local channel = self._configuration.Channel or "Reliable"
+
+	local queue = self._outgoingQueue :: { OutgoingPacket }
+	self["_outgoingQueue"] = {}
+
+	for _, packet in queue do
+		-- Typecheck recipients
+		if RunService:IsClient() then
+			if packet.recipient ~= "NET_SERVER" then
+				warn("Clients can only send to Net.Server")
+				continue
+			end
+		elseif RunService:IsServer() then
+			if typeof(packet.recipient) == "table" then
+				for _, player in packet.recipient do
+					if typeof(player) ~= "Instance" or (typeof(player) == "Instance" and not player:IsA("Player")) then
+						warn("Attempt to send a table with a non-player instance as a recipient")
+						continue
+					end
+				end
+			elseif
+				typeof(packet.recipient) ~= "Instance"
+				or (typeof(packet.recipient) == "Instance" and not packet.recipient:IsA("Player"))
+			then
+				warn("Attempt to send a non-player instance as a recipient")
+				continue
+			end
+		end
+
+		-- Typecheck identifier
+		if typeof(packet.identifier) ~= "string" then
+			warn("Invalid Identifier")
+
+			continue
+		end
+
+		if typeof(packet.recipient) == "string" and packet.recipient ~= "NET_SERVER" then
+			continue
+		end
+
+		table.insert(bridge._outgoingQueue[channel], packet)
+	end
 end
 
 --[=[
@@ -295,42 +383,63 @@ end
 	A [Matter Loop](https://eryn.io/matter/api/Loop).
 
 	For technical details, if you were to use a custom Loop object or try to integrate this Net Library in a ECS other than Matter,
-	the ``Net:start()`` method is the equivalent of scheduling the ``Bridge:step()`` function to run first on the ``RunService.Heartbeat``
-	event.
+	the ``Net.start(loop, { Net })`` function uses a similar implementation to ``Net.createHook({ Net })`` internally.
 
-	For more information on this, see the [Bridge API](https://yetanotherclown.github.io/Net/api/Bridge)
+	For more information on this, see [Net.createHook].
 ]=]
 
 --[=[
-	@method start
+	@function start
 	@within Net
 	
-	Initializes your Net Server by adding middleware to your Matter Loop.
-	This ensures that your netcode runs last every frame.
+	Initializes your Routes by adding middleware to your Matter Loop.
+	This ensures that your Routes run between each frame.
 
 	:::note
-	Please make sure that the event you set in the Configuration, or the default, is the same index you used for your ``RunService.Heartbeat`` event in your ``Loop:begin()`` method.
+	Please make sure that the event you set in the Configuration, or the default, is the same index you used for your
+	``RunService.Heartbeat`` event in your ``Loop:begin()`` method.
 
-	Your netcode is meant to run on the heartbeat, like most systems. In some cases you may want to run your netcode on different events, in this case
-	it is acceptable to change it to a different event.
-	You should have different Net objects for each event in this case.
+	Your Routes are meant to run on the heartbeat, like most systems. In some cases you may want to run your Routes on different events,
+	in this case it is acceptable to change it to a different event.
 	:::
 
 	@param loop Loop -- A Matter Loop
+	@param routes { Net } -- A table of your Routes
 ]=]
-function Net:start(loop: any)
+function Net.start(loop, netObjects)
+	local events = {}
+	for _, netObject in netObjects do
+		local event = netObject._configuration.Event or "default"
+
+		local exists = events[event]
+		if not exists then
+			events[event] = {}
+		end
+
+		table.insert(events[event], netObject)
+	end
+
+	local bridges = {}
+	for event, _ in events do
+		bridges[event] = Bridge.new()
+	end
+
 	-- Performs queue tasks after each frame finishes
 	loop:addMiddleware(function(nextFn, eventName)
 		local function networkingMiddleware()
-			-- Each Net object should run on one event
-			-- Otherwise it may cause undesired behavior
-			if eventName ~= self._configuration.Event then
+			if not bridges[eventName] then
 				nextFn()
 				return
 			end
 
+			local snapshot = bridges[eventName]:snapshot()
+			for _, netObject in events[eventName] do
+				netObject["_snapshot"] = snapshot
+				netObject:_queuePackets(bridges[eventName])
+			end
+
 			-- Middleware runs before/after each frame,
-			self._bridge:step()
+			bridges[eventName]:step()
 
 			nextFn()
 		end
@@ -342,25 +451,61 @@ function Net:start(loop: any)
 end
 
 --[=[
+	@function createHook
+	@within Net
+	
+	This function allows you to run Net scheduling code on your own events.
+
+	When you provide a table of Routes, this function will return another function
+	you can call which will step each Route and process it's Packet Queue.
+
+	For example, to run scheduling on the Heartbeat:
+	```lua
+	local hook = Net.createHook({ Net })
+	RunService.Heartbeat:Connect(hook)
+	```
+
+	@param routes { Net } -- A table of your Routes
+	@return () -> ()
+]=]
+function Net.createHook(netObjects)
+	local bridge = Bridge.new()
+
+	return function()
+		local snapshot = bridge:snapshot()
+		for _, netObject in netObjects do
+			netObject["_snapshot"] = snapshot
+			netObject:_queuePackets(bridge)
+		end
+
+		bridge:step()
+	end
+end
+
+--[=[
 	@function new
 	@within Net
 	
-	Creates a new Net object with unique configuration.
+	Creates a new Route with a unique identifier, channel, and event.
 
-	:::warning
-	You should limit the amount of Net objects you create, each object runs on a separate RemoteEvent based on it's
-	Channel and Event. Net Objects with the same Channel and Event will run on the same RemoteEvent.
-	Net achieves it's performance gains by primarily reducing the overhead of RemoteEvent calls.
+	:::note
+	All Routes with the same Channel will share a single Remote. It's recommended that you run all your
+	Net scheduling code on a single event.
 	:::
 
 	@param configuration Configuration?
 ]=]
-function Net.new(configuration: Configuration?)
+function Net.new(configuration: Configuration)
 	local self = {}
 	setmetatable(self, Net)
 
-	self._bridge = Bridge.new(configuration) :: Bridge
-	self._configuration = configuration or {}
+	self._configuration = configuration or { Channel = "Reliable" } :: Configuration
+	self._identifier = Identifier(tostring(self))
+	self._outgoingQueue = {}
+	self._snapshot = {
+		Reliable = {},
+		Unreliable = {},
+	}
 
 	return self
 end

@@ -45,46 +45,65 @@ RemoteEvent and structures Data to send the least amount of bytes over networkin
 And with inspiration from the [Bevy_Renet](https://github.com/lucaspoffo/renet/tree/master/bevy_renet) Crate and Matter itself,
 Net provides a effective API to use within an ECS.
 
-### Identifiers
+### Creating Routes
 
-Simply put, Identifiers are strings. You could simply just use a string when sending or querying data as your Identifier.
-However, Net provides a function to compress strings into 2 bytes in order to optimize bandwidth.
+Routes are the way you send and receive data through Net. They are uniquely identified so you're
+encouraged to create as many as you need as if you were creating individual RemoteEvents.
 
-To create a Identifier, use ``Net.identifier()``. For example,
+Routes can be Reliable or Unreliable. Reliable events are never dropped and are always in order per frame.
+Unreliable events might be dropped on bad connections, but they are always received in order per frame.
+
+You can also strictly type Routes to get autocompletion and typechecking when Sending and Querying packets.
+
+To create a Route, you can use ``Net.new()``
 ```lua
-local MyIdentifier = Net.identifier("myIdentifier")
-```
+local Net = require("Net.luau")
+type Net<U...> = Net.Net<U...>
 
-For more information on Identifiers and compressing data, see the [Compressing Data](handling-data/compressing-data.md) page.
+local PlayerLoaded: Net<boolean> = Net.new({
+    Channel = "Reliable"
+})
+```
 
 ### Sending Data
 
 To send data using Net, you can use the ``Net:send()`` method. For example,
 ```lua
-local MyIdentifier = Net.identifier("myIdentifier")
-Net:send(MyIdentifier, ...)
+local routes = require("routes.luau")
+local PlayerLoaded = routes.PlayerLoaded
+
+PlayerLoaded:send(true)
 ```
 
-For more information on sending data, see the [Sending Data](handling-data/sending-data.md) page.
+On the Server, you can also specify a player or players to send the packet to,
+```lua
+local routes = require("routes.luau")
+local PlayerLoaded = routes.PlayerLoaded
+
+PlayerLoaded:send(true):to(Player)
+```
 
 ### Querying Data
 
 To query data, you must iterate over it in a for loop.
-To do this, you can either iterate over the Net object itself or use the ``Net:query()`` method.
-
-By default, both of these options will return a tuple consisting of
-``position, sender, identifier, args...``.
-
-This may become a lot of values quickly, some of which you may not need. To solve this, you can pass in
-specific Types into the ``Net:query()`` method to filter them out.
+To do this, you can either iterate over the Route itself or use the ``Net:query()`` method.
 
 For example,
 ```lua
-local MyIdentifier = Net.identifier("myIdentifier")
+local routes = require("routes.luau")
+local PlayerLoaded = routes.PlayerLoaded
 
-for i, sender, args... in Net:query(MyIdentifier) do
-    -- Retrieves all packets with the specified identifier
+for i, sender, ...data in PlayerLoaded:query() do
+    -- Retrieves all packets from the Route
 end
 ```
 
-For more information on querying data, see the [Querying Data](handling-data/querying-data.md) page.
+And you can query by sender,
+```lua
+local routes = require("routes.luau")
+local PlayerLoaded = Routes.PlayerLoaded
+
+for i, _, ...data in PlayerLoaded:query():from(Player) do
+    -- Retrieves all packets from the Route send by the Player
+end
+```
