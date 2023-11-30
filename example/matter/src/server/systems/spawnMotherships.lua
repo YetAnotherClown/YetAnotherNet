@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Components = require(ReplicatedStorage.Shared.components)
 local Matter = require(ReplicatedStorage.Packages.Matter)
+local components = require(ReplicatedStorage.Shared.components)
 
 local function spawnMotherships(world)
 	if Matter.useThrottle(10) then
@@ -13,31 +13,31 @@ local function spawnMotherships(world)
 		local goalPosition = Vector3.new(math.random(-100, 100), 100, math.random(-100, 100))
 
 		world:spawn(
-			Components.Mothership({
+			components.Mothership({
 				goal = goalPosition,
 				nextGoal = despawnPosition,
 			}),
-			Components.Transform({
+			components.Transform({
 				cframe = CFrame.new(spawnPosition),
 			})
 		)
 	end
 
-	for id, transform in world:query(Components.Transform, Components.Mothership):without(Components.Model) do
+	for id, _ in world:query(components.Transform, components.Mothership):without(components.Model) do
 		local model = ReplicatedStorage.Assets.Mothership:Clone()
 		model.Parent = workspace
 		model.PrimaryPart:SetNetworkOwner(nil)
 
 		world:insert(
 			id,
-			Components.Model({
+			components.Model({
 				model = model,
 			})
 		)
 	end
 
 	for id, mothership, transform in
-		world:query(Components.Mothership, Components.Transform):without(Components.Lasering)
+		world:query(components.Mothership, components.Transform):without(components.Lasering)
 	do
 		if (transform.cframe.p - mothership.goal).magnitude < 10 then
 			if mothership.lasered then
@@ -49,7 +49,7 @@ local function spawnMotherships(world)
 						goal = mothership.nextGoal,
 						lasered = true,
 					}),
-					Components.Lasering({
+					components.Lasering({
 						remainingTime = 1,
 					})
 				)
@@ -57,7 +57,7 @@ local function spawnMotherships(world)
 		end
 	end
 
-	for id, mothership, model in world:query(Components.Mothership, Components.Model):without(Components.Lasering) do
+	for _, mothership, model in world:query(components.Mothership, components.Model):without(components.Lasering) do
 		model.model.Roomba.AlignPosition.Position = mothership.goal
 	end
 end

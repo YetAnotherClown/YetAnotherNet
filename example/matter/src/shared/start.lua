@@ -76,7 +76,7 @@ local function start(containers)
 	end
 
 	loop:scheduleSystems(firstRunSystems)
-	firstRunSystems = nil
+	firstRunSystems = {}
 
 	debugger:autoInitialize(loop)
 

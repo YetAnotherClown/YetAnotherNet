@@ -1,10 +1,10 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Components = require(ReplicatedStorage.Shared.components)
 local Matter = require(ReplicatedStorage.Packages.Matter)
+local components = require(ReplicatedStorage.Shared.components)
 
 local function roombasHurt(world)
-	for id, roomba, model in world:query(Components.Roomba, Components.Model) do
+	for _, _, model in world:query(components.Roomba, components.Model) do
 		for _, part in Matter.useEvent(model.model.PrimaryPart, "Touched") do
 			local touchedModel = part:FindFirstAncestorWhichIsA("Model")
 			if not touchedModel then

@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Components = require(ReplicatedStorage.Shared.components)
+local components = require(ReplicatedStorage.Shared.components)
 
 local function spinSpinners(world, _, ui)
 	if ui.checkbox("Disable Spinning"):checked() then
@@ -10,7 +10,7 @@ local function spinSpinners(world, _, ui)
 
 	local randomize = ui.button("Randomize colors!"):clicked()
 
-	for id, model in world:query(Components.Model, Components.Spinner) do
+	for _, model in world:query(components.Model, components.Spinner) do
 		model.model.PrimaryPart.CFrame = model.model.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(5), 0)
 		model.model.PrimaryPart.Transparency = transparency
 

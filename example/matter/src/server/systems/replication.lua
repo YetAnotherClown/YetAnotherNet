@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Components = require(ReplicatedStorage.Shared.components)
+local components = require(ReplicatedStorage.Shared.components)
 local routes = require(ReplicatedStorage.Shared.routes)
 local useEvent = require(ReplicatedStorage.Packages.Matter).useEvent
 
@@ -16,7 +16,7 @@ local REPLICATED_COMPONENTS = {
 local replicatedComponents = {}
 
 for _, name in REPLICATED_COMPONENTS do
-	replicatedComponents[Components[name]] = true
+	replicatedComponents[components[name]] = true
 end
 
 local function replication(world, _state, _ui)

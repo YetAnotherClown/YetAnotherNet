@@ -1,19 +1,19 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Components = require(ReplicatedStorage.Shared.components)
+local components = require(ReplicatedStorage.Shared.components)
 
 local boundTags = {
-	Spinner = Components.Spinner,
+	Spinner = components.Spinner,
 }
 
 local function setupTags(world)
 	local function spawnBound(instance, component)
 		local id = world:spawn(
 			component(),
-			Components.Model({
+			components.Model({
 				model = instance,
 			}),
-			Components.Transform({
+			components.Transform({
 				cframe = instance.PrimaryPart.CFrame,
 			})
 		)

@@ -1,15 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Components = require(ReplicatedStorage.Shared.components)
+local components = require(ReplicatedStorage.Shared.components)
 local removeMissingModels = require(script.Parent.removeMissingModels)
 
 local function updateTransforms(world)
 	-- Handle Transform added/changed to existing entity with Model
-	for id, transformRecord in world:queryChanged(Components.Transform) do
+	for id, transformRecord in world:queryChanged(components.Transform) do
 		if not world:contains(id) then
 			continue
 		end
 
-		local model = world:get(id, Components.Model)
+		local model = world:get(id, components.Model)
 
 		if not model then
 			continue
@@ -21,12 +21,12 @@ local function updateTransforms(world)
 	end
 
 	-- Handle Model added/changed on existing entity with Transform
-	for id, modelRecord in world:queryChanged(Components.Model) do
+	for id, modelRecord in world:queryChanged(components.Model) do
 		if not world:contains(id) then
 			continue
 		end
 
-		local transform = world:get(id, Components.Transform)
+		local transform = world:get(id, components.Transform)
 
 		if not transform then
 			continue
@@ -38,7 +38,7 @@ local function updateTransforms(world)
 	end
 
 	-- Update Transform on unanchored Models
-	for id, model, transform in world:query(Components.Model, Components.Transform) do
+	for id, model, transform in world:query(components.Model, components.Transform) do
 		if model.model.PrimaryPart.Anchored then
 			continue
 		end
@@ -55,7 +55,7 @@ local function updateTransforms(world)
 		if currentCFrame ~= existingCFrame then
 			world:insert(
 				id,
-				Components.Transform({
+				components.Transform({
 					cframe = currentCFrame,
 					doNotReconcile = true,
 				})

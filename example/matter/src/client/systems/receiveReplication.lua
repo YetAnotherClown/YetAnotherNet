@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Components = require(ReplicatedStorage.Shared.components)
+local components = require(ReplicatedStorage.Shared.components)
 local routes = require(ReplicatedStorage.Shared.routes)
 
 local entityIdMap = {}
@@ -30,10 +30,10 @@ local function receiveReplication(world, state, _ui)
 
 			for name, container in componentMap do
 				if container.data then
-					table.insert(componentsToInsert, Components[name](container.data))
+					table.insert(componentsToInsert, components[name](container.data))
 					table.insert(insertNames, name)
 				else
-					table.insert(componentsToRemove, Components[name])
+					table.insert(componentsToRemove, components[name])
 					table.insert(removeNames, name)
 				end
 			end

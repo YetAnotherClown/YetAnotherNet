@@ -1,15 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Components = require(ReplicatedStorage.Shared.components)
+local components = require(ReplicatedStorage.Shared.components)
 
 local function spawnRoombas(world)
-	for id, transform in world:query(Components.Transform, Components.Roomba):without(Components.Model) do
+	for id, _ in world:query(components.Transform, components.Roomba):without(components.Model) do
 		local model = ReplicatedStorage.Assets.KillerRoomba:Clone()
 		model.Parent = workspace
 		model.PrimaryPart:SetNetworkOwner(nil)
 
 		world:insert(
 			id,
-			Components.Model({
+			components.Model({
 				model = model,
 			})
 		)

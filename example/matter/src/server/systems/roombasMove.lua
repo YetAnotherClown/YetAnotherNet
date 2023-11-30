@@ -1,13 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Components = require(ReplicatedStorage.Shared.components)
+local components = require(ReplicatedStorage.Shared.components)
 
 local function roombasMove(world)
 	local targets = {}
-	for _, model in world:query(Components.Model, Components.Target) do
+	for _, model in world:query(components.Model, components.Target) do
 		table.insert(targets, model.model.PrimaryPart.CFrame.p)
 	end
 
-	for id, roomba, charge, model in world:query(Components.Roomba, Components.Charge, Components.Model) do
+	for _, _, charge, model in world:query(components.Roomba, components.Charge, components.Model) do
 		if charge.charge <= 0 then
 			continue
 		end
