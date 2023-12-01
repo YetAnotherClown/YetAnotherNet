@@ -118,6 +118,6 @@ local RunService = game:GetService("RunService")
 local Net = require("Net.luau")
 local routes = require("routes.luau")
 
-local hook = Net.createHook({ routes })
+local hook = Net.createHook(routes)
 RunService.Heartbeat:Connect(hook)
 ```
