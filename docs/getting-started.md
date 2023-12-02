@@ -59,7 +59,7 @@ local Net = require("Net.luau")
 local routes = require("routes.luau")
 
 local world = World.new()
-local loop = Loop.new(world, net)
+local loop = Loop.new(world)
 
 -- Schedules your Routes
 Net.start(loop, routes)
