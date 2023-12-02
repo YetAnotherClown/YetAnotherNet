@@ -1,50 +1,63 @@
 import Link from "@docusaurus/Link"
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
-import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from "@theme/Layout"
 import clsx from "clsx"
 import React from "react"
 import styles from "./index.module.css"
+import { func } from "prop-types"
 
 const FEATURES = [
   {
-    title: "Data-Driven",
+    image: "Routes.svg",
+    title: "Routes",
     description: (
-      <>
-        Net promotes a Data-Driven design by choice, as opposed to an Event-Driven one.
-      </>
+      <body>
+        <p>
+          Routes are the way you send and receive data through Net.
+          They are uniquely identified so you're encouraged to create as many as you need as if you were creating individual RemoteEvents.
+        </p>
+        <p>
+          Routes can be Reliable or Unreliable.
+          Reliable events are never dropped and are always in order per frame.
+          Unreliable events might be dropped on bad connections, but they are always received in order per frame.
+        </p>
+        <p>
+          You can also strictly type Routes to get autocompletion and typechecking when Sending and Querying packets.
+        </p>
+      </body>
     )
   },
   {
-    title: "Abstractions & Optimizations",
+    image: "Hooks.svg",
+    title: "Hooks",
     description: (
-      <>
-        No more creating new RemoteEvents, Net handles it all and reduces the Overhead of
-        sending RemoteEvent calls.
-      </>
-    )
-  },
-  {
-    title: "Made for ECS",
-    description: (
-      <>
-        First-Class support for ECS Architectures, made for the Matter ECS.
-      </>
+      <body>
+        <p>
+          Hooks are a simple and versatile way to integrate Net into any code architecture.
+        </p>
+        <p>
+          Hooks allow you to run your Route's scheduling whenever you want, such as a specific event.
+          A Hook is simply a function that you can call which will run each Route's scheduling code to process the current frame.
+          Data is not sent over the Network until your hook is called.
+        </p>
+        <p>
+          Net also provides a simple function that hooks your Routes to your Matter Middleware to run before/after your systems.
+          This allows for a simple setup when using the Matter ECS, leaving you to not worry about scheduling your Routes.
+        </p>
+      </body>
     )
   }
 ]
 
 function Feature({ image, title, description }) {
   return (
-    <div className={clsx("col col--4")}>
-      {image && (
-        <div className="text--center">
-          <img className={styles.featureSvg} alt={title} src={image} />
-        </div>
-      )}
-      <div className="text--center padding-horiz--md">
-        <h3>{title}</h3>
-        <p>{description}</p>
+    <div class={styles.feature}>
+      <div class={styles.featureImage}>
+        <img src={image} />
+      </div>
+      <div class={styles.featureText}>
+        <h1>{title}</h1>
+        <>{description}</>
       </div>
     </div>
   )
@@ -57,22 +70,56 @@ export function HomepageFeatures() {
     <section className={styles.features}>
       <div className="container">
         <div className="row">
+          <div className={styles.feature}>
+            <div style={{ paddingLeft: 30, maxWidth: "45%" }}>
+              <h1>A Type-safe Networking Library</h1>
+              <p>
+                Net is strictly-typed, giving you full auto-completion and type-safety.
+              </p>
+              <p>
+                Send arguments and Query return values of your Routes are fully typed, giving you auto-completion and type-checking when writing your Networking code.
+              </p>
+            </div>
+            <div style={{ paddingLeft: 60 }}>
+              <h1>A Data-driven Networking Library</h1>
+              <p>
+                With it's roots in ECS, Net was designed to promote a Data-driven design.<br />
+                Net's API integrates seamlessly into ECS Libraries like Matter to bring Data-driven Networking in ECS architectures.
+              </p>
+              <p>
+                Read more on why you should use an ECS <a href="https://eryn.io/matter/docs/WhyECS">here</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="row">
           {FEATURES.map((props, idx) => (
             <Feature key={idx} {...props} />
           ))}
         </div>
       </div>
-    </section>
+    </section >
   )
 }
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext()
+  const bannerImage = siteConfig.customFields.bannerImage
+  const hasBannerImage = bannerImage ? true : false
+  const heroBannerStyle = hasBannerImage ? { backgroundImage: `url("${bannerImage}")` } : null
+
+  const titleClassName = clsx("hero__title", {
+    [styles.titleOnBannerImage]: hasBannerImage
+  })
+  const taglineClassName = clsx("hero__subtitle", {
+    [styles.taglineOnBannerImage]: hasBannerImage
+  })
+
   return (
-    <header className={clsx("hero", styles.heroBanner)}>
+    <header className={clsx("hero", styles.heroBanner)} style={heroBannerStyle}>
       <div className="container">
-        <h1 className="hero__title">{siteConfig.title}</h1>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <h1 className={titleClassName}>{siteConfig.title}</h1>
+        <p className={taglineClassName}>{siteConfig.tagline}</p>
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
@@ -93,50 +140,6 @@ export default function Home() {
       <HomepageHeader />
       <main>
         <HomepageFeatures />
-        <p className={styles.tagline}>
-          <h1>
-            Networking on Roblox
-          </h1>
-          Roblox promotes a design behavior where in order to achieve networking, developers must create
-          multiple RemoteEvents for each use. This leads to malpractice which results in issues with
-          organization and bandwidth.<br />
-          <br />
-          Networking Modules and Libraries on Roblox strive to fix one of or both of these issues. <a href="https://sleitnick.github.io/Knit/">Knit</a> for example, makes it easier to replicate data and removes the need to make RemoteEvents (though they still exist). And <a href="https://ffrostflame.github.io/BridgeNet2/">BridgeNet2</a> aims to eliminate the need to create multiple RemoteEvents while also optimizing bandwidth.<br />
-          <br />
-          These are great, except using a framework like Knit is, in most cases, detrimental to developer workflows, and with
-          BridgeNet2 and most other Networking Modules and Libraries, they are all flawed by nature, by promoting
-          Event-Driven code.<br />
-          <br />
-
-          <h1>
-            A Data-Driven Networking Library
-          </h1>
-          When making my switch to ECS, I realized there was no real simple way to handle Networking efficiently in <a href="https://eryn.io/matter/">Matter</a>. Sure, we could use the <code>useEvent</code> function to use RemoteEvents in our code, but this was not efficient and was
-          detrimental to organization.<br />
-          <br />
-          I liked the idea of using BridgeNet2 but I did not like the way it felt when using it in a ECS. So, I decided to
-          make my own Networking Library akin to BridgeNet2 but built for use in a ECS.<br />
-          <br />
-          But why? Well, for some of the same <a href="https://eryn.io/matter/docs/WhyECS">reasons to use a ECS</a>, it felt
-          obvious to create and use a Data-Driven Networking Library as opposed to a Event-Driven Networking Library.<br />
-          <br />
-          <img
-            src={useBaseUrl("/BasicUsage.svg")}
-            className={styles.codeSnippet}
-            align="left"
-          /><p>
-            <br />
-            <br />
-            <h2>
-              Basic Usage
-            </h2>
-
-            Net provides a very simple API for Sending and Querying data, allowing for filtering through QueryResults and simple and efficient Namespacing with Routes.<br />
-            <br />
-            See <a href={useBaseUrl("/docs/intro")}>the Introduction</a> for a more in-depth guide.
-          </p>
-        </p>
-        <div className="container">{/***readme***/}</div>
       </main>
     </Layout>
   )

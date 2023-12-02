@@ -1,48 +1,46 @@
-/* stylelint-disable docusaurus/copyright-header */
+.heroBanner {
+  padding: 4rem 0;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
 
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
+@media screen and (max-width: 966px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
 
- .heroBanner {
-    padding: 4rem 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  @media screen and (max-width: 966px) {
-    .heroBanner {
-      padding: 2rem;
-    }
-  }
-  
-  .buttons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .tagline {
-    font-size: 1.5rem;
-    padding: 0 20rem;
-    margin: 3rem auto;
-  }
+.buttons {
+  display: flex;
+  align-items: left;
+  justify-content: left;
+}
 
-  .codeSnippet {
-    filter: drop-shadow(0px 0px 20px rgba(0, 0, 0, 0.7));
-    max-width: 800px;
-  }
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
 
-  .features {
-    display: flex;
-    align-items: center;
-    padding: 2rem 0;
-    width: 100%;
-  }
-  
-  .featureSvg {
-    height: 200px;
-    width: 200px;
-  }
+.feature {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  text-align: justify;
+}
+
+.feature:nth-of-type(even) {
+  flex-direction: row-reverse;
+}
+
+.featureImage {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.featureText {
+  padding-top: 70px;
+  max-width: 50%;
+}
