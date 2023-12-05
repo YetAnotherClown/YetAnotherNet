@@ -155,7 +155,13 @@ function Bridge:_processOutgoingQueue()
 	-- Send the Payload over the RemoteEvent
 	if RunService:IsClient() then
 		for channel, remote in pairs({ Reliable = self.reliableRemote, Unreliable = self.unreliableRemote }) do
-			if #serverPayloads[channel] == 0 then
+			local n = 0
+			for _ in serverPayloads[channel] do
+				n += 1
+			end
+
+			-- Do not send empty payloads
+			if n == 0 then
 				continue
 			end
 
