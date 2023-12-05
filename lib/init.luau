@@ -251,6 +251,8 @@ export type Net<U...> = typeof(setmetatable({} :: {
 local Net: NetImpl<...any> = {} :: NetImpl<...any>
 Net.__index = Net
 
+Net.Server = "NET_SERVER"
+
 --[=[
 	@method __iter
 	@within Net
@@ -311,7 +313,7 @@ function Net:send(...)
 		channel = self._configuration.Channel,
 		data = { ... },
 		identifier = self._identifier,
-		recipient = Players:GetPlayers(),
+		recipient = RunService:IsClient() and Net.Server or Players:GetPlayers(),
 	} :: OutgoingPacket
 	table.insert(self._outgoingQueue, packet)
 
