@@ -71,7 +71,7 @@ end
 
 ```toml
 [dependencies]
-Net = "yetanotherclown/net@0.5.1"
+Net = "yetanotherclown/net@0.6.x"
 ```
 
 Note: Wally does not export types automatically, if you wish to use Strict Typing with Net, install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman.
@@ -91,9 +91,9 @@ For more help, check out [the Rojo documentation](https://rojo.space/docs).
 - [x] Stable Core API
 - [x] Strict Typing
 - [x] Unreliable Channel
+- [X] Middleware
 - [ ] Void ``sender`` return argument when querying on the Client, with respect for Strict Typing
 - [ ] Rate limiting
-- [ ] Middleware
 - [ ] Debugger
 
 ## Planned Features
