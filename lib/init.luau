@@ -22,6 +22,7 @@ export type Identifier = Identifier.Identifier
 	@field Channel "Reliable" | "Unreliable" -- Default: Reliable
 	@field Event string -- The event to schedule the Route on in your Matter Loop -- Default: "default"
 	@field Ratelimit number -- Amount of allowed invocations a frame
+	@field Middleware (event: "send" | "receive", ...any?) -> ...any? -- Runs before your packets are sent or received
 
 	:::note
 	As of v0.5.0, Ratelimiting is not implemented. This feature will come in future versions.
@@ -36,6 +37,7 @@ export type Configuration = {
 	Channel: ("Reliable" | "Unreliable")?,
 	Event: string?,
 	Ratelimit: number?,
+	Middleware: ((event: "send" | "receive", ...any?) -> ...any?)?,
 }
 
 --[=[
@@ -230,11 +232,14 @@ type NetImpl<U...> = {
 	_configuration: Configuration,
 	_outgoingQueue: { OutgoingPacket },
 	_snapshot: IncomingQueue,
+	_middleware: ((event: "send" | "receive", U...) -> ...any?)?,
 
 	__index: NetImpl<U...>,
 	__iter: (self: Net<U...>) -> QueryResult<U...>,
 
 	_queuePackets: (Net<U...>, Bridge) -> (),
+	_updateSnapshot: (Net<U...>, Bridge) -> (),
+	addMiddleware: (self: Net<U...>, middleware: (event: "send" | "receive", ...any?) -> ...any?) -> (),
 	send: (self: Net<U...>, U...) -> SendRequest,
 	query: (self: Net<U...>) -> QueryResult<U...>,
 
@@ -244,9 +249,15 @@ type NetImpl<U...> = {
 	new: (Configuration) -> Net<U...>,
 }
 
-export type Net<U...> = typeof(setmetatable({} :: {
-	_configuration: Configuration,
-}, {} :: NetImpl<U...>))
+export type Net<U...> = typeof(setmetatable(
+	{} :: {
+		_middleware: ((event: "send" | "receive", U...) -> ...any?)?,
+		_configuration: Configuration,
+		_outgoingQueue: { OutgoingPacket },
+		_snapshot: IncomingQueue,
+	},
+	{} :: NetImpl<U...>
+))
 
 local Net: NetImpl<...any> = {} :: NetImpl<...any>
 Net.__index = Net
@@ -338,9 +349,19 @@ function Net:_queuePackets(bridge: Bridge)
 	local channel = self._configuration.Channel or "Reliable"
 
 	local queue = self._outgoingQueue :: { OutgoingPacket }
-	self["_outgoingQueue"] = {}
+	self._outgoingQueue = {}
 
 	for _, packet in queue do
+		-- Implement middleware
+		if self._middleware and packet.identifier == self._identifier then
+			local newData = { self._middleware("send", table.unpack(packet.data)) }
+			if #newData > 0 then
+				packet.data = newData
+			else
+				continue
+			end
+		end
+
 		-- Typecheck recipients
 		if RunService:IsClient() then
 			if packet.recipient ~= "NET_SERVER" then
@@ -377,6 +398,23 @@ function Net:_queuePackets(bridge: Bridge)
 
 		table.insert(bridge._outgoingQueue[channel], packet)
 	end
+end
+
+function Net:_updateSnapshot(bridge)
+	local snapshot = bridge:snapshot()[self._configuration.Channel or "Reliable"]
+	for _, packet in snapshot :: { IncomingPacket } do
+		if not self._middleware or packet.identifier ~= self._identifier then
+			continue
+		end
+
+		-- Implement middleware
+		local newData = { self._middleware("receive", table.unpack(packet.data)) }
+		if #newData > 0 then
+			packet.data = newData
+		end
+	end
+
+	self._snapshot = snapshot
 end
 
 --[=[
@@ -429,19 +467,19 @@ function Net.start(loop, netObjects)
 	-- Performs queue tasks after each frame finishes
 	loop:addMiddleware(function(nextFn, eventName)
 		local function networkingMiddleware()
-			if not bridges[eventName] then
+			local bridge = bridges[eventName]
+			if not bridge then
 				nextFn()
 				return
 			end
 
-			local snapshot = bridges[eventName]:snapshot()
 			for _, netObject in events[eventName] do
-				netObject["_snapshot"] = snapshot
-				netObject:_queuePackets(bridges[eventName])
+				netObject:_updateSnapshot(bridge)
+				netObject:_queuePackets(bridge)
 			end
 
 			-- Middleware runs before/after each frame,
-			bridges[eventName]:step()
+			bridge:step()
 
 			nextFn()
 		end
@@ -474,9 +512,8 @@ function Net.createHook(netObjects)
 	local bridge = Bridge.new()
 
 	return function()
-		local snapshot = bridge:snapshot()
 		for _, netObject in netObjects do
-			netObject["_snapshot"] = snapshot
+			netObject:_updateSnapshot(bridge)
 			netObject:_queuePackets(bridge)
 		end
 
@@ -503,6 +540,7 @@ function Net.new(configuration: Configuration)
 
 	self._configuration = configuration or { Channel = "Reliable" } :: Configuration
 	self._identifier = Identifier(tostring(self))
+	self._middleware = configuration.Middleware
 	self._outgoingQueue = {}
 	self._snapshot = {
 		Reliable = {},

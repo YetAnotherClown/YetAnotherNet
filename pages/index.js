@@ -28,6 +28,30 @@ const FEATURES = [
     )
   },
   {
+    image: "Middleware.svg",
+    title: "Middleware",
+    description: (
+      <body>
+        <p>
+          Middleware is another powerful feature of Net,
+          allowing you to validate types before they reach your code and even perform data compression or decompression before data is processed.
+        </p>
+        <p>
+          To create Middleware, you set a function in your Route's Middleware that will give you the event <code lang="lua">"send" | "receive"</code> and the data
+          that is about to be processed <code lang="lua">U...</code>, the types you specify in your type annotation <code lang="lua">Net&lt;U...&gt;</code>
+        </p>
+        <p>
+          In the Middleware function, you can validate your types or compress/decompress data. If your data does not match your types, you can do <code lang="lua">return nil</code> to drop the packet.
+          Dropped packets will never reach your code, meaning you can ensure that the types your code receives are always the types you expect.
+        </p>
+        <p>
+          To compress/decompress your data, you can use a library like <a href="https://github.com/Data-Oriented-House/Squash">Squash</a> to serialize and deserialize your data.
+          Simply return the types in order as a tuple, you can use the event parameter to determine whether to compress or decompress your data.
+        </p>
+      </body>
+    )
+  },
+  {
     image: "Hooks.svg",
     title: "Hooks",
     description: (
