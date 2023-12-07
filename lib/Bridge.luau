@@ -59,7 +59,12 @@ type BridgeImpl = {
 		packet: OutgoingPacket
 	) -> (),
 	_processOutgoingQueue: (self: Bridge) -> (),
-	_processIncoming: (self: Bridge, sender: Player | NetServer, payload: Payload) -> (),
+	_processIncoming: (
+		self: Bridge,
+		channel: "Reliable" | "Unreliable",
+		sender: Player | NetServer,
+		payload: Payload
+	) -> (),
 
 	step: (self: Bridge) -> (),
 	snapshot: (self: Bridge) -> IncomingQueue,
@@ -176,11 +181,11 @@ function Bridge:_processOutgoingQueue()
 end
 
 -- Processes an incoming packet, adding it to the incoming queue.
-function Bridge:_processIncoming(sender: Player | "NET_SERVER", payload: Payload)
+function Bridge:_processIncoming(channel: "Reliable" | "Unreliable", sender: Player | "NET_SERVER", payload: Payload)
 	-- Unpack each packet and add it to the queue
 	for identifier, packets in payload do
 		for _, data in packets do
-			local pos = #self._incomingQueue["Reliable"] + 1
+			local pos = #self._incomingQueue[channel] + 1
 
 			local packet = {
 				identifier = identifier,
@@ -188,7 +193,7 @@ function Bridge:_processIncoming(sender: Player | "NET_SERVER", payload: Payload
 				data = data,
 			}
 
-			table.insert(self._incomingQueue, pos, packet)
+			table.insert(self._incomingQueue[channel], pos, packet)
 		end
 	end
 end
@@ -231,22 +236,22 @@ function Bridge.new()
 		self.unreliableRemote.Name = "Unreliable"
 		self.unreliableRemote.Parent = script.Parent.Remotes
 
-		local function processIncoming(player, package)
-			self:_processIncoming(player, package)
-		end
-
-		self.reliableRemote.OnServerEvent:Connect(processIncoming)
-		self.unreliableRemote.OnServerEvent:Connect(processIncoming)
+		self.reliableRemote.OnServerEvent:Connect(function(player, package)
+			self:_processIncoming("Reliable", player, package)
+		end)
+		self.unreliableRemote.OnServerEvent:Connect(function(player, package)
+			self:_processIncoming("Unreliable", player, package)
+		end)
 	elseif RunService:IsClient() then
 		self.reliableRemote = script.Parent.Remotes:WaitForChild("Reliable")
 		self.unreliableRemote = script.Parent.Remotes:WaitForChild("Unreliable")
 
-		local function processIncoming(package)
-			self:_processIncoming("NET_SERVER", package)
-		end
-
-		self.reliableRemote.OnClientEvent:Connect(processIncoming)
-		self.unreliableRemote.OnClientEvent:Connect(processIncoming)
+		self.reliableRemote.OnClientEvent:Connect(function(package)
+			self:_processIncoming("Reliable", "NET_SERVER", package)
+		end)
+		self.unreliableRemote.OnClientEvent:Connect(function(package)
+			self:_processIncoming("Unreliable", "NET_SERVER", package)
+		end)
 	end
 
 	return self
