@@ -2,7 +2,8 @@
 sidebar_position: 2
 ---
 
-# Getting Started
+
+# Matter
 
 :::tip
 Check out the adapted version of the Matter Example game to see how it's used in a real game.
@@ -10,10 +11,7 @@ Check out the adapted version of the Matter Example game to see how it's used in
 See all of Net's [example projects](https://github.com/YetAnotherClown/Net/tree/main/examples) in the repository.
 :::
 
-### Setting up with Matter
-
-Being made for the Matter ECS, Net provides a simple method for scheduling your Routes to run
-on your Matter Loop.
+Being initially made for the Matter ECS, Net provides a simple function for scheduling your Routes to run on your Matter Loop.
 
 Firstly, create a ``routes.luau`` ModuleScript in ReplicatedStorage to strictly declare your Routes.
 
@@ -47,7 +45,7 @@ return {
 }
 ```
 
-And now in the same script where you create your Matter Loop, you can run the ``Net.start({ Net })``
+And now in the same script where you create your Matter Loop, you can run the ``Net.start(Loop, { Net })``
 function to schedule your Routes to run on Matter's Middleware.
 
 ```lua title="init.server.luau / init.client.luau"
@@ -98,26 +96,9 @@ local function exampleSystem(world)
     end
 
     -- Send data from the Client to the Server
-    PlayerLoaded:send(...)
+    PlayerLoaded:send(...data)
 
     -- Send data to a Client from the Server
-    PlayerLoaded:send(...):to(Player)
+    PlayerLoaded:send(...data):to(Player)
 end
-```
-
-### Other Setups
-
-Is Matter not for you? It is possible to use Net outside of Matter by creating a Hook using ``Net.createHook({ Net })``
-which is identical to the ``Net.start(loop, { Net })`` function. This function will return another function which you can
-call whenever you want to process your Routes' queues and send/receive your Packets on the Server or Client.
-
-Below is a simple example of creating custom scheduling behavior using ``Net.createHook({ Net })``,
-```lua
-local RunService = game:GetService("RunService")
-
-local Net = require("Net.luau")
-local routes = require("routes.luau")
-
-local hook = Net.createHook(routes)
-RunService.Heartbeat:Connect(hook)
 ```

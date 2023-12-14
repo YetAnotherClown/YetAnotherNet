@@ -108,7 +108,7 @@ end
 	```
 	:::
 
-	See [Querying Data](https://yetanotherclown.github.io/Net/docs/intro#querying-data) for more information.
+	See [Querying Data](/docs/getting-started/routes#querying) for more information.
 ]=]
 type QueryResultImpl<U...> = {
 	_snapshot: { IncomingPacket },
@@ -224,7 +224,7 @@ end
 
 	A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS.
 
-	See the [Intro](https://yetanotherclown.github.io/Net/docs/intro) to get started.
+	See the [Intro](/docs/intro) to get started.
 ]=]
 type NetImpl<U...> = {
 	Server: NetServer,
@@ -299,7 +299,7 @@ end
 	```
 	:::
 
-	See [Querying Data](https://yetanotherclown.github.io/Net/docs/intro#querying-data) for more information.
+	See [Querying Data](/docs/getting-started/routes#querying) for more information.
 
 	@return QueryResult
 ]=]
@@ -317,7 +317,7 @@ end
 	Clients to receive the data by chaining [SendRequest:to] and passing
 	``{ Player }``, ``Player``, or ``Net.Server``.
 
-	See [Sending Data](https://yetanotherclown.github.io/Net/docs/intro#sending-data) for more information.
+	See [Sending Data](/docs/getting-started/routes#sending) for more information.
 ]=]
 function Net:send(...)
 	local packet = {
@@ -534,13 +534,30 @@ end
 
 	@param configuration Configuration?
 ]=]
-function Net.new(configuration: Configuration)
+function Net.new(configuration: Configuration?)
 	local self = {}
 	setmetatable(self, Net)
 
 	self._configuration = configuration or { Channel = "Reliable" } :: Configuration
+	if configuration then
+		-- Validate Channel
+		if configuration.Channel and configuration.Channel ~= ("Reliable" or "Unreliable") then
+			error("Channel should be Reliable or Unreliable.", 2)
+		end
+
+		-- Validate Event
+		if configuration.Event and typeof(configuration.Event) ~= "string" then
+			error("Event should be a string.", 2)
+		end
+
+		-- Validate Middleware
+		if configuration.Middleware and typeof(configuration.Middleware) ~= "function" then
+			error("Middleware should be a function.", 2)
+		end
+	end
+
+	self._middleware = self._configuration.Middleware
 	self._identifier = Identifier(tostring(self))
-	self._middleware = configuration.Middleware
 	self._outgoingQueue = {}
 	self._snapshot = {
 		Reliable = {},

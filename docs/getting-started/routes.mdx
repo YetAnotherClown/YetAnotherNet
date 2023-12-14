@@ -1,0 +1,94 @@
+---
+sidebar_position: 1
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Routes
+
+Routes are the core component of Net, these objects are how you send or receive data through Net.
+These are uniquely identified and come with no overhead, so you're encouraged to create as many as you need as if you were creating individual RemoteEvents.
+
+## Configuration
+
+There are a few ways you can configure your Routes:
+<Tabs>
+  <TabItem value="channel" label="Channel" default>
+  <p>
+  All Routes run on one of two channels: Reliable & Unreliable.<br />
+  These channels change the way your packets are sent over the network.
+  </p>
+
+  | Channel | Description |
+  | ------- | ----------- |
+  | Reliable | Packets are never dropped, and are always ordered. |
+  | Unreliable | Packets may be dropped per frame, but are always ordered per frame. |
+  </TabItem>
+  <TabItem value="event" label="Event">
+    <p>
+    The <code lang="lua">Event</code> field is only used when you're using the Matter ECS.<br />
+    This is used internally in the <code lang="lua">Net.start(loop, 	&#123; routes &#125;)</code> hook to schedule your Routes.
+    </p>
+    <p>
+    You can safely ignore this field if you do not use the <code lang="lua">Net.start(loop, 	&#123; routes &#125;)</code> hook.
+    </p>
+  </TabItem>
+  <TabItem value="middleware" label="Middleware">
+    <p>
+    Middleware is a powerful feature that allows you to validate your types and serialize/deserialize data before Packets are sent/queried.<br />
+    There is a lot to say and go into detail about for Middleware, see <a href="/docs/getting-started/middleware">Getting Started with Middleware</a> for more.
+    </p>
+  </TabItem>
+</Tabs>
+
+---
+
+## Type-checking
+
+Routes can be Type-checked to provide intellisense and auto-completion by providing a type annotation when creating your Routes.
+
+```lua
+local Net = require("Net.luau")
+type Net<U...> = Net.Net<U...>
+
+local Route: Net<number, string, boolean> = Net.new()
+```
+
+In this example, the Route is annotated with the types `number, string, boolean`, this means that our methods like `Route:query()` and `Route:send()` will return or expect
+these types. E.g, `Route:send(number, string, boolean)` or `for _, _, number, string, boolean in Route:query() do`.
+
+This will enable auto-completion and type-checking when working with your Routes, as such it is encouraged you enable Strict Typing to compliment these features.
+
+## Sending
+
+You can use `Route:send(...data)` to send data over the Route. This data will be processed next frame, which is when you'll be able to query it on the receiving end.
+
+```lua
+local Net = require("Net.luau")
+type Net<U...> = Net.Net<U...>
+
+local Route: Net<number, string, boolean> = Net.new()
+
+Route:send(5, "Hello, world!", true)
+```
+
+By default, `Route:send()` will send the Packet of data to all Clients when used on the Server. You can specify a `Player` or `{ Player }` to send it to by using `Route:send():to(recipient)`.
+
+## Querying
+
+Querying is simple, you can query for Packets by using `Route:query()` which will return an iterator that will output `position, sender, ...data` in your for loop.
+
+```lua
+local Net = require("Net.luau")
+type Net<U...> = Net.Net<U...>
+
+local Route: Net<number, string, boolean> = Net.new()
+
+for pos, sender, num, str, bool in Route:query() do
+  -- Do something
+end
+```
+
+When you call the `query` method, it will take a snapshot of all Packets from the previous frame and filter it for you, such as only returning Packets from the Route the method was called on.
+Or, you can also filter out senders by calling `Route:query():from(...sender)` on the QueryResult and putting any values of type `{ Player } | Player | Net.Server` in the arguments.
