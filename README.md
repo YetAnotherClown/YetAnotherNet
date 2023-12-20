@@ -8,34 +8,36 @@
 Net is an experimental library, expect bugs and major design changes. While the API
 should remain the same, there is no guarantee.
 
-### Networking on Roblox
+## What is this?
 
-Roblox promotes a design behavior where in order to achieve networking, developers must create
-multiple RemoteEvents for each use. This leads to malpractice which results in issues with
-organization and bandwidth.
+Net is a networking library for Roblox, or rather its a library that wraps around Roblox's RemoteEvents to solve certain issues and provide new API for networking on Roblox.
 
-Networking Modules and Libraries on Roblox strive to fix one of or both of these issues.
-[Knit](https://sleitnick.github.io/Knit/) for example makes it easier to replicate data and removes the need to
-make RemoteEvents (though they still exist). And [BridgeNet2](https://ffrostflame.github.io/BridgeNet2/) aims to eliminate the need to create
-multiple RemoteEvents while also optimizing bandwidth.
+Some of the issues this library solves are:
+- Overhead from RemoteEvents
+- Ordering of Networking Events
+- Lack of Type-Checking and Intellisense for working with RemoteEvents
 
-These are great, except using a framework like Knit is, in most cases, detrimental to developer workflows, and with
-BridgeNet2 and most other Networking Modules and Libraries, they are all flawed by nature, by promoting
-Event-Driven code.
+Net also provides several utilities:
+- Middleware
+- Strict Type-Checking & Auto-completion
+- Simple integration with Hooks
+- Data-driven Design
 
----
+You can learn more about how Net works and how to use it by visiting [Getting Started with Routes](/docs/getting-started/routes). Or, you can keep reading to learn more about the technical details and design choices that went into creating Net.
 
-### A Data-Driven Networking Library
+## Data-driven by design
 
-When making my switch to ECS, I realized there was no real simple way to handle Networking efficiently in [Matter](https://eryn.io/matter/).
-Sure, we could use the ``useEvent`` function to use RemoteEvents in our code, but this was not efficient and was
-detrimental to organization.
+One thing that separates Net from other networking libraries on Roblox is this key design choice. Net was made to work with ECS, a Data-driven approach to game design, which has influenced the design of the library largely and makes it unique from the rest.
 
-I liked the idea of using BridgeNet2 but I did not like the way it felt when using it in a ECS. So, I decided to
-make my own Networking Library akin to BridgeNet2 but built for use in a ECS.
+With inspiration from [Bevy_Renet](https://github.com/lucaspoffo/renet/tree/master/bevy_renet), a Networking crate for use with the Bevy ECS in Rust, and another networking library on Roblox, [BridgeNet2](https://ffrostflame.github.io/BridgeNet2/), Net pushes to provide similar functionality to these two libraries for ECS on Roblox.
 
-But why? Well, for some of the same [reasons to use a ECS](https://eryn.io/matter/docs/WhyECS), it felt
-obvious to create and use a Data-Driven Networking Library as opposed to a Event-Driven Networking Library.
+### Why go for Data-driven?
+
+Data-driven design opposes Event-driven design, which is what you can commonly see on Roblox, such as RemoteEvents themselves. Event-driven design has it's woes, which is why we opt for ECS and generally Data-driven design.
+
+Event-driven design is sensitive to ordering, this makes it difficult to know when you might get data from an event. To solve this, Net does not use Events, it encourages you to query and send data in an ordered manner frame-by-frame, preferably with ECS.
+
+Since it's encouraged to use ECS with Net, though not required, we suggest reading [Matter — Why ECS?](https://eryn.io/matter/docs/WhyECS) by Evaera.
 
 ---
 
