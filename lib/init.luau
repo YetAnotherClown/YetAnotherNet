@@ -22,7 +22,6 @@ export type Identifier = Identifier.Identifier
 	@field Channel "Reliable" | "Unreliable" -- Default: Reliable
 	@field Event string -- The event to schedule the Route on in your Matter Loop -- Default: "default"
 	@field Ratelimit number -- Amount of allowed invocations a frame
-	@field Middleware (event: "send" | "receive", ...any?) -> ...any? -- Runs before your packets are sent or received
 
 	:::note
 	As of v0.5.0, Ratelimiting is not implemented. This feature will come in future versions.
@@ -37,7 +36,6 @@ export type Configuration = {
 	Channel: ("Reliable" | "Unreliable")?,
 	Event: string?,
 	Ratelimit: number?,
-	Middleware: ((event: "send" | "receive", ...any?) -> ...any?)?,
 }
 
 --[=[
@@ -232,14 +230,18 @@ type RouteImpl<U...> = {
 	_configuration: Configuration,
 	_outgoingQueue: { OutgoingPacket },
 	_snapshot: IncomingQueue,
-	_middleware: ((event: "send" | "receive", U...) -> ...any?)?,
+	_middleware: {
+		Incoming: ((...any?) -> U...)?,
+		Outgoing: ((U...) -> ...any?)?,
+	},
 
 	__index: RouteImpl<U...>,
 	__iter: (self: Route<U...>) -> QueryResult<U...>,
 
 	_queuePackets: (Route<U...>, Bridge) -> (),
 	_updateSnapshot: (Route<U...>, Bridge) -> (),
-	addMiddleware: (self: Route<U...>, middleware: (event: "send" | "receive", ...any?) -> ...any?) -> (),
+	addIncomingMiddleware: (self: Route<U...>, middleware: (...any?) -> U...?) -> (),
+	addOutgoingMiddleware: (self: Route<U...>, middleware: (U...) -> ...any?) -> (),
 	send: (self: Route<U...>, U...) -> SendRequest,
 	query: (self: Route<U...>) -> QueryResult<U...>,
 
@@ -251,7 +253,6 @@ type RouteImpl<U...> = {
 
 export type Route<U...> = typeof(setmetatable(
 	{} :: {
-		_middleware: ((event: "send" | "receive", U...) -> ...any?)?,
 		_configuration: Configuration,
 		_outgoingQueue: { OutgoingPacket },
 		_snapshot: IncomingQueue,
@@ -353,8 +354,8 @@ function Route:_queuePackets(bridge: Bridge)
 
 	for _, packet in queue do
 		-- Implement middleware
-		if self._middleware and packet.identifier == self._identifier then
-			local newData = { self._middleware("send", table.unpack(packet.data)) }
+		if self._middleware.Outgoing and packet.identifier == self._identifier then
+			local newData = { self._middleware.Outgoing(table.unpack(packet.data)) }
 			if #newData > 0 then
 				packet.data = newData
 			else
@@ -403,18 +404,54 @@ end
 function Route:_updateSnapshot(bridge)
 	local snapshot = bridge:snapshot()[self._configuration.Channel or "Reliable"]
 	for _, packet in snapshot :: { IncomingPacket } do
-		if not self._middleware or packet.identifier ~= self._identifier then
+		if not self._middleware.Incoming or packet.identifier ~= self._identifier then
 			continue
 		end
 
 		-- Implement middleware
-		local newData = { self._middleware("receive", table.unpack(packet.data)) }
+		local newData = { self._middleware.Incoming(table.unpack(packet.data)) }
 		if #newData > 0 then
 			packet.data = newData
 		end
 	end
 
 	self._snapshot = snapshot
+end
+
+--[=[
+	@method addIncomingMiddleware
+	@within Route
+	
+	Sets a function to be ran on Incoming packets before they are processed.
+	For example, this would run after the Client receives a Packet from the Server over the network:
+	after calling ``Route:send()`` on the Server and before calling ``Route:query()`` on the Client.
+
+	See [Middleware](/docs/getting-started/middleware) for more information.
+]=]
+function Route:addIncomingMiddleware(middleware)
+	if not middleware or typeof(middleware) ~= "function" then
+		error("Middleware should be a function.", 2)
+	end
+
+	self._middleware.Incoming = middleware
+end
+
+--[=[
+	@method addOutgoingMiddleware
+	@within Route
+	
+	Sets a function to be ran on Outgoing packets before they are sent over the network.
+	For example, this would run before the Server sends a Packet to the Client over the network:
+	after calling ``Route:send()`` on the Server and before the Client ever receives the Packet.
+
+	See [Middleware](/docs/getting-started/middleware) for more information.
+]=]
+function Route:addOutgoingMiddleware(middleware)
+	if not middleware or typeof(middleware) ~= "function" then
+		error("Middleware should be a function.", 2)
+	end
+
+	self._middleware.Outgoing = middleware
 end
 
 --[=[
@@ -549,14 +586,12 @@ function Route.new(configuration: Configuration?)
 		if configuration.Event and typeof(configuration.Event) ~= "string" then
 			error("Event should be a string.", 2)
 		end
-
-		-- Validate Middleware
-		if configuration.Middleware and typeof(configuration.Middleware) ~= "function" then
-			error("Middleware should be a function.", 2)
-		end
 	end
 
-	self._middleware = self._configuration.Middleware
+	self._middleware = {
+		Incoming = nil,
+		Outgoing = nil,
+	}
 	self._identifier = Identifier(tostring(self))
 	self._outgoingQueue = {}
 	self._snapshot = {
