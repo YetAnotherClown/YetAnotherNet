@@ -18,7 +18,7 @@ export type Identifier = Identifier.Identifier
 
 --[=[
 	@interface Configuration
-	@within Net
+	@within Route
 	@field Channel "Reliable" | "Unreliable" -- Default: Reliable
 	@field Event string -- The event to schedule the Route on in your Matter Loop -- Default: "default"
 	@field Ratelimit number -- Amount of allowed invocations a frame
@@ -93,7 +93,7 @@ end
 	@class QueryResult
 	@since v0.4.0
 
-	An iterable object returned as the result of [Net:query] that can filter snapshots
+	An iterable object returned as the result of [Route:query] that can filter snapshots
 	by Identifier and Senders.
 
 	:::note
@@ -102,7 +102,7 @@ end
 
 	For example:
 	```lua
-	for i, sender, ... in net:query():__iter() do
+	for i, sender, ... in Route:query():__iter() do
 		-- Do something
 	end
 	```
@@ -137,7 +137,7 @@ QueryResult.__index = QueryResult
 
 	Usage:
 	```lua
-	for pos, sender, ... in net:query():from(...senders) do
+	for pos, sender, ... in Route:query():from(...senders) do
 		-- Do something
 	end
 	```
@@ -220,13 +220,13 @@ function QueryResult.new(snapshot, identifier, senders)
 end
 
 --[=[
-	@class Net
+	@class Route
 
 	A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS.
 
 	See the [Intro](/docs/intro) to get started.
 ]=]
-type NetImpl<U...> = {
+type RouteImpl<U...> = {
 	server: NetServer,
 	_identifier: Identifier,
 	_configuration: Configuration,
@@ -234,55 +234,55 @@ type NetImpl<U...> = {
 	_snapshot: IncomingQueue,
 	_middleware: ((event: "send" | "receive", U...) -> ...any?)?,
 
-	__index: NetImpl<U...>,
-	__iter: (self: Net<U...>) -> QueryResult<U...>,
+	__index: RouteImpl<U...>,
+	__iter: (self: Route<U...>) -> QueryResult<U...>,
 
-	_queuePackets: (Net<U...>, Bridge) -> (),
-	_updateSnapshot: (Net<U...>, Bridge) -> (),
-	addMiddleware: (self: Net<U...>, middleware: (event: "send" | "receive", ...any?) -> ...any?) -> (),
-	send: (self: Net<U...>, U...) -> SendRequest,
-	query: (self: Net<U...>) -> QueryResult<U...>,
+	_queuePackets: (Route<U...>, Bridge) -> (),
+	_updateSnapshot: (Route<U...>, Bridge) -> (),
+	addMiddleware: (self: Route<U...>, middleware: (event: "send" | "receive", ...any?) -> ...any?) -> (),
+	send: (self: Route<U...>, U...) -> SendRequest,
+	query: (self: Route<U...>) -> QueryResult<U...>,
 
-	start: (loop: any, { Net<U...> }) -> (),
-	createHook: ({ Net<U...> }) -> () -> (),
+	start: (loop: any, { Route<U...> }) -> (),
+	createHook: ({ Route<U...> }) -> () -> (),
 
-	new: (Configuration) -> Net<U...>,
+	new: (Configuration) -> Route<U...>,
 }
 
-export type Net<U...> = typeof(setmetatable(
+export type Route<U...> = typeof(setmetatable(
 	{} :: {
 		_middleware: ((event: "send" | "receive", U...) -> ...any?)?,
 		_configuration: Configuration,
 		_outgoingQueue: { OutgoingPacket },
 		_snapshot: IncomingQueue,
 	},
-	{} :: NetImpl<U...>
+	{} :: RouteImpl<U...>
 ))
 
-local Net: NetImpl<...any> = {} :: NetImpl<...any>
-Net.__index = Net
+local Route: RouteImpl<...any> = {} :: RouteImpl<...any>
+Route.__index = Route
 
-Net.server = Bridge.server
+Route.server = Bridge.server
 
 --[=[
 	@method __iter
-	@within Net
+	@within Route
 	@private
 	
 	Creates a QueryResult that returns all Packets in the current frame's snapshot
 	from the Route's identifier.
 	
-	See [Net:query] to filter by Senders.
+	See [Route:query] to filter by Senders.
 
 	@return QueryResult
 ]=]
-function Net:__iter()
+function Route:__iter()
 	return QueryResult.new(self._snapshot, self._identifier)
 end
 
 --[=[
 	@method query
-	@within Net
+	@within Route
 	
 	Allows for iteration of all packets of the previous frame.
 	You can filter by Senders by chaining the ``QueryResult:from()`` method onto the query method.
@@ -293,7 +293,7 @@ end
 
 	For example:
 	```lua
-	for i, sender, ... in net:query():__iter() do
+	for i, sender, ... in route:query():__iter() do
 		-- Do something
 	end
 	```
@@ -303,23 +303,23 @@ end
 
 	@return QueryResult
 ]=]
-function Net:query()
+function Route:query()
 	return self:__iter()
 end
 
 --[=[
 	@method send
-	@within Net
+	@within Route
 	
 	Sends data to all clients or to specific recipients from the Route's identifier.
 
-	By default, [Net:send] will send the data to all Clients. You can specify which
+	By default, [Route:send] will send the data to all Clients. You can specify which
 	Clients to receive the data by chaining [SendRequest:to] and passing
-	``{ Player }``, ``Player``, or ``Net.Server``.
+	``{ Player }``, ``Player``, or ``Route.Server``.
 
 	See [Sending Data](/docs/getting-started/routes#sending) for more information.
 ]=]
-function Net:send(...)
+function Route:send(...)
 	local packet = {
 		channel = self._configuration.Channel,
 		data = { ... },
@@ -339,13 +339,13 @@ end
 
 --[=[
 	@method _queuePackets
-	@within Net
+	@within Route
 	@private
 	
 	Processes the Route's internal queue and sends it to the supplied Bridge.
 	Doing this will reset the internal queue.
 ]=]
-function Net:_queuePackets(bridge: Bridge)
+function Route:_queuePackets(bridge: Bridge)
 	local channel = self._configuration.Channel or "Reliable"
 
 	local queue = self._outgoingQueue :: { OutgoingPacket }
@@ -400,7 +400,7 @@ function Net:_queuePackets(bridge: Bridge)
 	end
 end
 
-function Net:_updateSnapshot(bridge)
+function Route:_updateSnapshot(bridge)
 	local snapshot = bridge:snapshot()[self._configuration.Channel or "Reliable"]
 	for _, packet in snapshot :: { IncomingPacket } do
 		if not self._middleware or packet.identifier ~= self._identifier then
@@ -423,14 +423,14 @@ end
 	A [Matter Loop](https://eryn.io/matter/api/Loop).
 
 	For technical details, if you were to use a custom Loop object or try to integrate this Net Library in a ECS other than Matter,
-	the ``Net.start(loop, { Net })`` function uses a similar implementation to ``Net.createHook({ Net })`` internally.
+	the ``Net.start(loop, { Route })`` function uses a similar implementation to ``Net.createHook({ Net })`` internally.
 
 	For more information on this, see [Net.createHook].
 ]=]
 
 --[=[
 	@function start
-	@within Net
+	@within Route
 	
 	Initializes your Routes by adding middleware to your Matter Loop.
 	This ensures that your Routes run between each frame.
@@ -444,19 +444,19 @@ end
 	:::
 
 	@param loop Loop -- A Matter Loop
-	@param routes { Net } -- A table of your Routes
+	@param routes { Route } -- A table of your Routes
 ]=]
-function Net.start(loop, netObjects)
+function Route.start(loop, routes)
 	local events = {}
-	for _, netObject in netObjects do
-		local event = netObject._configuration.Event or "default"
+	for _, route in routes do
+		local event = route._configuration.Event or "default"
 
 		local exists = events[event]
 		if not exists then
 			events[event] = {}
 		end
 
-		table.insert(events[event], netObject)
+		table.insert(events[event], route)
 	end
 
 	local bridges = {}
@@ -473,9 +473,9 @@ function Net.start(loop, netObjects)
 				return
 			end
 
-			for _, netObject in events[eventName] do
-				netObject:_updateSnapshot(bridge)
-				netObject:_queuePackets(bridge)
+			for _, route in events[eventName] do
+				route:_updateSnapshot(bridge)
+				route:_queuePackets(bridge)
 			end
 
 			-- Middleware runs before/after each frame,
@@ -492,7 +492,7 @@ end
 
 --[=[
 	@function createHook
-	@within Net
+	@within Route
 	
 	This function allows you to run Net scheduling code on your own events.
 
@@ -501,20 +501,20 @@ end
 
 	For example, to run scheduling on the Heartbeat:
 	```lua
-	local hook = Net.createHook({ Net })
+	local hook = Net.createHook({ Route })
 	RunService.Heartbeat:Connect(hook)
 	```
 
 	@param routes { Net } -- A table of your Routes
 	@return () -> ()
 ]=]
-function Net.createHook(netObjects)
+function Route.createHook(routes)
 	local bridge = Bridge.new()
 
 	return function()
-		for _, netObject in netObjects do
-			netObject:_updateSnapshot(bridge)
-			netObject:_queuePackets(bridge)
+		for _, route in routes do
+			route:_updateSnapshot(bridge)
+			route:_queuePackets(bridge)
 		end
 
 		bridge:step()
@@ -523,7 +523,7 @@ end
 
 --[=[
 	@function new
-	@within Net
+	@within Route
 	
 	Creates a new Route with a unique identifier, channel, and event.
 
@@ -534,9 +534,9 @@ end
 
 	@param configuration Configuration?
 ]=]
-function Net.new(configuration: Configuration?)
+function Route.new(configuration: Configuration?)
 	local self = {}
-	setmetatable(self, Net)
+	setmetatable(self, Route)
 
 	self._configuration = configuration or { Channel = "Reliable" } :: Configuration
 	if configuration then
@@ -567,4 +567,4 @@ function Net.new(configuration: Configuration?)
 	return self
 end
 
-return Net
+return Route
