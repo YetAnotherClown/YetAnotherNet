@@ -402,7 +402,7 @@ function Route:_queuePackets(bridge: Bridge)
 end
 
 function Route:_updateSnapshot(bridge)
-	local snapshot = bridge:snapshot()[self._configuration.Channel or "Reliable"]
+	local snapshot = bridge:snapshot()[self._configuration.Channel]
 	for _, packet in snapshot :: { IncomingPacket } do
 		if not self._middleware.Incoming or packet.identifier ~= self._identifier then
 			continue
@@ -575,11 +575,16 @@ function Route.new(configuration: Configuration?)
 	local self = {}
 	setmetatable(self, Route)
 
-	self._configuration = configuration or { Channel = "Reliable" } :: Configuration
+	self._configuration = configuration or {} :: Configuration
 	if configuration then
 		-- Validate Channel
 		if configuration.Channel and configuration.Channel ~= ("Reliable" or "Unreliable") then
 			error("Channel should be Reliable or Unreliable.", 2)
+		end
+
+		-- Implement default channel
+		if not configuration.Channel then
+			configuration.Channel = "Reliable"
 		end
 
 		-- Validate Event
