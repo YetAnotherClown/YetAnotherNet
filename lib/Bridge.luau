@@ -34,6 +34,7 @@ type Payload = {
 }
 
 type BridgeImpl = {
+	server: NetServer,
 	reliableRemote: RemoteEvent,
 	unreliableRemote: UnreliableRemoteEvent,
 
@@ -77,6 +78,8 @@ export type Bridge = typeof(setmetatable({}, {} :: BridgeImpl))
 -- Handles packaging and unpacking Packets to send and receive over Remotes
 local Bridge: BridgeImpl = {} :: BridgeImpl
 Bridge.__index = Bridge
+
+Bridge.server = "NET_SERVER" :: NetServer
 
 -- Packages a Packet to go into a Server Payload
 function Bridge:_addPacketToPayload(

@@ -227,7 +227,7 @@ end
 	See the [Intro](/docs/intro) to get started.
 ]=]
 type NetImpl<U...> = {
-	Server: NetServer,
+	server: NetServer,
 	_identifier: Identifier,
 	_configuration: Configuration,
 	_outgoingQueue: { OutgoingPacket },
@@ -262,7 +262,7 @@ export type Net<U...> = typeof(setmetatable(
 local Net: NetImpl<...any> = {} :: NetImpl<...any>
 Net.__index = Net
 
-Net.Server = "NET_SERVER"
+Net.server = Bridge.server
 
 --[=[
 	@method __iter
@@ -324,7 +324,7 @@ function Net:send(...)
 		channel = self._configuration.Channel,
 		data = { ... },
 		identifier = self._identifier,
-		recipient = RunService:IsClient() and Net.Server or Players:GetPlayers(),
+		recipient = RunService:IsClient() and Bridge.server or Players:GetPlayers(),
 	} :: OutgoingPacket
 	table.insert(self._outgoingQueue, packet)
 
@@ -364,7 +364,7 @@ function Net:_queuePackets(bridge: Bridge)
 
 		-- Typecheck recipients
 		if RunService:IsClient() then
-			if packet.recipient ~= "NET_SERVER" then
+			if packet.recipient ~= Bridge.server then
 				warn("Clients can only send to Net.Server")
 				continue
 			end
@@ -392,7 +392,7 @@ function Net:_queuePackets(bridge: Bridge)
 			continue
 		end
 
-		if typeof(packet.recipient) == "string" and packet.recipient ~= "NET_SERVER" then
+		if typeof(packet.recipient) == "string" and packet.recipient ~= Bridge.server then
 			continue
 		end
 
