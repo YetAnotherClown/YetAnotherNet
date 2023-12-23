@@ -85,39 +85,43 @@ type Net<U...> = Net.Net<U...>
 
 local route: Net<string, number> = Net.new({
     Channel = "Reliable",
-    Middleware = function(event: "send" | "receive", str, boolean)
-        local values: { any } = {}
-        local alphabet = Squash.string.alphabet(str)
-
-        -- Serialize Packets before sending
-        if event == "send" then
-            -- Type-check sent values,
-        	-- Should be of the provided types U... in Net<U...>
-            if type(str) ~= "string" or type(boolean) ~= "boolean" then
-                return
-            end
-
-            values = {
-                Squash.string.ser(str, alphabet),
-                Squash.boolean.ser(boolean),
-            }
-        end
-
-        -- Deserialize Packets before returning
-        if event == "receive" then
-            -- Type-check returned values;
-        	-- Squash serializes types into other types, like string
-            if type(str) ~= "string" or type(boolean) ~= "string" then
-                return
-            end
-
-            values = {
-                Squash.string.des(str, alphabet),
-                Squash.boolean.des(boolean),
-            }
-        end
-
-        return table.unpack(values)
-    end,
 })
+
+-- Deserialize Packets before returning
+route:addIncomingMiddleware(function(str, bool)
+local values: { any } = {}
+    local alphabet = Squash.string.alphabet(str)
+
+    -- Type-check returned values;
+    -- Squash serializes types into other types, like string
+    if type(str) ~= "string" or type(boolean) ~= "string" then
+        return
+    end
+
+    values = {
+        Squash.string.des(str, alphabet),
+        Squash.boolean.des(boolean),
+    }
+
+    return table.unpack(values)
+end)
+
+-- Serialize Packets before sending
+route:addOutgoingMiddleware(function(str, bool)
+local values: { any } = {}
+    local alphabet = Squash.string.alphabet(str)
+
+    -- Type-check sent values,
+    -- Should be of the provided types U... in Net<U...>
+    if type(str) ~= "string" or type(boolean) ~= "boolean" then
+        return
+    end
+
+    values = {
+        Squash.string.ser(str, alphabet),
+        Squash.boolean.ser(boolean),
+    }
+
+    return table.unpack(values)
+end)
 ```
