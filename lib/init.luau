@@ -282,17 +282,6 @@ function Route:addOutgoingMiddleware(middleware)
 end
 
 --[=[
-	@class Loop
-
-	A [Matter Loop](https://eryn.io/matter/api/Loop).
-
-	For technical details, if you were to use a custom Loop object or try to integrate this Net Library in a ECS other than Matter,
-	the ``Net.start(loop, { Route })`` function uses a similar implementation to ``Net.createHook({ Net })`` internally.
-
-	For more information on this, see [Net.createHook].
-]=]
-
---[=[
 	@function new
 	@within Route
 	
@@ -340,6 +329,17 @@ function Route.new(configuration: Configuration?)
 
 	return self
 end
+
+--[=[
+	@class Loop
+
+	A [Matter Loop](https://eryn.io/matter/api/Loop).
+
+	For technical details, if you were to use a custom Loop object or try to integrate this Net Library in a ECS other than Matter,
+	the ``Net.start(loop, { Route })`` function uses a similar implementation to ``Net.createHook({ Net })`` internally.
+
+	For more information on this, see [Net.createHook].
+]=]
 
 --[=[
 	@within Net
