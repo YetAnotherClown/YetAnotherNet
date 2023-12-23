@@ -2,7 +2,10 @@ title = "Net"
 gitSourceBranch = "main"
 classOrder = [
     "Net",
-    "Loop"
+    "Route",
+    "Loop",
+    "QueryResult",
+    "SendRequest",
 ]
 
 [docusaurus]
