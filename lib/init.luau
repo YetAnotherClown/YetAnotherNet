@@ -149,9 +149,12 @@ function QueryResult:__iter()
 	local identifier = self._identifier
 
 	local snapshot = self._snapshot
-	local i = 1
+	local i = 0
 
 	return function()
+		-- Tick for new packet
+		i += 1
+
 		local packet = snapshot[i]
 		if not packet then
 			return
@@ -165,9 +168,6 @@ function QueryResult:__iter()
 		if packet.identifier ~= identifier or not isSenderAllowed then
 			return
 		end
-
-		-- Tick for next packet
-		i += 1
 
 		return i, packet.sender, unpack(packet.data)
 	end
@@ -466,6 +466,55 @@ end
 ]=]
 
 --[=[
+	@function new
+	@within Route
+	
+	Creates a new Route with a unique identifier, channel, and event.
+
+	:::note
+	All Routes with the same Channel will share a single Remote. It's recommended that you run all your
+	Net scheduling code on a single event.
+	:::
+
+	@param configuration Configuration?
+]=]
+function Route.new(configuration: Configuration?)
+	local self = {}
+	setmetatable(self, Route)
+
+	self._configuration = configuration or {} :: Configuration
+	if configuration then
+		-- Validate Channel
+		if configuration.Channel and configuration.Channel ~= ("Reliable" or "Unreliable") then
+			error("Channel should be Reliable or Unreliable.", 2)
+		end
+
+		-- Implement default channel
+		if not configuration.Channel then
+			configuration.Channel = "Reliable"
+		end
+
+		-- Validate Event
+		if configuration.Event and typeof(configuration.Event) ~= "string" then
+			error("Event should be a string.", 2)
+		end
+	end
+
+	self._middleware = {
+		Incoming = nil,
+		Outgoing = nil,
+	}
+	self._identifier = Identifier(tostring(self))
+	self._outgoingQueue = {}
+	self._snapshot = {
+		Reliable = {},
+		Unreliable = {},
+	}
+
+	return self
+end
+
+--[=[
 	@within Net
 
 	Initializes your Routes by adding middleware to your Matter Loop.
@@ -554,55 +603,6 @@ function createHook(routes)
 
 		bridge:step()
 	end
-end
-
---[=[
-	@function new
-	@within Route
-	
-	Creates a new Route with a unique identifier, channel, and event.
-
-	:::note
-	All Routes with the same Channel will share a single Remote. It's recommended that you run all your
-	Net scheduling code on a single event.
-	:::
-
-	@param configuration Configuration?
-]=]
-function Route.new(configuration: Configuration?)
-	local self = {}
-	setmetatable(self, Route)
-
-	self._configuration = configuration or {} :: Configuration
-	if configuration then
-		-- Validate Channel
-		if configuration.Channel and configuration.Channel ~= ("Reliable" or "Unreliable") then
-			error("Channel should be Reliable or Unreliable.", 2)
-		end
-
-		-- Implement default channel
-		if not configuration.Channel then
-			configuration.Channel = "Reliable"
-		end
-
-		-- Validate Event
-		if configuration.Event and typeof(configuration.Event) ~= "string" then
-			error("Event should be a string.", 2)
-		end
-	end
-
-	self._middleware = {
-		Incoming = nil,
-		Outgoing = nil,
-	}
-	self._identifier = Identifier(tostring(self))
-	self._outgoingQueue = {}
-	self._snapshot = {
-		Reliable = {},
-		Unreliable = {},
-	}
-
-	return self
 end
 
 --- @prop server "Net_Server"
