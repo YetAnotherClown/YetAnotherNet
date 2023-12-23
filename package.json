@@ -1,0 +1,43 @@
+{
+    "name": "@rbxts/yetanothernet",
+    "version": "0.6.0",
+    "description": "A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS.",
+    "homepage": "https://yetanotherclown.github.io/Net/",
+    "repository": {
+        "type": "github",
+        "url": "https://github.com/YetAnotherClown/Net"
+    },
+    "main": "lib",
+    "scripts": {
+        "build": "rbxtsc",
+        "watch": "rbxtsc -w",
+        "prepublishOnly": "npm run build"
+    },
+    "keywords": [
+        "Networking",
+        "ECS",
+        "Matter"
+    ],
+    "author": "YetAnotherClown",
+    "license": "MIT",
+    "typings": "lib/index.d.ts",
+    "files": [
+        "lib/"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "devDependencies": {
+        "@rbxts/compiler-types": "^2.2.0-types.0",
+        "@rbxts/types": "^1.0.737",
+        "@typescript-eslint/eslint-plugin": "^6.15.0",
+        "@typescript-eslint/parser": "^6.15.0",
+        "eslint": "^8.56.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-prettier": "^5.1.0",
+        "eslint-plugin-roblox-ts": "^0.0.36",
+        "prettier": "^3.1.1",
+        "roblox-ts": "^2.2.0",
+        "typescript": "^5.3.3"
+    }
+}

@@ -2,5 +2,7 @@
 /*.rbxl.lock
 /*.rbxm
 /build
+/node_modules
 .vscode
 sourcemap.json
+package-lock.json

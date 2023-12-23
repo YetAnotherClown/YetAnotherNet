@@ -229,6 +229,13 @@ function Bridge.new()
 
 	self._outgoingQueue = { Reliable = {}, Unreliable = {} } :: OutgoingQueue
 
+	-- Fix for typescript
+	if not script.Parent:FindFirstChild("Remotes") then
+		local folder = Instance.new("Folder")
+		folder.Name = "Remotes"
+		folder.Parent = script.Parent
+	end
+
 	if RunService:IsServer() then
 		self.reliableRemote = script.Parent.Remotes:FindFirstChild("Reliable") or Instance.new("RemoteEvent")
 		self.reliableRemote.Name = "Reliable"
