@@ -466,9 +466,8 @@ end
 ]=]
 
 --[=[
-	@function start
-	@within Route
-	
+	@within Net
+
 	Initializes your Routes by adding middleware to your Matter Loop.
 	This ensures that your Routes run between each frame.
 
@@ -483,7 +482,7 @@ end
 	@param loop Loop -- A Matter Loop
 	@param routes { Route } -- A table of your Routes
 ]=]
-function Route.start(loop, routes)
+function start(loop, routes)
 	local events = {}
 	for _, route in routes do
 		local event = route._configuration.Event or "default"
@@ -528,9 +527,8 @@ function Route.start(loop, routes)
 end
 
 --[=[
-	@function createHook
-	@within Route
-	
+	@within Net
+
 	This function allows you to run Net scheduling code on your own events.
 
 	When you provide a table of Routes, this function will return another function
@@ -545,7 +543,7 @@ end
 	@param routes { Net } -- A table of your Routes
 	@return () -> ()
 ]=]
-function Route.createHook(routes)
+function createHook(routes)
 	local bridge = Bridge.new()
 
 	return function()
@@ -607,4 +605,37 @@ function Route.new(configuration: Configuration?)
 	return self
 end
 
-return Route
+--- @prop server "Net_Server"
+--- @within Net
+--- A unique identifier used for to identify the Server when sending/querying.
+
+--- @prop Route Route
+--- @within Net
+--- A uniquely identified Object responsible for handling queries and send requests.
+
+--[=[
+	@class Net
+
+	Net is a networking library for Roblox, or rather its a library that wraps around Roblox's RemoteEvents to solve certain issues and provide new API for networking on Roblox.
+
+	Some of the issues this library solves are:
+	- Overhead from RemoteEvents
+	- Ordering of Networking Events
+	- Lack of Type-Checking and Intellisense for working with RemoteEvents
+
+	Net also provides several utilities:
+	- Middleware
+	- Strict Type-Checking & Auto-completion
+	- Simple integration with Hooks
+	- Data-driven Design
+
+	You can learn more about how Net works and how to use it by visiting [Getting Started with Routes](/docs/getting-started/routes).
+	Or, you can keep reading to learn more about the technical details and design choices that went into creating Net in the [Introduction](/docs/intro).
+]=]
+return {
+	server = Bridge.server :: NetServer,
+	Route = Route,
+
+	createHook = createHook,
+	start = start,
+}
