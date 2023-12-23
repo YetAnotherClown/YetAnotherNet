@@ -16,7 +16,7 @@ declare class SendRequest {
     public to(recipient: Recipient): void;
 }
 
-type Query<T extends Array<any>> = IterableFunction<LuaTuple<[number, ...T]>>;
+type Query<T extends Array<any>> = IterableFunction<LuaTuple<[number, Player | "NET_SERVER", ...T]>>;
 
 /**
      * An iterable object returned as the result of `Route.query()` that can filter snapshots
