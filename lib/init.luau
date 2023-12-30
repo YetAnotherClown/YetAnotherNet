@@ -301,7 +301,7 @@ function Route.new(configuration: Configuration?)
 	self._configuration = configuration or {} :: Configuration
 	if configuration then
 		-- Validate Channel
-		if configuration.Channel and configuration.Channel ~= ("Reliable" or "Unreliable") then
+		if configuration.Channel and not table.find({ "Reliable", "Unreliable" }, configuration.Channel) then
 			error("Channel should be Reliable or Unreliable.", 2)
 		end
 
