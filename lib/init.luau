@@ -459,10 +459,10 @@ end
 	You can learn more about how Net works and how to use it by visiting [Getting Started with Routes](/docs/getting-started/routes).
 	Or, you can keep reading to learn more about the technical details and design choices that went into creating Net in the [Introduction](/docs/intro).
 ]=]
-return {
+return table.freeze({
 	server = Bridge.server :: NetServer,
 	Route = Route,
 
 	createHook = createHook,
 	start = start,
-}
+})
