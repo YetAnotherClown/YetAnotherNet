@@ -1,0 +1,43 @@
+---
+sidebar_position: 2
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Other Setups
+
+<Tabs>
+<TabItem value="lua" label="Luau" default>
+
+You can integrate Net into whatever game architecture you want by creating a Hook using ``Net.createHook({ Route })`` which is identical to the ``Net.start(loop, { Route })`` function. This function will return another function which you can call whenever you want to process your Routes' queues and send/receive your Packets on the Server or Client.
+
+Below is a simple example of creating custom scheduling behavior using ``Net.createHook({ Route })``,
+```lua
+local RunService = game:GetService("RunService")
+
+local Net = require("Net.luau")
+local routes = require("routes.luau")
+
+local hook = Net.createHook(routes)
+RunService.Heartbeat:Connect(hook)
+```
+
+</TabItem>
+<TabItem value="ts" label="Typescript">
+
+You can integrate Net into whatever game architecture you want by creating a Hook using ``Net.createHook([Route])`` which is identical to the ``Net.start(loop, [Route])`` function. This function will return another function which you can call whenever you want to process your Routes' queues and send/receive your Packets on the Server or Client.
+
+Below is a simple example of creating custom scheduling behavior using ``Net.createHook([Route])``,
+```ts
+import Net from "@rbxts/yetanothernet";
+import routes from "shared/routes";
+
+const RunService = game.GetService("RunService");
+
+const hook = Net.createHook(routes);
+RunService.Heartbeat.Connect(hook);
+```
+
+</TabItem>
+</Tabs>

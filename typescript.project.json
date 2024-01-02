@@ -1,0 +1,10 @@
+{
+  "name": "yetanothernet",
+  "tree": {
+    "$path": "out",
+    "Remotes": {
+      "$className": "Folder",
+      "$ignoreUnknownInstances": true
+    }
+  }
+}

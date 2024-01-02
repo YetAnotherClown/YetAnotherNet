@@ -34,12 +34,6 @@ There are a few ways you can configure your Routes:
     You can safely ignore this field if you do not use the <code lang="lua">Net.start(loop, 	&#123; routes &#125;)</code> hook.
     </p>
   </TabItem>
-  <TabItem value="middleware" label="Middleware">
-    <p>
-    Middleware is a powerful feature that allows you to validate your types and serialize/deserialize data before Packets are sent/queried.<br />
-    There is a lot to say and go into detail about for Middleware, see <a href="/docs/getting-started/middleware">Getting Started with Middleware</a> for more.
-    </p>
-  </TabItem>
 </Tabs>
 
 ---
@@ -48,19 +42,63 @@ There are a few ways you can configure your Routes:
 
 Routes can be Type-checked to provide intellisense and auto-completion by providing a type annotation when creating your Routes.
 
+<Tabs>
+<TabItem value="lua" label="Luau" default>
+
 ```lua
 local Net = require("Net.luau")
-type Net<U...> = Net.Net<U...>
 
-local Route: Net<number, string, boolean> = Net.new()
+local Route = Net.Route
+type Route<U...> = Net.Route<U...>;
+
+local route: Route<number, string, boolean> = Route.new()
+
+-- Send will expect the types annotated
+route:send(1, "Hello, world!", true)
+
+-- The returned arguments are typed
+for pos, num, str, bool in route:query() do
+  -- Do something
+end
 ```
 
 In this example, the Route is annotated with the types `number, string, boolean`, this means that our methods like `Route:query()` and `Route:send()` will return or expect
-these types. E.g, `Route:send(number, string, boolean)` or `for _, _, number, string, boolean in Route:query() do`.
+these types.
 
 This will enable auto-completion and type-checking when working with your Routes, as such it is encouraged you enable Strict Typing to compliment these features.
 
+</TabItem>
+<TabItem value="ts" label="Typescript">
+
+```ts
+import { Route } from "@rbxts/yetanothernet";
+
+const route: Route<[number, boolean, string]> = new Route({
+  Channel: "Reliable",
+  Event: undefined,
+});
+
+// Send will expect the types annotated
+route.send(1, "Hello, world!", true)
+
+// The returned arguments are typed
+for (const [pos, sender, num, str, bool] of route.query()) {
+  // Do something
+}
+```
+
+In this example, the Route is annotated with the types `number, string, boolean`, this means that our methods like `Route.query()` and `Route.send()` will return or expect
+these types.
+
+This will enable auto-completion and type-checking when working with your Routes, as such it is encouraged you enable Strict Typing to compliment these features.
+
+</TabItem>
+</Tabs>
+
 ## Sending
+
+<Tabs>
+<TabItem value="lua" label="Luau" default>
 
 You can use `Route:send(...data)` to send data over the Route. This data will be processed next frame, which is when you'll be able to query it on the receiving end.
 
@@ -70,12 +108,36 @@ type Net<U...> = Net.Net<U...>
 
 local Route: Net<number, string, boolean> = Net.new()
 
-Route:send(5, "Hello, world!", true)
+Route:send(5, true, "Hello, world!")
 ```
 
 By default, `Route:send()` will send the Packet of data to all Clients when used on the Server. You can specify a `Player` or `{ Player }` to send it to by using `Route:send():to(recipient)`.
 
+</TabItem>
+<TabItem value="ts" label="Typescript">
+
+You can use `Route.send(...data)` to send data over the Route. This data will be processed next frame, which is when you'll be able to query it on the receiving end.
+
+```ts
+import Route from "@rbxts/yetanothernet";
+
+const route: Route<[number, boolean, string]> = new Route({
+  Channel: "Reliable",
+  Event: undefined,
+});
+
+Route.send(5, true, "Hello, world!")
+```
+
+By default, `Route.send()` will send the Packet of data to all Clients when used on the Server. You can specify a `Player` or `[Player]` to send it to by using `Route.send().to(recipient)`.
+
+</TabItem>
+</Tabs>
+
 ## Querying
+
+<Tabs>
+<TabItem value="lua" label="Luau" default>
 
 Querying is simple, you can query for Packets by using `Route:query()` which will return an iterator that will output `position, sender, ...data` in your for loop.
 
@@ -91,4 +153,28 @@ end
 ```
 
 When you call the `query` method, it will take a snapshot of all Packets from the previous frame and filter it for you, such as only returning Packets from the Route the method was called on.
-Or, you can also filter out senders by calling `Route:query():from(...sender)` on the QueryResult and putting any values of type `{ Player } | Player | Net.Server` in the arguments.
+Or, you can also filter out senders by calling `Route:query():from(...sender)` on the QueryResult and putting any values of type `{ Player } | Player | Net.server` in the arguments.
+
+</TabItem>
+<TabItem value="ts" label="Typescript">
+
+Querying is simple, you can query for Packets by using `Route.query()` which will return an iterator that will output `position, sender, ...data` in your for loop.
+
+```ts
+import { Route } from "@rbxts/yetanothernet";
+
+const route: Route<[number, boolean, string]> = new Route({
+  Channel: "Reliable",
+  Event: undefined,
+});
+
+for (const [pos, sender, num, str, bool] of route.query()) {
+  // Do something
+}
+```
+
+When you call the `query` function, it will take a snapshot of all Packets from the previous frame and filter it for you, such as only returning Packets from the Route the function was called on.
+Or, you can also filter out senders by calling `Route.query().from(...sender)` on the QueryResult and putting any values of type `[Player] | Player | Net.server` in the arguments.
+
+</TabItem>
+</Tabs>
