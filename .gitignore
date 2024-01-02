@@ -1,8 +1,10 @@
 /*.rbxlx.lock
 /*.rbxl.lock
 /*.rbxm
+/*.tgz
 /build
 /node_modules
+/out
 .vscode
 sourcemap.json
 package-lock.json

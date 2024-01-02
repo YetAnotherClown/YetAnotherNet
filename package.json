@@ -1,6 +1,6 @@
 {
     "name": "@rbxts/yetanothernet",
-    "version": "0.6.0",
+    "version": "0.7.0-beta.1",
     "description": "A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS.",
     "homepage": "https://yetanotherclown.github.io/Net/",
     "repository": {
@@ -9,8 +9,8 @@
     },
     "main": "lib",
     "scripts": {
-        "build": "rbxtsc",
-        "watch": "rbxtsc -w",
+        "build": "rbxtsc --rojo typescript.project.json",
+        "watch": "rbxtsc --rojo typescript.project.json -w",
         "prepublishOnly": "npm run build"
     },
     "keywords": [
