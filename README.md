@@ -78,6 +78,14 @@ Net = "yetanotherclown/net@0.7.x"
 
 Note: Wally does not export types automatically, if you wish to use Strict Typing with Net, install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman.
 
+### Installing for Roblox Typescript
+
+You can find Net as [YetAnotherNet on NPM](https://www.npmjs.com/package/@rbxts/yetanothernet).
+
+```json
+"@rbxts/yetanothernet": "0.7.0-beta.2"
+```
+
 ### Building with Rojo
 
 To build yourself, use: 
