@@ -73,7 +73,7 @@ end
 
 ```toml
 [dependencies]
-Net = "yetanotherclown/net@0.6.x"
+Net = "yetanotherclown/net@0.7.x"
 ```
 
 Note: Wally does not export types automatically, if you wish to use Strict Typing with Net, install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman.
