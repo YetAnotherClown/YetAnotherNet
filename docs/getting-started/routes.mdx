@@ -143,9 +143,11 @@ Querying is simple, you can query for Packets by using `Route:query()` which wil
 
 ```lua
 local Net = require("Net.luau")
-type Net<U...> = Net.Net<U...>
 
-local Route: Net<number, string, boolean> = Net.new()
+local Route = Net.Route
+type Route<U...> = Net.Route<U...>;
+
+local Route: Route<number, string, boolean> = Route.new()
 
 for pos, sender, num, str, bool in Route:query() do
   -- Do something
