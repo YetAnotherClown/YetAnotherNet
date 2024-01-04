@@ -22,7 +22,9 @@ Firstly, create a ``routes.luau`` ModuleScript in ReplicatedStorage to strictly 
 
 ```lua title="routes.luau"
 local Net = require("Net.luau")
-type Net<U...> = Net.Net<U...>
+
+local Route = Net.Route
+type Route<U...> = Net.Route<U...>;
 
 local defaultConfiguration = {
   Channel = "Reliable",
