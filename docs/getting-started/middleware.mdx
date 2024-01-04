@@ -81,9 +81,11 @@ To compress/decompress your data, you can use a library like [Squash](https://gi
 ```lua
 local Squash = require("Squash.luau")
 local Net = require("Net.luau")
-type Net<U...> = Net.Net<U...>
 
-local route: Net<string, number> = Net.new({
+local Route = Net.Route
+type Route<U...> = Net.Route<U...>;
+
+local route: Route<string, number> = Route.new({
     Channel = "Reliable",
 })
 
