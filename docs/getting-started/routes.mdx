@@ -104,7 +104,19 @@ You can use `Route:send(...data)` to send data over the Route. This data will be
 
 ```lua
 local Net = require("Net.luau")
-type Net<U...> = Net.Net<U...>
+
+local Route = Net.Route
+type Route<U...> = Net.Route<U...>;
+
+local route: Route<number, string, boolean> = Route.new()
+
+-- Send will expect the types annotated
+route:send(1, "Hello, world!", true)
+
+-- The returned arguments are typed
+for pos, num, str, bool in route:query() do
+  -- Do something
+end
 
 local Route: Net<number, string, boolean> = Net.new()
 
