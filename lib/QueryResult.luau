@@ -88,7 +88,7 @@ function QueryResult:__iter()
 
 		-- Return all packets if no Senders are supplied, or filter by Senders
 		local filterSenders = #senders > 0
-		local isSenderAllowed = not filterSenders and table.find(senders, packet.sender) or true
+		local isSenderAllowed = if filterSenders then table.find(senders, packet.sender) else true
 
 		-- Don't return packet if filtered
 		if packet.identifier ~= identifier or not isSenderAllowed then
@@ -113,7 +113,7 @@ function QueryResult:from(...)
 
 	local params = { ... }
 	for _, param in params do
-		if typeof(param) == "table" then
+		if typeof(param) == "table" and param.__type ~= "Player" then
 			for _, player in param do
 				table.insert(senders, player)
 			end
