@@ -1,0 +1,25 @@
+{
+  "name": "Net",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Packages": {
+        "$className": "Folder",
+        "Net": {
+          "$path": "lib"
+        }
+      },
+      "DevPackages": {
+        "$path": "DevPackages"
+      },
+      "jest.config": {
+        "$path": "tests/jest.config.luau"
+      }
+    },
+    "ServerScriptService": {
+      "server": {
+        "$path": "tests/startJest.server.luau"
+      }
+    }
+  }
+}
