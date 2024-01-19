@@ -33,7 +33,7 @@ type Payload = {
 	[string]: { { any } },
 }
 
-type BridgeImpl = {
+export type BridgeImpl = {
 	server: NetServer,
 	reliableRemote: RemoteEvent,
 	unreliableRemote: UnreliableRemoteEvent,
@@ -69,6 +69,10 @@ type BridgeImpl = {
 
 	step: (self: Bridge) -> (),
 	snapshot: (self: Bridge) -> IncomingQueue,
+	getContext: (self: Bridge) -> "server" | "client",
+	isPlayer: (self: Bridge, player: any) -> boolean,
+
+	_initializeRemotes: (self: Bridge) -> (),
 
 	new: () -> Bridge,
 }
@@ -148,12 +152,16 @@ function Bridge:_processOutgoingQueue()
 	-- Add each packet to it's respective payload
 	for channel, package in pairs(snapshot) do
 		for _, packet in package do
-			if typeof(packet.recipient) == "table" then
+			if self:isPlayer(packet.recipient) then
+				self:_updateClientPayload(clientPayloads, packet.recipient, packet)
+			elseif typeof(packet.recipient) == "table" then
 				for _, player in packet.recipient do
+					if not self:isPlayer(player) then
+						continue
+					end
+
 					self:_updateClientPayload(clientPayloads, player, packet)
 				end
-			elseif typeof(packet.recipient) == "Instance" and packet.recipient:IsA("Player") then
-				self:_updateClientPayload(clientPayloads, packet.recipient, packet)
 			else
 				self:_addPacketToPayload(serverPayloads[channel], packet)
 			end
@@ -161,7 +169,7 @@ function Bridge:_processOutgoingQueue()
 	end
 
 	-- Send the Payload over the RemoteEvent
-	if RunService:IsClient() then
+	if self:getContext() == "client" then
 		for channel, remote in pairs({ Reliable = self.reliableRemote, Unreliable = self.unreliableRemote }) do
 			local n = 0
 			for _ in serverPayloads[channel] do
@@ -175,7 +183,7 @@ function Bridge:_processOutgoingQueue()
 
 			remote:FireServer(serverPayloads[channel])
 		end
-	elseif RunService:IsServer() then
+	elseif self:getContext() == "server" then
 		for player, payload in clientPayloads do
 			self.reliableRemote:FireClient(player, payload.Reliable)
 			self.unreliableRemote:FireClient(player, payload.Unreliable)
@@ -219,16 +227,15 @@ function Bridge:snapshot()
 	return table.clone(self._snapshot)
 end
 
--- Creates a new Bridge
-function Bridge.new()
-	local self = {}
-	setmetatable(self, Bridge)
+function Bridge:isPlayer(player: any)
+	return typeof(player) == "Instance" and player:IsA("Player") or false
+end
 
-	self._incomingQueue = { Reliable = {}, Unreliable = {} } :: IncomingQueue
-	self._snapshot = { Reliable = {}, Unreliable = {} } :: IncomingQueue
+function Bridge:getContext()
+	return RunService:IsServer() and "server" or RunService:IsClient() and "client"
+end
 
-	self._outgoingQueue = { Reliable = {}, Unreliable = {} } :: OutgoingQueue
-
+function Bridge:_initializeRemotes()
 	-- Fix for typescript
 	if not script.Parent:FindFirstChild("Remotes") then
 		local folder = Instance.new("Folder")
@@ -263,6 +270,19 @@ function Bridge.new()
 			self:_processIncoming("Unreliable", "NET_SERVER", package)
 		end)
 	end
+end
+
+-- Creates a new Bridge
+function Bridge.new()
+	local self = {}
+	setmetatable(self, Bridge)
+
+	self._incomingQueue = { Reliable = {}, Unreliable = {} } :: IncomingQueue
+	self._snapshot = { Reliable = {}, Unreliable = {} } :: IncomingQueue
+
+	self._outgoingQueue = { Reliable = {}, Unreliable = {} } :: OutgoingQueue
+
+	self:_initializeRemotes()
 
 	return self
 end
