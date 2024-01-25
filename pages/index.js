@@ -142,8 +142,10 @@ function HomepageHeader() {
   return (
     <header className={clsx("hero", styles.heroBanner)} style={heroBannerStyle}>
       <div className="container">
-        <h1 className={titleClassName}>{siteConfig.title}</h1>
-        <p className={taglineClassName}>{siteConfig.tagline}</p>
+        <img
+          alt="YetAnotherNet — A Data-Driven Networking Library, inspired by Bevy_Renet & BridgeNet2, made for ECS."
+          src="Banner.svg"
+        ></img>
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
