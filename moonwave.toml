@@ -9,7 +9,7 @@ classOrder = [
 ]
 
 [docusaurus]
-tagline = "A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS."
+favicon = "Favicon.svg"
 
 [[navbar.items]]
 href = "https://discord.gg/gMWmuaZEY6"
