@@ -1,49 +1,122 @@
-# Net
-**[View Docs](https://yetanotherclown.github.io/Net/)**
+<div align="center">
+    <img alt="YetAnotherNet — A Data-Driven Networking Library, inspired by Bevy_Renet & BridgeNet2, made for ECS." src=".moonwave/static/Banner.svg">
+</div>
 
-> A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS.
+## Quick Start
 
-### WARNING
+- [**Documentation**]
+- [**Basic Use**]
+- [**To-do**]
+- **Getting Started**
+    - [**Routes**]
+    - [**Middleware**]
+    - [**Hooks**]
+- **Setup Guides**
+    - [**Matter**]
+    - [**Other**]
+- **Installation**
+    - [**Wally**]
+    - [**NPM**]
 
-Net is an experimental library, expect bugs and major design changes. While the API
-should remain the same, there is no guarantee.
+[**Documentation**]: https://yetanotherclown.github.io/YetAnotherNet/
+[**Basic Use**]: #basic-usage
+[**To-do**]: #to-do
+[**Routes**]: https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/routes
+[**Middleware**]: https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/middleware
+[**Hooks**]: https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/hooks
+[**Matter**]: https://yetanotherclown.github.io/YetAnotherNet/docs/setup/matter
+[**Other**]: https://yetanotherclown.github.io/YetAnotherNet/docs/setup/other
+[**Wally**]: #wally
+[**NPM**]: #npm-for-roblox-typescript
 
-## What is this?
+## About
 
-Net is a networking library for Roblox, or rather its a library that wraps around Roblox's RemoteEvents to solve certain issues and provide new API for networking on Roblox.
+YetAnotherNet is a Networking Library for Roblox, which wraps around Roblox's RemoteEvents to improve developer experience, offer efficient networking, and provide other tools, utilities, and features relating to Networking on Roblox.
 
-Some of the issues this library solves are:
-- Overhead from RemoteEvents
-- Ordering of Networking Events
-- Lack of Type-Checking and Intellisense for working with RemoteEvents
+### Features
 
-Net also provides several utilities:
+- Complete Typechecking & Intellisense
+- No Overhead from RemoteEvents
+- Ordered Networking
 - Middleware
-- Strict Type-Checking & Auto-completion
-- Simple integration with Hooks
-- Data-driven Design
+- Data-Driven Design
+- Simple Integration & API
+- Hot-reloading Support with [Rewire]
 
-You can learn more about how Net works and how to use it by visiting [Getting Started with Routes](/docs/getting-started/routes). Or, you can keep reading to learn more about the technical details and design choices that went into creating Net.
+[Rewire]: https://github.com/sayhisam1/Rewire
 
-## Data-driven by design
+### Data-driven by design
 
-One thing that separates Net from other networking libraries on Roblox is this key design choice. Net was made to work with ECS, a Data-driven approach to game design, which has influenced the design of the library largely and makes it unique from the rest.
+One thing that separates YetAnotherNet from other networking libraries on Roblox is this key design choice. YetAnotherNet was made to work with ECS, a Data-driven approach to game design, which has influenced the design of the library largely and makes it unique from the rest.
 
-With inspiration from [Bevy_Renet](https://github.com/lucaspoffo/renet/tree/master/bevy_renet), a Networking crate for use with the Bevy ECS in Rust, and another networking library on Roblox, [BridgeNet2](https://ffrostflame.github.io/BridgeNet2/), Net pushes to provide similar functionality to these two libraries for ECS on Roblox.
+With inspiration from [Bevy_Renet], a Networking crate for use with the Bevy ECS in Rust, and another networking library on Roblox, [BridgeNet2], YetAnotherNet pushes to provide similar functionality to these two libraries for ECS on Roblox.
 
-### Why go for Data-driven?
+[Bevy_Renet]: https://github.com/lucaspoffo/renet/tree/master/bevy_renet
+[BridgeNet2]: https://ffrostflame.github.io/BridgeNet2/
+
+#### Why go for Data-Driven Design?
 
 Data-driven design opposes Event-driven design, which is what you can commonly see on Roblox, such as RemoteEvents themselves. Event-driven design has it's woes, which is why we opt for ECS and generally Data-driven design.
 
-Event-driven design is sensitive to ordering, this makes it difficult to know when you might get data from an event. To solve this, Net does not use Events, it encourages you to query and send data in an ordered manner frame-by-frame, preferably with ECS.
+Event-driven design is sensitive to ordering, this makes it difficult to know when you might get data from an event. To solve this, YetAnotherNet does not use Events, it encourages you to query and send data in an ordered manner frame-by-frame, preferably with ECS.
 
-Since it's encouraged to use ECS with Net, though not required, we suggest reading [Matter — Why ECS?](https://eryn.io/matter/docs/WhyECS) by Evaera.
+Since it's encouraged to use ECS with YetAnotherNet, though not required, we suggest reading [Matter — Why ECS?] by Evaera.
+
+[Matter — Why ECS?]: https://matter-ecs.github.io/matter/docs/WhyECS
 
 ---
 
-### Basic Usage
+## To-do
 
-In a [Matter](https://github.com/evaera/matter) System:
+Tasks to complete before version 1.0.0 is released.
+
+- [x] Basic Functionality
+- [x] Stable Core API
+- [x] Strict Typing
+- [x] Unreliable Channel
+- [X] Middleware
+- [X] Typescript Support
+- [ ] Unit + Integration Tests w/ Jest 
+- [ ] Rate limiting
+- [ ] Internal Use of Buffers
+- [ ] Debugger
+
+Other Tasks
+- [ ] Minimal Example
+- [ ] ECR Setup Guide
+- [ ] ECR Example
+- [ ] Docs Page for Technical Details
+
+---
+
+## Basic Usage
+
+> [!TIP]
+> See full documentation on [How to Use Routes] and [How to Setup with Matter] on the Documentation Site.
+
+[How to Use Routes]: https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/routes
+[How to Setup with Matter]: https://yetanotherclown.github.io/YetAnotherNet/docs/setup/matter
+
+### Setup
+
+Basic Setup for Routes
+```lua
+local Net = require("Net.luau")
+
+local Route = Net.Route
+type Route<U...> = Net.Route<U...>;
+
+-- You can specify the type(s) between the <> for Typechecking + Intellisense
+local ExampleRoute: Route<any> = Route.new()
+
+return {
+    ExampleRoute = ExampleRoute
+}
+```
+
+### Example Use
+
+Example of how usage in a [Matter] System
 ```lua
 local routes = require("routes.luau")
 local ExampleRoute = routes.ExampleOne
@@ -67,45 +140,43 @@ local function exampleSystem(world)
 end
 ```
 
+[Matter]: https://github.com/matter-ecs/matter
+
 ---
 
-### Installing with Wally
+## Installation
 
+### Wally
+
+Add YetAnotherNet to your project with [Wally] by adding the following to your ``wally.toml`` file:
 ```toml
 [dependencies]
-Net = "yetanotherclown/net@0.7.x"
+Net = "yetanotherclown/yetanothernet@0.7.0"
 ```
 
-Note: Wally does not export types automatically, if you wish to use Strict Typing with Net, install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman.
+> [!NOTE]
+> Wally does not export types automatically, if you wish to use Strict Typing with YetAnotherNet, install [Wally Package Types] with Aftman.
 
-### Installing for Roblox Typescript
+[Wally]: https://github.com/UpliftGames/wally
+[Wally Package Types]: https://github.com/JohnnyMorganz/wally-package-types
 
-You can find Net as [YetAnotherNet on NPM](https://www.npmjs.com/package/@rbxts/yetanothernet).
+### NPM for Roblox Typescript
+
+You can find YetAnotherNet on [NPM], or install it with the command line:
 
 ```
 npm i @rbxts/yetanothernet
 ```
 
-### Building with Rojo
+[NPM]: https://www.npmjs.com/package/@rbxts/yetanothernet
 
-To build yourself, use: 
+## Building
+
+To build yourself with Rojo, use: 
 ```bash
 rojo build -o "Net.rbxm"
 ```
 
-For more help, check out [the Rojo documentation](https://rojo.space/docs).
+For more help, check out [the Rojo documentation].
 
-## Todo for 1.0.0
-
-- [x] Basic Functionality
-- [x] Stable Core API
-- [x] Strict Typing
-- [x] Unreliable Channel
-- [X] Middleware
-- [ ] Void ``sender`` return argument when querying on the Client, with respect for Strict Typing
-- [ ] Rate limiting
-- [ ] Debugger
-
-## Planned Features
-
-- [ ] Internal Use of Buffers -- When released on Roblox
+[the Rojo documentation]: https://rojo.space/docs
