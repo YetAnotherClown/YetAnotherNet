@@ -34,7 +34,7 @@ Data-driven design opposes Event-driven design, which is what you can commonly s
 
 Event-driven design is sensitive to ordering, this makes it difficult to know when you might get data from an event. To solve this, Net does not use Events, it encourages you to query and send data in an ordered manner frame-by-frame, preferably with ECS.
 
-Since it's encouraged to use ECS with Net, though not required, we suggest reading [Matter — Why ECS?](https://eryn.io/matter/docs/WhyECS) by Evaera.
+Since it's encouraged to use ECS with Net, though not required, we suggest reading [Matter — Why ECS?](https://matter-ecs.github.io/matter/docs/WhyECS) by Evaera.
 
 ## Installation
 
@@ -42,7 +42,7 @@ Since it's encouraged to use ECS with Net, though not required, we suggest readi
 
 ```toml
 [dependencies]
-Net = "yetanotherclown/net@0.7.x"
+Net = "yetanotherclown/yetanothernet@0.7.0"
 ```
 
 Note: Wally does not export types automatically, if you wish to use Strict Typing with Net, install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman.

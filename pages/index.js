@@ -111,7 +111,7 @@ export function HomepageFeatures() {
                 Net's API integrates seamlessly into ECS Libraries like Matter to bring Data-driven Networking in ECS architectures.
               </p>
               <p>
-                Read more on why you should use an ECS <a href="https://eryn.io/matter/docs/WhyECS">here</a>.
+                Read more on why you should use an ECS <a href="https://matter-ecs.github.io/matter/docs/WhyECS">here</a>.
               </p>
             </div>
           </div>

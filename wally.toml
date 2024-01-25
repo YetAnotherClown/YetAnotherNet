@@ -1,5 +1,5 @@
 [package]
-name = "yetanotherclown/net"
+name = "yetanotherclown/yetanothernet"
 description = "A Data-Driven Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for the Matter ECS."
 version = "0.7.0"
 license = "MIT"

@@ -333,7 +333,7 @@ end
 --[=[
 	@class Loop
 
-	A [Matter Loop](https://eryn.io/matter/api/Loop).
+	A [Matter Loop](https://matter-ecs.github.io/matter/api/Loop).
 
 	For technical details, if you were to use a custom Loop object or try to integrate this Net Library in a ECS other than Matter,
 	the ``Net.start(loop, { Route })`` function uses a similar implementation to ``Net.createHook({ Net })`` internally.
@@ -443,20 +443,20 @@ end
 --[=[
 	@class Net
 
-	Net is a networking library for Roblox, or rather its a library that wraps around Roblox's RemoteEvents to solve certain issues and provide new API for networking on Roblox.
+	YetAnotherNet is a networking library for Roblox, or rather its a library that wraps around Roblox's RemoteEvents to solve certain issues and provide new API for networking on Roblox.
 
 	Some of the issues this library solves are:
 	- Overhead from RemoteEvents
 	- Ordering of Networking Events
 	- Lack of Type-Checking and Intellisense for working with RemoteEvents
 
-	Net also provides several utilities:
+	YetAnotherNet also provides several utilities:
 	- Middleware
 	- Strict Type-Checking & Auto-completion
 	- Simple integration with Hooks
 	- Data-driven Design
 
-	You can learn more about how Net works and how to use it by visiting [Getting Started with Routes](/docs/getting-started/routes).
+	You can learn more about how YetAnotherNet works and how to use it by visiting [Getting Started with Routes](/docs/getting-started/routes).
 	Or, you can keep reading to learn more about the technical details and design choices that went into creating Net in the [Introduction](/docs/intro).
 ]=]
 return table.freeze({

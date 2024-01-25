@@ -49,7 +49,7 @@ declare namespace Net {
          * Clients to receive the data by chaining `Route.send().to(recipient)` and passing
          * ``[Player]``, ``Player``, or ``Net.server``.
          * 
-         * See [Sending Data](https://yetanotherclown.github.io/Net/docs/getting-started/routes#sending) for more information.
+         * See [Sending Data](https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/routes#sending) for more information.
          * @returns SendRequest - A chainable object for modifying the send request
         */
         public send(...data: T): SendRequest;
@@ -66,7 +66,7 @@ declare namespace Net {
          * For example, this would run after the Client receives a Packet from the Server over the network:
          * after calling ``Route.send()`` on the Server and before calling ``Route.query()`` on the Client.
          * 
-         * See [Middleware](https://yetanotherclown.github.io/Net/docs/getting-started/middleware) for more information.
+         * See [Middleware](https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/middleware) for more information.
          * @param middleware - A function that transforms your data
          */
         public addIncomingMiddleware(middleware: (...rawData: Array<unknown>) => LuaTuple<T> | undefined): void
@@ -76,7 +76,7 @@ declare namespace Net {
          * For example, this would run before the Server sends a Packet to the Client over the network:
          * after calling ``Route.send()`` on the Server and before the Client ever receives the Packet.
          * 
-         * See [Middleware](https://yetanotherclown.github.io/Net/docs/getting-started/middleware) for more information.
+         * See [Middleware](https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/middleware) for more information.
          * @param middleware - A function that transforms your data
          */
         public addOutgoingMiddleware(middleware: (...rawData: T) => LuaTuple<any> | undefined): void
