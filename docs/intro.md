@@ -52,5 +52,5 @@ Note: Wally does not export types automatically, if you wish to use Strict Typin
 You can find Net as [YetAnotherNet on NPM](https://www.npmjs.com/package/@rbxts/yetanothernet).
 
 ```json
-"@rbxts/yetanothernet": "0.7.0-beta.2"
+"@rbxts/yetanothernet": "0.7.0-beta.3"
 ```
