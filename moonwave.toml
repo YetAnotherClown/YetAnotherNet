@@ -11,6 +11,8 @@ classOrder = [
 [docusaurus]
 tagline = "A Data-Driven Networking Library, inspired by Bevy_Renet & BridgeNet2, made for ECS."
 favicon = "Favicon.svg"
+url = "https://yetanotherclown.github.io"
+baseUrl = "/YetAnotherNet"
 
 [[navbar.items]]
 href = "https://discord.gg/gMWmuaZEY6"
