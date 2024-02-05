@@ -1,10 +1,5 @@
 type Recipient = "NET_SERVER" | Player | [Player]
 
-type Configuration = {
-    Channel: "Reliable" | "Unreliable" | undefined,
-    Event: string | undefined,
-}
-
 /**
  * Allows for modification of queued packets before they're sent.
  */
@@ -39,6 +34,11 @@ type QueryResult<T extends Array<any>> = Query<T> & {
 
 declare namespace Net {
     const server: "NET_SERVER";
+
+    type Configuration = {
+        Channel: "Reliable" | "Unreliable" | undefined,
+        Event: string | undefined,
+    }
 
     class Route<T extends Array<any>> {
         public constructor(configuration: Configuration | null);
@@ -96,8 +96,7 @@ declare namespace Net {
      * @param loop - A Matter Loop
      * @param routes - An array of your routes
      */
-    function start<T extends Array<any>>(loop: any, routes: Array<Route<T>>): void
-
+    function start(loop: any, routes: {[index: string]: Route<any>}): void
     /**
      * This function allows you to run Net scheduling code on your own events.
      * 
@@ -111,7 +110,7 @@ declare namespace Net {
      * ```
      * @param routes - An array of your routes
      */
-    function createHook<T extends Array<any>>(routes: Array<Route<T>>): () => void
+    function createHook(routes: {[index: string]: Route<any>}): () => void
 }
 
 export = Net

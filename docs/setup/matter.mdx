@@ -118,9 +118,9 @@ Being initially made for the Matter ECS, Net provides a simple function for sche
 Firstly, create a ``routes.ts`` ModuleScript in ReplicatedStorage to strictly declare your Routes.
 
 ```ts title="routes.ts"
-import { Route } from "@rbxts/yetanothernet";
+import { Route, Configuration } from "@rbxts/yetanothernet";
 
-const defaultConfiguration = {
+const defaultConfiguration: Configuration = {
   Channel: "Reliable",
   Event: "default",
 }
