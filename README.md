@@ -116,7 +116,7 @@ return {
 
 ### Example Use
 
-Example of how usage in a [Matter] System
+Example of how to use YetAnotherNet in a [Matter] System
 ```lua
 local routes = require("routes.luau")
 local ExampleRoute = routes.ExampleOne
