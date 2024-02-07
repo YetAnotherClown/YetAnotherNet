@@ -26,9 +26,9 @@ RunService.Heartbeat:Connect(hook)
 </TabItem>
 <TabItem value="ts" label="Typescript">
 
-You can integrate Net into whatever game architecture you want by creating a Hook using ``Net.createHook([Route])`` which is identical to the ``Net.start(loop, [Route])`` function. This function will return another function which you can call whenever you want to process your Routes' queues and send/receive your Packets on the Server or Client.
+You can integrate Net into whatever game architecture you want by creating a Hook using ``Net.createHook({ route: Route })`` which is identical to the ``Net.start(loop, { route: Route })`` function. This function will return another function which you can call whenever you want to process your Routes' queues and send/receive your Packets on the Server or Client.
 
-Below is a simple example of creating custom scheduling behavior using ``Net.createHook([Route])``,
+Below is a simple example of creating custom scheduling behavior using ``Net.createHook({ route: Route })``,
 ```ts
 import Net from "@rbxts/yetanothernet";
 import routes from "shared/routes";
