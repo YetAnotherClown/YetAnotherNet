@@ -1,16 +1,26 @@
 # Attack of the Killer Roombas
-Adapted from Matter's official example game.
+
+> [!NOTE]
+> This is an adapted version of the [Matter Example Game](https://github.com/matter-ecs/matter/tree/main/example), changes are stated below.
+
+Adapted Changes:
+- Use of YetAnotherNet instead of RemoteEvents
+- Tweak `receiveReplication` to run as a system
+- Style & Linting Fixes
+
+If you plan on modifying this example, you may want to run `wally-package-types --sourcemap sourcemap.json Packages/`
+with [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) after running `wally install` to get Strict-Typing with YetAnotherNet.
+
+## Building with Rojo
 
 To build:
 
 - Clone this repo
+- Open the `example/matter` directory
 - Run `wally install`
-- Run `wally install` in the `example` directory
 - Run `rojo build example.project.json --output example.rbxl`
 
 Then, open `example.rbxl` and play. Enjoy.
-
-Note: Wally does not export types automatically, please install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman and run it.
 
 ## Hot reloading
 
