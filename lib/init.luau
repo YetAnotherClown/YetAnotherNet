@@ -67,7 +67,7 @@ type RouteImpl<U...> = {
 
 	_queuePackets: (Route<U...>, Bridge) -> (),
 	_updateSnapshot: (Route<U...>, Bridge) -> (),
-	addIncomingMiddleware: (self: Route<U...>, middleware: (...any?) -> U...?) -> (),
+	addIncomingMiddleware: (self: Route<U...>, middleware: (...unknown) -> U... | (...unknown) -> nil) -> (),
 	addOutgoingMiddleware: (self: Route<U...>, middleware: (U...) -> ...any?) -> (),
 	send: (self: Route<U...>, U...) -> SendRequest,
 	query: (self: Route<U...>) -> QueryResult<U...>,
