@@ -152,7 +152,7 @@ function Route:send(...)
 		channel = self._configuration.Channel,
 		data = { ... },
 		identifier = self._identifier,
-		recipient = RunService:IsClient() and Bridge.server or Players:GetPlayers(),
+		recipient = Bridge and Bridge.server or Players:GetPlayers(),
 	} :: OutgoingPacket
 	table.insert(self._outgoingQueue, packet)
 
@@ -191,25 +191,24 @@ function Route:_queuePackets(bridge: Bridge)
 		end
 
 		-- Typecheck recipients
-		if RunService:IsClient() then
+		if bridge:getContext() == "client" then
 			if packet.recipient ~= Bridge.server then
 				warn("Clients can only send to Net.Server")
 				continue
 			end
-		elseif RunService:IsServer() then
-			if typeof(packet.recipient) == "table" then
-				for _, player in packet.recipient do
-					if typeof(player) ~= "Instance" or (typeof(player) == "Instance" and not player:IsA("Player")) then
-						warn("Attempt to send a table with a non-player instance as a recipient")
-						continue
+		elseif bridge:getContext() == "server" then
+			if not bridge:isPlayer(packet.recipient) then
+				if typeof(packet.recipient) == "table" then
+					for _, player in packet.recipient do
+						if not bridge:isPlayer(player) then
+							warn("Attempt to send a table with a non-player instance as a recipient")
+							continue
+						end
 					end
+				else
+					warn("Attempt to send a non-player instance as a recipient")
+					continue
 				end
-			elseif
-				typeof(packet.recipient) ~= "Instance"
-				or (typeof(packet.recipient) == "Instance" and not packet.recipient:IsA("Player"))
-			then
-				warn("Attempt to send a non-player instance as a recipient")
-				continue
 			end
 		end
 
@@ -230,6 +229,7 @@ end
 
 function Route:_updateSnapshot(bridge)
 	local snapshot = bridge:snapshot()[self._configuration.Channel]
+
 	for _, packet in snapshot :: { IncomingPacket } do
 		if not self._middleware.Incoming or packet.identifier ~= self._identifier then
 			continue
