@@ -12,4 +12,4 @@ Jest.runCLI(
 	{
 		ReplicatedStorage,
 	}
-)
+):await()
