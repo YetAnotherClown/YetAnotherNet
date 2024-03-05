@@ -220,6 +220,7 @@ function Route:_queuePackets(bridge: Bridge)
 		end
 
 		if typeof(packet.recipient) == "string" and packet.recipient ~= Bridge.server then
+			warn("Invalid Recipient: must be a player instance or Route.server")
 			continue
 		end
 
