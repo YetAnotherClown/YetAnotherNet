@@ -88,7 +88,7 @@ describe("Route", function()
 		processHooks()
 	end)
 
-	test("When calling `:send(), it should properly queue the packets to it's bridge", function()
+	test("When calling `:send()`, it should properly queue the packets to it's bridge", function()
 		local sendRequest = serverRoute:send(1, true, "Hello, world")
 		sendRequest:to(mockPlayer)
 
