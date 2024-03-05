@@ -299,21 +299,20 @@ function Route.new(configuration: Configuration?)
 	setmetatable(self, Route)
 
 	self._configuration = configuration or {} :: Configuration
-	if configuration then
-		-- Validate Channel
-		if configuration.Channel and not table.find({ "Reliable", "Unreliable" }, configuration.Channel) then
-			error("Channel should be Reliable or Unreliable.", 2)
-		end
 
-		-- Implement default channel
-		if not configuration.Channel then
-			configuration.Channel = "Reliable"
-		end
+	-- Validate Channel
+	if self._configuration.Channel and not table.find({ "Reliable", "Unreliable" }, self._configuration.Channel) then
+		error("Channel should be Reliable or Unreliable.", 2)
+	end
 
-		-- Validate Event
-		if configuration.Event and typeof(configuration.Event) ~= "string" then
-			error("Event should be a string.", 2)
-		end
+	-- Implement default channel
+	if not self._configuration.Channel then
+		self._configuration.Channel = "Reliable"
+	end
+
+	-- Validate Event
+	if self._configuration.Event and typeof(self._configuration.Event) ~= "string" then
+		error("Event should be a string.", 2)
 	end
 
 	self._middleware = {
