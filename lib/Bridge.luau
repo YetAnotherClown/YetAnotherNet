@@ -59,7 +59,8 @@ export type BridgeImpl = {
 		player: Player,
 		packet: OutgoingPacket
 	) -> (),
-	_processOutgoingQueue: (self: Bridge) -> (),
+	_sendPayloads: (self: Bridge, clientPayloads: ClientPayloads, clientPayloads: ServerPayloads) -> (),
+	_processOutgoingQueue: (self: Bridge) -> (ClientPayloads, ServerPayloads),
 	_processIncoming: (
 		self: Bridge,
 		channel: "Reliable" | "Unreliable",
@@ -131,7 +132,19 @@ function Bridge:_updateClientPayload(
 	return
 end
 
--- Sends all queued outgoing packets over the Remote.
+type ServerPayloads = {
+	Reliable: Payload,
+	Unreliable: Payload,
+}
+
+type ClientPayloads = {
+	[Player]: {
+		Reliable: Payload,
+		Unreliable: Payload,
+	},
+}
+
+-- Package all packets into payloads to be sent over the network
 function Bridge:_processOutgoingQueue()
 	local serverPayloads = {
 		Reliable = {},
@@ -168,7 +181,11 @@ function Bridge:_processOutgoingQueue()
 		end
 	end
 
-	-- Send the Payload over the RemoteEvent
+	return clientPayloads, serverPayloads
+end
+
+-- Send payloads over the network to their respective channel
+function Bridge:_sendPayloads(clientPayloads: ClientPayloads, serverPayloads: ServerPayloads)
 	if self:getContext() == "client" then
 		for channel, remote in pairs({ Reliable = self.reliableRemote, Unreliable = self.unreliableRemote }) do
 			local n = 0
@@ -185,8 +202,19 @@ function Bridge:_processOutgoingQueue()
 		end
 	elseif self:getContext() == "server" then
 		for player, payload in clientPayloads do
-			self.reliableRemote:FireClient(player, payload.Reliable)
-			self.unreliableRemote:FireClient(player, payload.Unreliable)
+			for channel, remote in pairs({ Reliable = self.reliableRemote, Unreliable = self.unreliableRemote }) do
+				local n = 0
+				for _ in payload[channel] do
+					n += 1
+				end
+
+				-- Do not send empty payloads
+				if n == 0 then
+					continue
+				end
+
+				remote:FireClient(player, payload[channel])
+			end
 		end
 	end
 end
@@ -219,7 +247,8 @@ function Bridge:step()
 	}
 
 	-- Send outgoing
-	self:_processOutgoingQueue()
+	local clientPayloads, serverPayloads = self:_processOutgoingQueue()
+	self:_sendPayloads(clientPayloads, serverPayloads)
 end
 
 -- Returns a snapshot of the incoming queue.
