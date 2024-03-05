@@ -13,7 +13,7 @@ const FEATURES = [
     description: (
       <body>
         <p>
-          Routes are the way you send and receive data through Net.
+          Routes are the way you send and receive data through YetAnotherNet.
           They are uniquely identified so you're encouraged to create as many as you need as if you were creating individual RemoteEvents.
         </p>
         <p>
@@ -33,7 +33,7 @@ const FEATURES = [
     description: (
       <body>
         <p>
-          Middleware is another powerful feature of Net,
+          Middleware is another powerful feature of YetAnotherNet,
           allowing you to validate types before they reach your code and even perform data compression or decompression before data is processed.
         </p>
         <p>
@@ -57,7 +57,7 @@ const FEATURES = [
     description: (
       <body>
         <p>
-          Hooks are a simple and versatile way to integrate Net into any code architecture.
+          Hooks are a simple and versatile way to integrate YetAnotherNet into any code architecture.
         </p>
         <p>
           Hooks allow you to run your Route's scheduling whenever you want, such as a specific event.
@@ -65,7 +65,7 @@ const FEATURES = [
           Data is not sent over the Network until your hook is called.
         </p>
         <p>
-          Net also provides a simple function that hooks your Routes to your Matter Middleware to run before/after your systems.
+          YetAnotherNet also provides a simple function that hooks your Routes to your Matter Middleware to run before/after your systems.
           This allows for a simple setup when using the Matter ECS, leaving you to not worry about scheduling your Routes.
         </p>
       </body>
@@ -98,7 +98,7 @@ export function HomepageFeatures() {
             <div style={{ paddingLeft: 30, maxWidth: "45%" }}>
               <h1>A Type-safe Networking Library</h1>
               <p>
-                Net is strictly-typed, giving you full auto-completion and type-safety.
+                YetAnotherNet is strictly-typed, giving you full auto-completion and type-safety.
               </p>
               <p>
                 Send arguments and Query return values of your Routes are fully typed, giving you auto-completion and type-checking when writing your Networking code.
@@ -107,8 +107,8 @@ export function HomepageFeatures() {
             <div style={{ paddingLeft: 60 }}>
               <h1>A Data-driven Networking Library</h1>
               <p>
-                With it's roots in ECS, Net was designed to promote a Data-driven design.<br />
-                Net's API integrates seamlessly into ECS Libraries like Matter to bring Data-driven Networking in ECS architectures.
+                With it's roots in ECS, YetAnotherNet was designed to promote a Data-driven design.<br />
+                YetAnotherNet's API integrates seamlessly into ECS Libraries like Matter to bring Data-driven Networking in ECS architectures.
               </p>
               <p>
                 Read more on why you should use an ECS <a href="https://matter-ecs.github.io/matter/docs/WhyECS">here</a>.
