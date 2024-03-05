@@ -20,6 +20,9 @@ function ClientRemoteEvent:FireServer(...: any)
 	end
 
 	for _, remote in container do
+		if remote._channel ~= self._channel then
+			return
+		end
 		remote.OnServerEvent:Fire(self._owner, ...)
 	end
 end
@@ -60,7 +63,7 @@ function ServerRemoteEvent:FireClient(player, ...: any)
 	end
 
 	for _, remote in container do
-		if remote._owner ~= player then
+		if remote._owner ~= player or remote._channel ~= self._channel then
 			continue
 		end
 
