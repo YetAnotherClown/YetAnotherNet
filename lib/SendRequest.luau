@@ -46,7 +46,6 @@ SendRequest.__index = SendRequest
 function SendRequest:to(recipient: Recipient)
 	if RunService:IsClient() then
 		warn("You should not use the SendRequest:to() method on the Client")
-		return
 	end
 
 	local position = self._position
