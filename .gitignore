@@ -9,5 +9,4 @@
 .vscode
 sourcemap.json
 package-lock.json
-export_types.py
 wally.lock
