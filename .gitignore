@@ -1,5 +1,7 @@
 /*.rbxlx.lock
+/*.rbxlx
 /*.rbxl.lock
+/*.rbxl
 /*.rbxm
 /*.tgz
 /DevPackages
@@ -9,5 +11,4 @@
 .vscode
 sourcemap.json
 package-lock.json
-export_types.py
 wally.lock
