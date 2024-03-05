@@ -13,17 +13,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - For Identifier
     - For SendRequest
     - For QueryResult
-- Bridge, Player, and RemoteEvent Mocking
+    - For Route
+    - For Bridge
+- Bridge, Route, Player, and RemoteEvent Mocking
+- Script for Installing Wally and Exporting Wally Types
+- Script for running Jest tests using run-in-roblox
+- Warning for attempting to send an invalid string as a recipient
 
 ### Changed
 
 - Updated Rojo to v7.4.0
+- Updated Jest-Lua to v0.6.1-rc.2
+- Migrate from Aftman to Foreman
+- `SendRequest:to()` no longer returns if called on the Client
+- Refactored Bridge to better allow for unit tests
 
 ### Fixed
 
 - QueryResult does not filter senders
 - Incorrect types for Incoming Middleware
 - Incorrect and inconsistent Roblox-TS Types
+- Default Channel is never applied when no `configuration` parameter was supplied
+- Outdated use of `Net.start` in Documentation
 
 ## [0.7.0] - 2024-01-02
 
