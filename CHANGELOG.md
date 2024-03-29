@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrate from Aftman to Foreman
 - `SendRequest:to()` no longer returns if called on the Client
 - Refactored Bridge to better allow for unit tests
+- Optimized the internals of `Route:send()`
 
 ### Fixed
 
