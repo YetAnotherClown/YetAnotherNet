@@ -22,6 +22,8 @@ export type QueryResult<U...> = QueryResult.QueryResult<U...>
 local SendRequest = require(script.SendRequest)
 export type SendRequest = SendRequest.SendRequest
 
+local isClient = RunService:IsClient()
+
 --[=[
 	@interface Configuration
 	@within Route
@@ -56,6 +58,7 @@ type RouteImpl<U...> = {
 	_identifier: Identifier,
 	_configuration: Configuration,
 	_outgoingQueue: { OutgoingPacket },
+	_currentPlayers: { Player },
 	_snapshot: IncomingQueue,
 	_middleware: {
 		Incoming: ((...any?) -> U...)?,
@@ -67,7 +70,7 @@ type RouteImpl<U...> = {
 
 	_queuePackets: (Route<U...>, Bridge) -> (),
 	_updateSnapshot: (Route<U...>, Bridge) -> (),
-	addIncomingMiddleware: (self: Route<U...>, middleware: (...unknown) -> U... | (...unknown) -> nil) -> (),
+	addIncomingMiddleware: (self: Route<U...>, middleware: (...any?) -> U...?) -> (),
 	addOutgoingMiddleware: (self: Route<U...>, middleware: (U...) -> ...any?) -> (),
 	send: (self: Route<U...>, U...) -> SendRequest,
 	query: (self: Route<U...>) -> QueryResult<U...>,
@@ -83,6 +86,7 @@ export type Route<U...> = typeof(setmetatable(
 		_configuration: Configuration,
 		_outgoingQueue: { OutgoingPacket },
 		_snapshot: IncomingQueue,
+		_currentPlayers: { Player },
 	},
 	{} :: RouteImpl<U...>
 ))
@@ -148,18 +152,16 @@ end
 	See [Sending Data](/docs/getting-started/routes#sending) for more information.
 ]=]
 function Route:send(...)
-	local packet = {
-		channel = self._configuration.Channel,
-		data = { ... },
-		identifier = self._identifier,
-		recipient = Bridge and Bridge.server or Players:GetPlayers(),
-	} :: OutgoingPacket
+	local packet = {} :: OutgoingPacket
+	packet.data = { ... }
+	packet.recipient = isClient and Bridge.server or self._currentPlayers
+	-- Identifier and Channel are assigned when queuing to the Bridge
+
 	table.insert(self._outgoingQueue, packet)
 
-	local sendRequest = {
-		_outgoingQueue = self._outgoingQueue,
-		_position = #self._outgoingQueue,
-	}
+	local sendRequest = {}
+	SendRequest._outgoingQueue = self._outgoingQueue
+	SendRequest._position = #self._outgoingQueue
 	setmetatable(sendRequest, SendRequest)
 
 	return sendRequest
@@ -189,6 +191,9 @@ function Route:_queuePackets(bridge: Bridge)
 				continue
 			end
 		end
+
+		packet.identifier = self._identifier
+		packet.channel = channel :: "Reliable" | "Unreliable"
 
 		-- Typecheck recipients
 		if bridge:getContext() == "client" then
@@ -244,6 +249,7 @@ function Route:_updateSnapshot(bridge)
 	end
 
 	self._snapshot = snapshot
+	self._currentPlayers = Players:GetPlayers()
 end
 
 --[=[
@@ -322,6 +328,7 @@ function Route.new(configuration: Configuration?)
 	}
 	self._identifier = Identifier(tostring(self))
 	self._outgoingQueue = {}
+	self._currentPlayers = Players:GetPlayers()
 	self._snapshot = {
 		Reliable = {},
 		Unreliable = {},
