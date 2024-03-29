@@ -94,8 +94,6 @@ describe("Route", function()
 
 		expect(sendRequest._outgoingQueue).toEqual(serverRoute._outgoingQueue)
 		expect(sendRequest._outgoingQueue[sendRequest._position]).toEqual({
-			channel = "Reliable",
-			identifier = serverRoute._identifier,
 			recipient = mockPlayer,
 			data = { 1, true, "Hello, world" } :: { any },
 		})
