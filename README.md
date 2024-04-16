@@ -35,6 +35,7 @@ YetAnotherNet is a Networking Library for Roblox, which wraps around Roblox's Re
 
 ### Features
 
+- Hassle-free Buffer Compression
 - Complete Typechecking & Intellisense
 - No Overhead from RemoteEvents
 - Ordered Networking
@@ -76,9 +77,9 @@ Tasks to complete before version 1.0.0 is released.
 - [x] Unreliable Channel
 - [X] Middleware
 - [X] Typescript Support
+- [X] Automatic Buffer Compression
 - [ ] Unit + Integration Tests w/ Jest 
 - [ ] Rate limiting
-- [ ] Internal Use of Buffers
 - [ ] Debugger
 
 Other Tasks

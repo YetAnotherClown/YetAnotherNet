@@ -3,9 +3,10 @@ gitSourceBranch = "main"
 classOrder = [
     "Net",
     "Route",
-    "Loop",
+    "Bridge",
     "QueryResult",
     "SendRequest",
+    "Loop",
 ]
 
 [docusaurus]

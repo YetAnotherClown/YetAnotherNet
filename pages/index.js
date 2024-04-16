@@ -33,20 +33,18 @@ const FEATURES = [
     description: (
       <body>
         <p>
-          Middleware is another powerful feature of YetAnotherNet,
-          allowing you to validate types before they reach your code and even perform data compression or decompression before data is processed.
+          Middleware is another powerful feature of YetAnotherNet, allowing you to validate types before they reach your code.
         </p>
         <p>
           To create Middleware, you set a function in your Route's Middleware that will give you the event <code lang="lua">"send" | "receive"</code> and the data
           that is about to be processed <code lang="lua">U...</code>, the types you specify in your type annotation <code lang="lua">Net&lt;U...&gt;</code>
         </p>
         <p>
-          In the Middleware function, you can validate your types or compress/decompress data. If your data does not match your types, you can do <code lang="lua">return nil</code> to drop the packet.
+          In the Middleware function, you can validate your types. If your data does not match your types, you can do <code lang="lua">return nil</code> to drop the packet.
           Dropped packets will never reach your code, meaning you can ensure that the types your code receives are always the types you expect.
         </p>
         <p>
-          To compress/decompress your data, you can use a library like <a href="https://github.com/Data-Oriented-House/Squash">Squash</a> to serialize and deserialize your data.
-          Simply return the types in order as a tuple, you can use the event parameter to determine whether to compress or decompress your data.
+          You may want to use Middleware to Compress or Decompress your data, but YetAnotherNet has built-in buffer compression!
         </p>
       </body>
     )
@@ -104,8 +102,23 @@ export function HomepageFeatures() {
                 Send arguments and Query return values of your Routes are fully typed, giving you auto-completion and type-checking when writing your Networking code.
               </p>
             </div>
-            <div style={{ paddingLeft: 60 }}>
-              <h1>A Data-driven Networking Library</h1>
+            <div style={{ paddingLeft: 100 }}>
+              <h1>Hassle-free Compression Included</h1>
+              <p>
+                YetAnotherNet works behind the scenes to automatically compress the data you send over the network.
+                It features an internal Ser/Des library to serialize all Luau Datatypes and most Roblox Datatypes.
+              </p>
+              <p>
+                This process requires no work on the user's end besides making sure to avoid
+                any <a href="./docs/getting-started/buffer-compression#unsupported-datatypes">Unsupported Datatypes</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className={styles.feature}>
+          <div style={{ paddingLeft: 30, maxWidth: "45%" }}>
+              <h1>Data-driven by Design</h1>
               <p>
                 With it's roots in ECS, YetAnotherNet was designed to promote a Data-driven design.<br />
                 YetAnotherNet's API integrates seamlessly into ECS Libraries like Matter to bring Data-driven Networking in ECS architectures.
@@ -113,6 +126,13 @@ export function HomepageFeatures() {
               <p>
                 Read more on why you should use an ECS <a href="https://matter-ecs.github.io/matter/docs/WhyECS">here</a>.
               </p>
+            </div>
+            <div style={{ paddingLeft: 60}}>
+              <h1>Available for Roblox Typescript</h1>
+                <p>
+                We provide Typings for Roblox Typescript users, you can get them on NPM <a href="https://www.npmjs.com/package/@rbxts/yetanothernet">here</a>,
+                or you can install using <code>npm i @rbxts/yetanothernet</code>.
+                </p>
             </div>
           </div>
         </div>
