@@ -155,7 +155,7 @@ describe("Bridge", function()
 
 		-- Track whether or not the RemoteEvent was fired
 		local wasFired = false
-		clientBridge.reliableRemote.OnClientEvent:Connect(function()
+		clientBridge.reliableChannel.OnClientEvent:Connect(function()
 			wasFired = true
 		end)
 

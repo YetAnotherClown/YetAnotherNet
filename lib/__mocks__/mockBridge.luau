@@ -6,27 +6,19 @@ local utils = root.__utils__
 local mockRemoteEvents = require(utils.mockRemoteEvents)
 local mockPlayers = require(utils.mockPlayers)
 
-export type MockedBridge = Bridge.Bridge & MockedBridgeImpl & {
-	_owner: any,
-	context: "server" | "client",
-}
-
-export type MockedBridgeImpl = Bridge.BridgeImpl & {
-	context: "server" | "client",
-	_initializeRemotes: (self: MockedBridge) -> (),
-	new: (context: "server" | "client", owner: any) -> MockedBridge,
-}
+local ServerRemoteEvent = mockRemoteEvents.ServerRemoteEvent
+local ClientRemoteEvent = mockRemoteEvents.ClientRemoteEvent
 
 local n = 0
 
-local mockedModule = table.clone(Bridge) :: MockedBridgeImpl
+local mockedModule = table.clone(Bridge)
 mockedModule.__index = mockedModule
 
-function mockedModule:getContext()
+function mockedModule:_getContext()
 	return self.context
 end
 
-function mockedModule:isPlayer(player)
+function mockedModule:_isPlayer(player)
 	if table.find(mockPlayers.getAllPlayers(), player) then
 		return true
 	end
@@ -34,30 +26,20 @@ function mockedModule:isPlayer(player)
 	return false
 end
 
-function mockedModule:_initializeRemotes()
+function mockedModule:_getRemotes()
 	local identifier = tostring(n)
 
-	if self:getContext() == "server" then
-		self.reliableRemote = mockRemoteEvents.ServerRemoteEvent.new(tostring(identifier), "Reliable")
-		self.unreliableRemote = mockRemoteEvents.ServerRemoteEvent.new(tostring(identifier), "Unreliable")
-
-		self.reliableRemote.OnServerEvent:Connect(function(player, package)
-			self:_processIncoming("Reliable", player, package)
-		end)
-		self.unreliableRemote.OnServerEvent:Connect(function(player, package)
-			self:_processIncoming("Unreliable", player, package)
-		end)
-	elseif self:getContext() == "client" then
-		self.reliableRemote = mockRemoteEvents.ClientRemoteEvent.new(self._owner, tostring(identifier), "Reliable")
-		self.unreliableRemote = mockRemoteEvents.ClientRemoteEvent.new(self._owner, tostring(identifier), "Unreliable")
-
-		self.reliableRemote.OnClientEvent:Connect(function(package)
-			self:_processIncoming("Reliable", "NET_SERVER", package)
-		end)
-		self.unreliableRemote.OnClientEvent:Connect(function(package)
-			self:_processIncoming("Unreliable", "NET_SERVER", package)
-		end)
+	if self:_getContext() == "server" then
+		local reliable = ServerRemoteEvent.new(identifier, "Reliable")
+		local unreliable = ServerRemoteEvent.new(identifier, "Unreliable")
+		return reliable, unreliable
+	elseif self:_getContext() == "client" then
+		local reliable = ClientRemoteEvent.new(self._owner, identifier, "Reliable")
+		local unreliable = ClientRemoteEvent.new(self._owner, identifier, "Unreliable")
+		return reliable, unreliable
 	end
+
+	return
 end
 
 function mockedModule.new(context: "client" | "server", owner: any)
@@ -67,15 +49,12 @@ function mockedModule.new(context: "client" | "server", owner: any)
 	self.context = context
 	self._owner = owner
 
-	self._incomingQueue = { Reliable = {}, Unreliable = {} } :: Bridge.IncomingQueue
-	self._snapshot = { Reliable = {}, Unreliable = {} } :: Bridge.IncomingQueue
-
-	self._outgoingQueue = { Reliable = {}, Unreliable = {} } :: Bridge.OutgoingQueue
-
-	self:_initializeRemotes()
+	self:_initialize()
 
 	return self
 end
+
+export type MockedBridge = typeof(mockedModule)
 
 return function()
 	n += 1

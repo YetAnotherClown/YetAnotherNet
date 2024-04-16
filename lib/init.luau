@@ -196,16 +196,16 @@ function Route:_queuePackets(bridge: Bridge)
 		packet.channel = channel :: "Reliable" | "Unreliable"
 
 		-- Typecheck recipients
-		if bridge:getContext() == "client" then
+		if bridge:_getContext() == "client" then
 			if packet.recipient ~= Bridge.server then
 				warn("Clients can only send to Net.Server")
 				continue
 			end
-		elseif bridge:getContext() == "server" then
-			if not bridge:isPlayer(packet.recipient) then
+		elseif bridge:_getContext() == "server" then
+			if not bridge:_isPlayer(packet.recipient) then
 				if typeof(packet.recipient) == "table" then
 					for _, player in packet.recipient do
-						if not bridge:isPlayer(player) then
+						if not bridge:_isPlayer(player) then
 							warn("Attempt to send a table with a non-player instance as a recipient")
 							continue
 						end
