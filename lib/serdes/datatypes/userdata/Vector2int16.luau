@@ -2,7 +2,7 @@
 
 local BUFFER_SIZE = 4
 
-local function serialize(vector: Vector2): buffer
+local function serialize(vector: Vector2int16): buffer
 	local _buffer = buffer.create(BUFFER_SIZE)
 	buffer.writei16(_buffer, 0, vector.X)
 	buffer.writei16(_buffer, 2, vector.Y)
@@ -10,11 +10,11 @@ local function serialize(vector: Vector2): buffer
 	return _buffer
 end
 
-local function deserialize(_buffer: buffer): Vector2
+local function deserialize(_buffer: buffer): Vector2int16
 	local x = buffer.readi16(_buffer, 0)
 	local y = buffer.readi16(_buffer, 2)
 
-	return Vector2.new(x, y)
+	return Vector2int16.new(x, y)
 end
 
 return {
