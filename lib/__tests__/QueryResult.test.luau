@@ -12,17 +12,21 @@ local QueryResult = require(root.QueryResult)
 local utils = root.__utils__
 local mockPlayers = require(utils.mockPlayers)
 
+local Identifier = require(root.Identifier)
+
+local identifier = Identifier.new()
+
 describe("QueryResult", function()
 	test("When iterating, should return all expected values", function()
 		local snapshot = {
 			{
 				data = { 1, 2, 3 },
-				identifier = "Jest",
+				identifier = identifier,
 				sender = "NET_SERVER" :: "NET_SERVER",
 			},
 		}
 
-		local result = QueryResult.new(snapshot, "Jest")
+		local result = QueryResult.new(snapshot, identifier)
 		for i, sender, num1, num2, num3 in result do
 			expect(i).toEqual(1)
 			expect(sender).toEqual("NET_SERVER")
@@ -36,17 +40,17 @@ describe("QueryResult", function()
 		local snapshot = {
 			{
 				data = { 1, 2, 3 },
-				identifier = "Jest",
+				identifier = identifier,
 				sender = "NET_SERVER" :: "NET_SERVER",
 			},
 			{
 				data = { "a", "b", "c" },
-				identifier = "Jest",
+				identifier = identifier,
 				sender = mockPlayers.createPlayer(),
 			},
 		} :: { any }
 
-		local result = QueryResult.new(snapshot, "Jest")
+		local result = QueryResult.new(snapshot, identifier)
 
 		local n = 0
 		for i, sender, num1, num2, num3 in result:from("NET_SERVER") do
@@ -61,20 +65,23 @@ describe("QueryResult", function()
 	end)
 
 	it("Should respect it's identifier", function()
+		local identifier1 = Identifier.new()
+		local identifier2 = Identifier.new()
+
 		local snapshot = {
 			{
 				data = { 1, 2, 3 },
-				identifier = "Jest",
+				identifier = identifier1,
 				sender = "NET_SERVER" :: "NET_SERVER",
 			},
 			{
 				data = { "a", "b", "c" },
-				identifier = "Wrong",
+				identifier = identifier2,
 				sender = "NET_SERVER" :: "NET_SERVER",
 			},
 		} :: { any }
 
-		local result = QueryResult.new(snapshot, "Jest")
+		local result = QueryResult.new(snapshot, identifier1)
 
 		local n = 0
 		for i, sender, num1, num2, num3 in result:from("NET_SERVER") do

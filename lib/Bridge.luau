@@ -5,10 +5,11 @@ local serdes = require(script.Parent.serdes)
 local instance = serdes.Instance
 local dictionary = serdes.dictionary
 
+local Identifier = require(script.Parent.Identifier)
+export type Identifier = Identifier.Identifier
+
 export type Channel = "Reliable" | "Unreliable"
 export type NetServer = "NET_SERVER"
-
-export type Identifier = string
 
 export type IncomingPacket = {
 	identifier: Identifier,

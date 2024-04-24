@@ -14,6 +14,7 @@ local typeToValue = {
 		b = 2,
 		c = 3,
 	},
+	identifier = 1,
 	boolean = true,
 	number = 22,
 	string = "Hello, world!",

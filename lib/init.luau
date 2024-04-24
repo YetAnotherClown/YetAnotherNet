@@ -15,6 +15,7 @@ type NetServer = Bridge.NetServer
 
 local Identifier = require(script.Identifier)
 export type Identifier = Identifier.Identifier
+local read = Identifier.read
 
 local QueryResult = require(script.QueryResult)
 export type QueryResult<U...> = QueryResult.QueryResult<U...>
@@ -218,7 +219,7 @@ function Route:_queuePackets(bridge: Bridge)
 		end
 
 		-- Typecheck identifier
-		if typeof(packet.identifier) ~= "string" then
+		if typeof(packet.identifier) ~= "buffer" then
 			warn("Invalid Identifier")
 
 			continue
@@ -237,7 +238,7 @@ function Route:_updateSnapshot(bridge)
 	local snapshot = bridge:snapshot()[self._configuration.Channel]
 
 	for _, packet in snapshot :: { IncomingPacket } do
-		if not self._middleware.Incoming or packet.identifier ~= self._identifier then
+		if not self._middleware.Incoming or read(packet.identifier) ~= read(self._identifier) then
 			continue
 		end
 
@@ -326,7 +327,7 @@ function Route.new(configuration: Configuration?)
 		Incoming = nil,
 		Outgoing = nil,
 	}
-	self._identifier = Identifier(tostring(self))
+	self._identifier = Identifier.new()
 	self._outgoingQueue = {}
 	self._currentPlayers = Players:GetPlayers()
 	self._snapshot = {
