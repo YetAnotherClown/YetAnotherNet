@@ -11,6 +11,6 @@ end
 return {
 	serialize = serialize,
 	deserialize = deserialize,
-	
+
 	id = 5,
 }

@@ -15,6 +15,7 @@ type NetServer = Bridge.NetServer
 
 local Identifier = require(script.Identifier)
 export type Identifier = Identifier.Identifier
+
 local read = Identifier.read
 
 local QueryResult = require(script.QueryResult)
@@ -184,7 +185,7 @@ function Route:_queuePackets(bridge: Bridge)
 
 	for _, packet in queue do
 		-- Implement middleware
-		if self._middleware.Outgoing and packet.identifier == self._identifier then
+		if self._middleware.Outgoing then
 			local newData = { self._middleware.Outgoing(table.unpack(packet.data)) }
 			if #newData > 0 then
 				packet.data = newData
