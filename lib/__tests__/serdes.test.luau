@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
 local JestGlobals = require(ReplicatedStorage.DevPackages.JestGlobals)
 local expect = JestGlobals.expect
@@ -36,22 +37,75 @@ local typeToValue = {
 }
 
 describe.only("Ser/Des", function()
-	for _, module in root.serdes.datatypes:GetDescendants() do
-		if not module:IsA("ModuleScript") then
-			continue
+	describe("Serialization and Deserialization should return exact value", function()
+		for _, module in root.serdes.datatypes:GetDescendants() do
+			if not module:IsA("ModuleScript") then
+				continue
+			end
+
+			if not typeToValue[module.Name] then
+				if module.Name == "Instance" then
+					continue
+				end
+
+				test.todo(module.Name)
+				continue
+			end
+
+			test(module.Name, function()
+				local serdes = require(module) :: any
+
+				local _buffer = serdes.serialize(typeToValue[module.Name])
+				local value = serdes.deserialize(_buffer)
+
+				expect(value).toEqual(typeToValue[module.Name])
+			end)
 		end
 
-		if not typeToValue[module.Name] then
-			test.todo(module.Name)
-		end
+		test.todo("Instance")
+	end)
 
-		test(module.Name, function()
-			local serdes = require(module) :: any
+	test("Array should return nil when failing serialization", function()
+		local part = Instance.new("Part")
+		part.Anchored = true
+		part.Position = Vector3.new(0, 3, 0)
+		part.Parent = Workspace
 
-			local _buffer = serdes.serialize(typeToValue[module.Name])
-			local value = serdes.deserialize(_buffer)
+		-- RaycastResults have no constructor, meaning we can't deserialize it
+		local raycastResult = Workspace:Raycast(Vector3.zero, Vector3.new(0, 5, 0))
 
-			expect(value).toEqual(typeToValue[module.Name])
-		end)
-	end
+		local serdes = require(root.serdes.datatypes.custom.array)
+		local array: { any } = {
+			1,
+			true,
+			raycastResult,
+		}
+
+		part:Destroy()
+
+		local _buffer = serdes.serialize(array)
+		expect(_buffer).toBeNil()
+	end)
+
+	test("Dictionary should return nil when failing serialization", function()
+		local part = Instance.new("Part")
+		part.Anchored = true
+		part.Position = Vector3.new(0, 3, 0)
+		part.Parent = Workspace
+
+		-- RaycastResults have no constructor, meaning we can't deserialize it
+		local raycastResult = Workspace:Raycast(Vector3.zero, Vector3.new(0, 5, 0))
+
+		local serdes = require(root.serdes.datatypes.custom.dictionary)
+		local dictionary = {
+			a = 1,
+			b = true,
+			c = raycastResult,
+		}
+
+		part:Destroy()
+
+		local _buffer = serdes.serialize(dictionary)
+		expect(_buffer).toBeNil()
+	end)
 end)
