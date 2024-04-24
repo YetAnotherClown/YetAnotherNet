@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation no longer references Compression with Middleware
 - Rewrote the Bridge to support Buffers
 - Refactored the Bridge to better support Mocking
+- Identifiers are now represented as Buffers instead of packed strings
 
 ### Fixed
 
@@ -43,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default Channel is never applied when no `configuration` parameter was supplied
 - Outdated use of `Net.start` in Documentation
 - `SendRequest:to()` will show a client warning when using run-in-roblox
+- Incorrect Unit Test for Outgoing Middleware
 
 ## [0.7.0] - 2024-01-02
 
