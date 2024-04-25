@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rewrote the Bridge to support Buffers
 - Refactored the Bridge to better support Mocking
 - Identifiers are now represented as Buffers instead of packed strings
+- Bridge:snapshot() now returns a frozen table instead of a cloned table
 
 ### Fixed
 
