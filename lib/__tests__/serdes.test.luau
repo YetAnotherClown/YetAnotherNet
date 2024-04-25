@@ -24,6 +24,7 @@ local typeToValue = {
 	Color3 = Color3.fromHex("54bbff"),
 	DateTime = DateTime.fromUnixTimestampMillis(1686894720000),
 	EnumItem = Enum.Genre.Scary,
+	Instance = Instance.new("Part"),
 	Rect = Rect.new(Vector2.new(10, 20), Vector2.new(40, 80)),
 	Region3 = Region3.new(Vector3.zero, Vector3.new(30, 30, 30)),
 	Region3int16 = Region3int16.new(Vector3int16.new(0, 0, 0), Vector3int16.new(30, 30, 30)),
@@ -37,7 +38,6 @@ local typeToValue = {
 }
 
 local customTests = {
-	"Instance",
 	"buffer",
 }
 
@@ -66,8 +66,6 @@ describe("Ser/Des", function()
 				expect(value).toEqual(typeToValue[module.Name])
 			end)
 		end
-
-		test.todo("Instance")
 	end)
 
 	test("Array should return nil when failing serialization", function()
