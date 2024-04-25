@@ -249,7 +249,7 @@ end
 	The snapshot is a snapshot of the last frame's IncomingQueue.
 ]=]
 function Bridge:snapshot()
-	return table.clone(self._snapshot)
+	return self._snapshot
 end
 
 --[=[
@@ -264,7 +264,7 @@ end
 	this behavior using the Bridge itself.
 ]=]
 function Bridge:step()
-	self._snapshot = self._incomingQueue
+	self._snapshot = table.freeze(self._incomingQueue)
 	self._incomingQueue = {
 		Reliable = {},
 		Unreliable = {},
@@ -332,7 +332,7 @@ end
 function Bridge:_initialize()
 	self._incomingQueue = { Reliable = {}, Unreliable = {} } :: IncomingQueue
 	self._outgoingQueue = { Reliable = {}, Unreliable = {} } :: OutgoingQueue
-	self._snapshot = { Reliable = {}, Unreliable = {} } :: IncomingQueue
+	self._snapshot = table.freeze({ Reliable = {}, Unreliable = {} }) :: IncomingQueue
 
 	local reliable, unreliable = self:_getRemotes()
 	self.reliableChannel = reliable
