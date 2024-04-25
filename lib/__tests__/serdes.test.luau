@@ -36,7 +36,12 @@ local typeToValue = {
 	Vector3int16 = Vector3int16.new(40, 80, 120),
 }
 
-describe.only("Ser/Des", function()
+local customTests = {
+	"Instance",
+	"buffer",
+}
+
+describe("Ser/Des", function()
 	describe("Serialization and Deserialization should return exact value", function()
 		for _, module in root.serdes.datatypes:GetDescendants() do
 			if not module:IsA("ModuleScript") then
@@ -44,7 +49,7 @@ describe.only("Ser/Des", function()
 			end
 
 			if not typeToValue[module.Name] then
-				if module.Name == "Instance" then
+				if table.find(customTests, module.Name) then
 					continue
 				end
 
