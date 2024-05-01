@@ -384,7 +384,25 @@ end
 ]=]
 function Bridge:_getRemotes()
 	local remotes = script.Parent.Remotes
-	return remotes:WaitForChild("Reliable"), remotes:WaitForChild("Unreliable")
+
+	local reliableRemote, unreliableRemote = remotes:FindFirstChild("Reliable"), remotes:FindFirstChild("Unreliable")
+	if reliableRemote and unreliableRemote then
+		return reliableRemote, unreliableRemote
+	end
+
+	if self:_getContext() == "server" then
+		reliableRemote = Instance.new("RemoteEvent")
+		reliableRemote.Name = "Reliable"
+		reliableRemote.Parent = remotes
+
+		unreliableRemote = Instance.new("RemoteEvent")
+		unreliableRemote.Name = "Unreliable"
+		unreliableRemote.Parent = remotes
+
+		return reliableRemote, unreliableRemote
+	else
+		return remotes:WaitForChild("Reliable"), remotes:WaitForChild("Unreliable")
+	end
 end
 
 --[=[
