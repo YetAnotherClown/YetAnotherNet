@@ -7,7 +7,6 @@ local instanceMap = {}
 
 local function setIdentifier(identifier: number, instance: Instance)
 	instanceMap[identifier] = instance
-	nextIdentifer += 1
 end
 
 local function getInstanceMap()
@@ -15,8 +14,11 @@ local function getInstanceMap()
 end
 
 local function serialize(instance: Instance): (buffer, number)
-	local identifier = nextIdentifer
-	setIdentifier(identifier, instance)
+	local identifier = table.find(instanceMap, instance) or nextIdentifer
+	if identifier == nextIdentifer then
+		setIdentifier(identifier, instance)
+		nextIdentifer += 1
+	end
 
 	local _buffer = buffer.create(BUFFER_SIZE)
 	buffer.writeu32(_buffer, 0, identifier)
