@@ -90,6 +90,17 @@ describe("Ser/Des", function()
 		expect(_buffer).toBeNil()
 	end)
 
+	test("Array should be able to serialize/deserialize empty arrays", function()
+		local serdes = require(root.serdes.datatypes.custom.array)
+		local array = {}
+
+		local _buffer = serdes.serialize(array)
+		expect(_buffer).toEqual(expect.any("buffer"))
+
+		local value = serdes.deserialize(_buffer)
+		expect(value).toEqual(array)
+	end)
+
 	test("Dictionary should return nil when failing serialization", function()
 		local part = Instance.new("Part")
 		part.Anchored = true

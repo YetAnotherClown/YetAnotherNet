@@ -106,12 +106,15 @@ end
 local function deserialize(_buffer: buffer): { any }
 	local array = {}
 
+	if buffer.len(_buffer) == 0 then
+		return array
+	end
+
 	local cursor = 0
 	local i = 0
 
 	repeat
 		i += 1
-
 		local value, cursorPosition = deserializeBuffer(_buffer, cursor)
 		cursor = cursorPosition
 		array[i] = value
