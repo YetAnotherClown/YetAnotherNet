@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Script for Installing Wally and Exporting Wally Types
 - Script for running Jest tests using run-in-roblox
 - Warning for attempting to send an invalid string as a recipient
+- An Internal Ser/Des Library
+- Automatic Compression for the Bridge
+- Documentation for the Bridge
 
 ### Changed
 
@@ -28,6 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SendRequest:to()` no longer returns if called on the Client
 - Refactored Bridge to better allow for unit tests
 - Reduced the average call time of `Route:send()` by 50-60%
+- Documentation no longer references Compression with Middleware
+- Rewrote the Bridge to support Buffers
+- Refactored the Bridge to better support Mocking
+- Identifiers are now represented as Buffers instead of packed strings
+- Bridge:snapshot() now returns a frozen table instead of a cloned table
 
 ### Fixed
 
@@ -36,6 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Incorrect and inconsistent Roblox-TS Types
 - Default Channel is never applied when no `configuration` parameter was supplied
 - Outdated use of `Net.start` in Documentation
+- `SendRequest:to()` will show a client warning when using run-in-roblox
+- Incorrect Unit Test for Outgoing Middleware
 
 ## [0.7.0] - 2024-01-02
 

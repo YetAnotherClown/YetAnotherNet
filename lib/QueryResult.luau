@@ -13,6 +13,8 @@ type NetServer = Bridge.NetServer
 local Identifier = require(script.Parent.Identifier)
 export type Identifier = Identifier.Identifier
 
+local read = Identifier.read
+
 --[=[
 	@class QueryResult
 	@since v0.4.0
@@ -91,7 +93,7 @@ function QueryResult:__iter()
 		local isSenderAllowed = if filterSenders then table.find(senders, packet.sender) else true
 
 		-- Don't return packet if filtered
-		if packet.identifier ~= identifier or not isSenderAllowed then
+		if read(packet.identifier) ~= read(identifier) or not isSenderAllowed then
 			return
 		end
 

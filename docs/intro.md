@@ -15,10 +15,11 @@ Some of the issues this library solves are:
 - Lack of Type-Checking and Intellisense for working with RemoteEvents
 
 YetAnotherNet also provides several utilities:
-- Middleware
+- Hassle-free Buffer Compression
 - Strict Type-Checking & Auto-completion
 - Simple integration with Hooks
 - Data-driven Design
+- Middleware
 
 You can learn more about how YetAnotherNet works and how to use it by visiting [Getting Started with Routes](/docs/getting-started/routes). Or, you can keep reading to learn more about the technical details and design choices that went into creating YetAnotherNet.
 

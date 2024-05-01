@@ -1,8 +1,15 @@
+--!native
 local RunService = game:GetService("RunService")
 
-export type NetServer = "NET_SERVER"
+local serdes = require(script.Parent.serdes)
+local instance = serdes.Instance
+local dictionary = serdes.dictionary
 
-export type Identifier = string
+local Identifier = require(script.Parent.Identifier)
+export type Identifier = Identifier.Identifier
+
+export type Channel = "Reliable" | "Unreliable"
+export type NetServer = "NET_SERVER"
 
 export type IncomingPacket = {
 	identifier: Identifier,
@@ -15,10 +22,10 @@ export type IncomingQueue = {
 	Unreliable: { IncomingPacket },
 }
 
-export type Recipient = { Player } | Player | "NET_SERVER"
+export type Recipient = { Player } | Player | NetServer
 
 export type OutgoingPacket = {
-	channel: "Reliable" | "Unreliable",
+	channel: Channel,
 	identifier: Identifier,
 	recipient: Recipient,
 	data: { any },
@@ -30,70 +37,165 @@ export type OutgoingQueue = {
 }
 
 type Payload = {
-	[string]: { { any } },
+	[Identifier]: { { any } },
+}
+
+type ServerPayload = {
+	Reliable: Payload,
+	Unreliable: Payload,
+}
+
+type ClientPayloads = {
+	[Player]: {
+		Reliable: Payload,
+		Unreliable: Payload,
+	},
 }
 
 export type BridgeImpl = {
+	__index: BridgeImpl,
+
 	server: NetServer,
-	reliableRemote: RemoteEvent,
-	unreliableRemote: UnreliableRemoteEvent,
+	reliableChannel: RemoteEvent,
+	unreliableChannel: UnreliableRemoteEvent,
 
 	_incomingQueue: IncomingQueue,
+	_instanceMap: { [number]: Instance },
 	_outgoingQueue: OutgoingQueue,
 	_snapshot: IncomingQueue,
 
-	__index: BridgeImpl,
-
-	_addPacketToPayload: (self: Bridge, {
-		Reliable: Payload,
-		Unreliable: Payload,
-	}, OutgoingPacket) -> (),
-	_updateClientPayload: (
-		self: Bridge,
-		clientPackages: {
-			[Player]: {
-				Reliable: Payload,
-				Unreliable: Payload,
-			},
-		},
-		player: Player,
-		packet: OutgoingPacket
-	) -> (),
-	_sendPayloads: (self: Bridge, clientPayloads: ClientPayloads, clientPayloads: ServerPayloads) -> (),
-	_processOutgoingQueue: (self: Bridge) -> (ClientPayloads, ServerPayloads),
-	_processIncoming: (
-		self: Bridge,
-		channel: "Reliable" | "Unreliable",
-		sender: Player | NetServer,
-		payload: Payload
-	) -> (),
-
 	step: (self: Bridge) -> (),
 	snapshot: (self: Bridge) -> IncomingQueue,
-	getContext: (self: Bridge) -> "server" | "client",
-	isPlayer: (self: Bridge, player: any) -> boolean,
 
-	_initializeRemotes: (self: Bridge) -> (),
+	_getInstanceMapChanges: (self: Bridge) -> { [number]: Instance }?,
+	_processIncoming: (
+		self: Bridge,
+		channel: Channel,
+		sender: Player | NetServer,
+		package: Payload | buffer,
+		instanceMapChanges: {
+			[number]: Instance,
+		}?
+	) -> (),
+	_processOutgoingQueue: (self: Bridge) -> (ClientPayloads, ServerPayload),
+	_sendPayloads: (self: Bridge, clientPayloads: ClientPayloads, serverPayloads: ServerPayload) -> (),
+
+	_initialize: (self: Bridge) -> (),
+
+	_getContext: (self: Bridge) -> "client" | "server",
+	_getRemotes: (self: Bridge) -> (RemoteEvent, UnreliableRemoteEvent),
+	_isPlayer: (self: Bridge, player: any) -> boolean,
 
 	new: () -> Bridge,
 }
 
 export type Bridge = typeof(setmetatable({}, {} :: BridgeImpl))
 
--- Handles packaging and unpacking Packets to send and receive over Remotes
+--[=[
+	@class Bridge
+
+	Bridges are the Transport and SerDes Layer of YetAnotherNet, responsible for
+	serializing and deserializing data as well as sending it over the network.
+
+	The Bridge class should only be used internally within the Library, when
+	creating behavior identical to hooks, or when performing Unit/Integration Tests.
+
+	The Bridge is structured in a way to enable simple mocking using Jest-Lua.
+]=]
 local Bridge: BridgeImpl = {} :: BridgeImpl
 Bridge.__index = Bridge
+Bridge.server = "NET_SERVER"
 
-Bridge.server = "NET_SERVER" :: NetServer
+function Bridge:_getInstanceMapChanges()
+	local changes = {}
+	local currentMap = instance.getInstanceMap()
 
--- Packages a Packet to go into a Server Payload
-function Bridge:_addPacketToPayload(
-	payload: {
-		Reliable: Payload,
-		Unreliable: Payload,
-	},
-	packet: OutgoingPacket
-)
+	for identifier, _instance in currentMap do
+		if self._instanceMap[identifier] ~= _instance then
+			changes[identifier] = _instance
+			continue
+		end
+	end
+
+	self._instanceMap = currentMap
+
+	return next(changes) ~= nil and changes or nil
+end
+
+--[=[
+	@method _sendPayloads
+	@within Bridge
+	
+	Before sending the Payloads over the network, this method will
+	attempt to serialize the Payloads into buffers. If the payload
+	fails to serialize, it will send the unserialized payload
+	instead.
+]=]
+function Bridge:_sendPayloads(clientPayloads, serverPayload)
+	if self:_getContext() == "client" then
+		for channel, remote in pairs({ Reliable = self.reliableChannel, Unreliable = self.unreliableChannel }) do
+			local n = 0
+			for _ in serverPayload[channel] do
+				n += 1
+			end
+
+			-- Do not send empty payloads
+			if n == 0 then
+				continue
+			end
+
+			local _buffer = dictionary.serialize(serverPayload[channel])
+			local instanceMapChanges = self:_getInstanceMapChanges()
+
+			local package: buffer? | { [number]: any } = _buffer
+			if not package then
+				local newPackage = {}
+
+				-- Buffers as indices get converted to strings
+				for identifier, packets in serverPayload[channel] do
+					newPackage[Identifier.read(identifier)] = packets
+				end
+
+				package = newPackage
+			end
+
+			remote:FireServer(_buffer or serverPayload[channel], instanceMapChanges)
+		end
+	elseif self:_getContext() == "server" then
+		for player, payload in clientPayloads do
+			for channel, remote in pairs({ Reliable = self.reliableChannel, Unreliable = self.unreliableChannel }) do
+				local n = 0
+				for _ in payload[channel] do
+					n += 1
+				end
+
+				-- Do not send empty payloads
+				if n == 0 then
+					continue
+				end
+
+				local _buffer = dictionary.serialize(payload[channel])
+				local instanceMapChanges = self:_getInstanceMapChanges()
+
+				local package: buffer? | { [number]: any } = _buffer
+				if not package then
+					local newPackage = {}
+
+					-- Buffers as indices get converted to strings
+					for identifier, packets in payload[channel] do
+						newPackage[Identifier.read(identifier)] = packets
+					end
+
+					package = newPackage
+				end
+
+				remote:FireClient(player, _buffer or payload[channel], instanceMapChanges)
+			end
+		end
+	end
+end
+
+local function addPacketToPayload(payload: ServerPayload, packet: OutgoingPacket)
 	if not payload[packet.identifier] then
 		payload[packet.identifier] = {}
 	end
@@ -109,120 +211,128 @@ function Bridge:_addPacketToPayload(
 	return
 end
 
--- Packages a Packet to go into a Client Payload
-function Bridge:_updateClientPayload(
-	clientPackages: {
-		[Player]: {
-			Reliable: Payload,
-			Unreliable: Payload,
-		},
-	},
-	player: Player,
-	packet: OutgoingPacket
-)
-	if not clientPackages[player] then
-		clientPackages[player] = {
+local function updateClientPayload(clientPayloads: ClientPayloads, player: Player, packet: OutgoingPacket)
+	if not clientPayloads[player] then
+		clientPayloads[player] = {
 			Reliable = {},
 			Unreliable = {},
 		}
 	end
 
-	self:_addPacketToPayload(clientPackages[player][packet.channel], packet)
+	addPacketToPayload(clientPayloads[player][packet.channel], packet)
 
 	return
 end
 
-type ServerPayloads = {
-	Reliable: Payload,
-	Unreliable: Payload,
-}
+--[=[
+	@method _processOutgoingQueue
+	@within Bridge
+	
+	This method will process the OutgoingQueue and pack it into Payloads for
+	use in Bride:_sendPayloads()
 
-type ClientPayloads = {
-	[Player]: {
-		Reliable: Payload,
-		Unreliable: Payload,
-	},
-}
-
--- Package all packets into payloads to be sent over the network
+	@return ClientPayloads, ServerPayload
+]=]
 function Bridge:_processOutgoingQueue()
-	local serverPayloads = {
+	local serverPayload = {
 		Reliable = {},
 		Unreliable = {},
-	} :: {
-		Reliable: Payload,
-		Unreliable: Payload,
-	}
-	local clientPayloads = {} :: {
-		[Player]: {
-			Reliable: Payload,
-			Unreliable: Payload,
-		},
-	}
+	} :: ServerPayload
+	local clientPayloads = {} :: ClientPayloads
+
 	local snapshot = self._outgoingQueue
 	self._outgoingQueue = { Reliable = {}, Unreliable = {} }
 
 	-- Add each packet to it's respective payload
 	for channel, package in pairs(snapshot) do
 		for _, packet in package do
-			if self:isPlayer(packet.recipient) then
-				self:_updateClientPayload(clientPayloads, packet.recipient, packet)
+			if self:_isPlayer(packet.recipient) then
+				updateClientPayload(clientPayloads, packet.recipient, packet)
 			elseif typeof(packet.recipient) == "table" then
 				for _, player in packet.recipient do
-					if not self:isPlayer(player) then
+					if not self:_isPlayer(player) then
 						continue
 					end
 
-					self:_updateClientPayload(clientPayloads, player, packet)
+					updateClientPayload(clientPayloads, player, packet)
 				end
 			else
-				self:_addPacketToPayload(serverPayloads[channel], packet)
+				addPacketToPayload(serverPayload[channel], packet)
 			end
 		end
 	end
 
-	return clientPayloads, serverPayloads
+	return clientPayloads, serverPayload
 end
 
--- Send payloads over the network to their respective channel
-function Bridge:_sendPayloads(clientPayloads: ClientPayloads, serverPayloads: ServerPayloads)
-	if self:getContext() == "client" then
-		for channel, remote in pairs({ Reliable = self.reliableRemote, Unreliable = self.unreliableRemote }) do
-			local n = 0
-			for _ in serverPayloads[channel] do
-				n += 1
-			end
+--[=[
+	@method snapshot
+	@within Bridge
+	
+	Returns a copy of the snapshot.
+	The snapshot is a snapshot of the last frame's IncomingQueue.
+]=]
+function Bridge:snapshot()
+	return self._snapshot
+end
 
-			-- Do not send empty payloads
-			if n == 0 then
-				continue
-			end
+--[=[
+	@method step
+	@within Bridge
+	
+	This will empty the IncomingQueue and produce a new Snapshot of it, then
+	it will process the OutgoingQueue and send the payloads over the network.
 
-			remote:FireServer(serverPayloads[channel])
-		end
-	elseif self:getContext() == "server" then
-		for player, payload in clientPayloads do
-			for channel, remote in pairs({ Reliable = self.reliableRemote, Unreliable = self.unreliableRemote }) do
-				local n = 0
-				for _ in payload[channel] do
-					n += 1
-				end
+	You should only use this function if creating custom scheduling behavior
+	similar to the Hooks API, which you should use instead of trying to achieve
+	this behavior using the Bridge itself.
+]=]
+function Bridge:step()
+	self._snapshot = table.freeze(self._incomingQueue)
+	self._incomingQueue = {
+		Reliable = {},
+		Unreliable = {},
+	}
 
-				-- Do not send empty payloads
-				if n == 0 then
-					continue
-				end
+	local clientPayloads, serverPayloads = self:_processOutgoingQueue()
+	self:_sendPayloads(clientPayloads, serverPayloads)
+end
 
-				remote:FireClient(player, payload[channel])
-			end
+--[=[
+	@method _processIncoming
+	@within Bridge
+	@private
+	
+	This method will process any packages sent over either channel of the Bridge.
+	It will attempt to deserialize the package and add it to our IncomingQueue.
+]=]
+function Bridge:_processIncoming(channel, sender, package, instanceMapChanges)
+	if instanceMapChanges then
+		for identifier, _instance in instanceMapChanges do
+			instance.setIdentifier(identifier, _instance)
+			self._instanceMap = instance.getInstanceMap()
 		end
 	end
-end
 
--- Processes an incoming packet, adding it to the incoming queue.
-function Bridge:_processIncoming(channel: "Reliable" | "Unreliable", sender: Player | "NET_SERVER", payload: Payload)
+	-- Todo: Stricter typechecking for Payload
+	local payload: Payload? = typeof(package) == "table" and package or nil
+	if not payload and typeof(package) == "buffer" then
+		payload = dictionary.deserialize(package)
+		if not payload then
+			warn("Error when attempting to deserialize package")
+			return
+		end
+	elseif not payload then
+		warn("Invalid package sent over network.")
+		return
+	end
+
 	-- Unpack each packet and add it to the queue
-	for identifier, packets in payload do
+	for identifier, packets in payload :: { [any]: any } do
+		if type(identifier) == "string" then
+			identifier = Identifier.new(tonumber(identifier))
+		end
+
 		for _, data in packets do
 			local pos = #self._incomingQueue[channel] + 1
 
@@ -237,81 +347,128 @@ function Bridge:_processIncoming(channel: "Reliable" | "Unreliable", sender: Pla
 	end
 end
 
--- Updates the incoming queue and snapshot and calls ``Bridge:_processOutgoingQueue()``.
-function Bridge:step()
-	-- Update queue & Snapshot
-	self._snapshot = self._incomingQueue
-	self._incomingQueue = {
-		Reliable = {},
-		Unreliable = {},
-	}
+--[=[
+	@method _initialize
+	@within Bridge
+	@private
+	
+	Assigns starting values, creates connections for channels, and other initialization work.
 
-	-- Send outgoing
-	local clientPayloads, serverPayloads = self:_processOutgoingQueue()
-	self:_sendPayloads(clientPayloads, serverPayloads)
+	This is intentionally abstracted out of Bridge.new() so we can overwrite Bridge.new()
+	during mocking without having to rewrite the contents of this function.
+]=]
+function Bridge:_initialize()
+	self._incomingQueue = { Reliable = {}, Unreliable = {} } :: IncomingQueue
+	self._outgoingQueue = { Reliable = {}, Unreliable = {} } :: OutgoingQueue
+	self._snapshot = table.freeze({ Reliable = {}, Unreliable = {} }) :: IncomingQueue
+	self._instanceMap = instance.getInstanceMap()
+
+	local reliable, unreliable = self:_getRemotes()
+	self.reliableChannel = reliable
+	self.unreliableChannel = unreliable
+
+	if self:_getContext() == "server" then
+		reliable.OnServerEvent:Connect(function(player, package, instanceMapChanges)
+			self:_processIncoming("Reliable", player, package, instanceMapChanges)
+		end)
+
+		unreliable.OnServerEvent:Connect(function(player, package, instanceMapChanges)
+			self:_processIncoming("Unreliable", player, package, instanceMapChanges)
+		end)
+	elseif self:_getContext() == "client" then
+		reliable.OnClientEvent:Connect(function(package, instanceMapChanges)
+			self:_processIncoming("Reliable", "NET_SERVER", package, instanceMapChanges)
+		end)
+
+		unreliable.OnClientEvent:Connect(function(package, instanceMapChanges)
+			self:_processIncoming("Unreliable", "NET_SERVER", package, instanceMapChanges)
+		end)
+	end
 end
 
--- Returns a snapshot of the incoming queue.
-function Bridge:snapshot()
-	return table.clone(self._snapshot)
-end
+--[=[
+	@method _getContext
+	@within Bridge
+	@private
+	
+	This is a wrapper around RunService:IsServer() and RunService:IsClient()
+	to enable us to mock the Click/Server Boundary during Unit Testing.
 
-function Bridge:isPlayer(player: any)
-	return typeof(player) == "Instance" and player:IsA("Player") or false
-end
-
-function Bridge:getContext()
+	@return "client" | "server"
+]=]
+function Bridge:_getContext()
 	return RunService:IsServer() and "server" or RunService:IsClient() and "client"
 end
 
-function Bridge:_initializeRemotes()
-	-- Fix for typescript
-	if not script.Parent:FindFirstChild("Remotes") then
-		local folder = Instance.new("Folder")
-		folder.Name = "Remotes"
-		folder.Parent = script.Parent
+--[=[
+	@method _getRemotes
+	@within Bridge
+	@private
+	
+	When mocking, we use Mock RemoteEvents instead of actual RemoteEvents,
+	this function allows us to replace the Remotes with these Mock RemoteEvents
+	without having to rewrite any functionality of the library during mocking.
+
+	@return RemoteEvent, UnreliableRemoveEvent
+]=]
+function Bridge:_getRemotes()
+	local remotes = script.Parent.Remotes
+
+	local reliableRemote, unreliableRemote = remotes:FindFirstChild("Reliable"), remotes:FindFirstChild("Unreliable")
+	if reliableRemote and unreliableRemote then
+		return reliableRemote, unreliableRemote
 	end
 
-	if RunService:IsServer() then
-		self.reliableRemote = script.Parent.Remotes:FindFirstChild("Reliable") or Instance.new("RemoteEvent")
-		self.reliableRemote.Name = "Reliable"
-		self.reliableRemote.Parent = script.Parent.Remotes
+	if self:_getContext() == "server" then
+		reliableRemote = Instance.new("RemoteEvent")
+		reliableRemote.Name = "Reliable"
+		reliableRemote.Parent = remotes
 
-		self.unreliableRemote = script.Parent.Remotes:FindFirstChild("Unreliable")
-			or Instance.new("UnreliableRemoteEvent")
-		self.unreliableRemote.Name = "Unreliable"
-		self.unreliableRemote.Parent = script.Parent.Remotes
+		unreliableRemote = Instance.new("RemoteEvent")
+		unreliableRemote.Name = "Unreliable"
+		unreliableRemote.Parent = remotes
 
-		self.reliableRemote.OnServerEvent:Connect(function(player, package)
-			self:_processIncoming("Reliable", player, package)
-		end)
-		self.unreliableRemote.OnServerEvent:Connect(function(player, package)
-			self:_processIncoming("Unreliable", player, package)
-		end)
-	elseif RunService:IsClient() then
-		self.reliableRemote = script.Parent.Remotes:WaitForChild("Reliable")
-		self.unreliableRemote = script.Parent.Remotes:WaitForChild("Unreliable")
-
-		self.reliableRemote.OnClientEvent:Connect(function(package)
-			self:_processIncoming("Reliable", "NET_SERVER", package)
-		end)
-		self.unreliableRemote.OnClientEvent:Connect(function(package)
-			self:_processIncoming("Unreliable", "NET_SERVER", package)
-		end)
+		return reliableRemote, unreliableRemote
+	else
+		return remotes:WaitForChild("Reliable"), remotes:WaitForChild("Unreliable")
 	end
 end
 
--- Creates a new Bridge
+--[=[
+	@method _isPlayer
+	@within Bridge
+	@private
+	
+	Since we mock the Client/Server Boundary in Unit Tests, we also fake the
+	Players in our games with Mock Players. This function allows us to
+	switch out the typechecking for Players with typechecking for Mock Players.
+
+	@return boolean
+]=]
+function Bridge:_isPlayer(player: any)
+	return typeof(player) == "Instance" and player:IsA("Player") or false
+end
+
+--[=[
+	@function new
+	@within Bridge
+	
+	This creates a new Bridge and performs initialization work.
+
+	You should not create or use Bridges in your code unless creating
+	custom scheduling behavior similar to hooks. If you can use the
+	native Hooks API, it is recommended you do instead of using the Bridge
+	directly.
+
+	Creating a new Bridge does not create new Remotes, all Remotes are shared
+	by all Bridges. During Mocking, we can change this behavior by overwriting
+	the Bridge:_getRemotes() method.
+
+	@return boolean
+]=]
 function Bridge.new()
-	local self = {}
-	setmetatable(self, Bridge)
-
-	self._incomingQueue = { Reliable = {}, Unreliable = {} } :: IncomingQueue
-	self._snapshot = { Reliable = {}, Unreliable = {} } :: IncomingQueue
-
-	self._outgoingQueue = { Reliable = {}, Unreliable = {} } :: OutgoingQueue
-
-	self:_initializeRemotes()
+	local self = setmetatable({}, Bridge) :: Bridge
+	self:_initialize()
 
 	return self
 end

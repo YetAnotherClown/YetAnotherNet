@@ -44,7 +44,7 @@ SendRequest.__index = SendRequest
 	@param recipient { Player } | Player | "NET_SERVER"
 ]=]
 function SendRequest:to(recipient: Recipient)
-	if RunService:IsClient() then
+	if RunService:IsRunning() and RunService:IsClient() then
 		warn("You should not use the SendRequest:to() method on the Client")
 	end
 

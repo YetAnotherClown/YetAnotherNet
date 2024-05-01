@@ -10,7 +10,7 @@ import TabItem from '@theme/TabItem';
 <Tabs>
 <TabItem value="lua" label="Luau" default>
 
-Middleware is a powerful feature of YetAnotherNet that allows you to validate types and serialize/deserialize data before it is processed when sending and receiving data.
+Middleware is a powerful feature of YetAnotherNet that allows you to validate types before they are processed when sending and receiving data.
 
 To create Middleware, you can specify a function in either `Route:addIncomingMiddleware()` or `Route:addOutgoingMiddleware()`.
 
@@ -31,7 +31,7 @@ end)
 
 -- Sets a function to be ran on Outgoing packets before they are sent over the network
 route:addOutgoingMiddleware(function(number: number, string: string, boolean: boolean)
-    -- Do something, e.g., Compress data
+    -- Do something
 
     return number, string, boolean
 end)
@@ -42,7 +42,7 @@ To validate your types, you can return the values in order to allow it to be pro
 </TabItem>
 <TabItem value="ts" label="Typescript">
 
-Middleware is a powerful feature of YetAnotherNet that allows you to validate types and serialize/deserialize data before it is processed when sending and receiving data.
+Middleware is a powerful feature of YetAnotherNet that allows you to validate types before they are processed when sending and receiving data.
 
 To create Middleware, you can specify a function in either `Route.addIncomingMiddleware()` or `Route.addOutgoingMiddleware()`.
 
@@ -63,7 +63,7 @@ route.addIncomingMiddleware(function (number: unknown, string: unknown, boolean:
 
 // Sets a function to be ran on Outgoing packets before they are sent over the network
 route.addOutgoingMiddleware(function (number: number, string: string, boolean: boolean) {
-    // Do something, e.g., Compress data
+    // Do something
 
     return $tuple(number, string, boolean)
 })
@@ -73,57 +73,3 @@ To validate your types, you can return the values in order to allow it to be pro
 
 </TabItem>
 </Tabs>
-
-## Compression
-
-To compress/decompress your data, you can use a library like [Squash](https://github.com/Data-Oriented-House/Squash) to serialize and deserialize your data. Simply return the types in order as a tuple, you can use the event parameter to determine whether to compress or decompress your data.
-
-```lua
-local Squash = require("Squash.luau")
-local Net = require("Net.luau")
-
-local Route = Net.Route
-type Route<U...> = Net.Route<U...>;
-
-local route: Route<string, number> = Route.new({
-    Channel = "Reliable",
-})
-
--- Deserialize Packets before returning
-route:addIncomingMiddleware(function(str, bool)
-local values: { any } = {}
-    local alphabet = Squash.string.alphabet(str)
-
-    -- Type-check returned values;
-    -- Squash serializes types into other types, like string
-    if type(str) ~= "string" or type(boolean) ~= "string" then
-        return
-    end
-
-    values = {
-        Squash.string.des(str, alphabet),
-        Squash.boolean.des(boolean),
-    }
-
-    return table.unpack(values)
-end)
-
--- Serialize Packets before sending
-route:addOutgoingMiddleware(function(str, bool)
-local values: { any } = {}
-    local alphabet = Squash.string.alphabet(str)
-
-    -- Type-check sent values,
-    -- Should be of the provided types U... in Net<U...>
-    if type(str) ~= "string" or type(boolean) ~= "boolean" then
-        return
-    end
-
-    values = {
-        Squash.string.ser(str, alphabet),
-        Squash.boolean.ser(boolean),
-    }
-
-    return table.unpack(values)
-end)
-```

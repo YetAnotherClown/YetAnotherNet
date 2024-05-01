@@ -142,7 +142,7 @@ describe("Route", function()
 	end)
 
 	test("Outgoing Middleware should overwrite each packet's data", function()
-		clientRoute:addOutgoingMiddleware(function(num, bool, str)
+		serverRoute:addOutgoingMiddleware(function(num, bool, str)
 			local returnValues = {} :: { any }
 
 			table.insert(returnValues, if typeof(num) ~= "number" then 1 else num)

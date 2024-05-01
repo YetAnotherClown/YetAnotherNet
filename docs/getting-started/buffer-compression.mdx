@@ -1,0 +1,99 @@
+---
+sidebar_position: 4
+---
+
+# Buffer Compression
+
+## Hassle-free & Behind the Scenes
+
+YetAnotherNet will work behind the scenes to automatically compress the data you send for you into Buffers.
+The library features an internal Ser/Des library to serialize all Luau Datatypes and most Roblox Datatypes.
+
+What's great about this compression is that it requires almost no additional work from the user to use.
+As long as you use all supported datatypes, YetAnotherNet will pack your data efficiently into buffers with no data-loss.
+
+You can see the list of [Supported Datatypes] and [Unsupported Datatypes] on this page.
+
+[Supported Datatypes]: ./buffer-compression#supported-datatypes
+[Unsupported Datatypes]: ./buffer-compression#unsupported-datatypes
+
+## Datatypes
+
+### Supported Datatypes
+
+The following Datatypes can be Serialized by YetAnotherNet, when using these Datatypes, your data
+will be packed efficiently into a buffer.
+
+Keep in mind that the buffer will be compressed even further by Roblox, the sizes listed here are not
+the sizes that will actually be sent over the network, the size sent may be lower.
+
+| Datatype           	| Bytes                                                 	|
+|--------------------	|-------------------------------------------------------	|
+| array (table)      	| 1-5 bytes per entry + size of value                   	|
+| dictionary (table) 	| 2-10 bytes per key-value pair + size of key and value 	|
+| boolean            	| 1                                                     	|
+| number             	| 4                                                     	|
+| string             	| N/A                                                   	|
+| BrickColor         	| 2                                                     	|
+| CFrame             	| 48                                                    	|
+| Color3             	| 12                                                    	|
+| DateTime           	| 8                                                     	|
+| EnumItem           	| N/A                                                   	|
+| Instance           	| 4                                                     	|
+| Rect               	| 16                                                    	|
+| Region3            	| 60                                                    	|
+| Region3int16       	| 12                                                    	|
+| TweenInfo          	| 25 + Size of EnumItems                                	|
+| UDim               	| 8                                                     	|
+| UDim2              	| 16                                                    	|
+| Vector2            	| 8                                                     	|
+| Vector2int16       	| 4                                                     	|
+| Vector3            	| 12                                                    	|
+| Vector3int16       	| 6                                                     	|
+
+*Datatypes last updated 04/15/2024, any datatypes added after this date are Unimplemented/Unknown.*
+
+If a Datatype not listed here is sent, it will cause the library to send a partially compressed payload
+over the network, you will lose out on some compression, but the loss will try to be minimized.
+
+### Unsupported Datatypes
+
+The following Datatypes are considered Unserializable, either because there is no way to properly
+serialize/deserialize them, or they have not been implemented.
+
+If it's unimplemented, you may request it be implemented or create a Pull Request to implement it yourself.
+
+| Datatype                	| Status                                         	|
+|-------------------------	|------------------------------------------------	|
+| Axes                    	| Unimplemented: niche datatype                  	|
+| CatalogSearchParams     	| Unimplemented: niche datatype                  	|
+| ColorSequence           	| Unimplemented: requires ColorSequenceKeypoint  	|
+| ColorSequenceKeypoint   	| Unimplemented                                  	|
+| DockWidgetPluginGuiInfo 	| Unimplemented: niche datatype                  	|
+| Faces                   	| Unimplemented                                  	|
+| FloatCurveKey           	| Unimplemented                                  	|
+| Font                    	| Unimplemented                                  	|
+| function                	| Cannot Serialize/Deserialize                   	|
+| NumberRange             	| Unimplemented                                  	|
+| NumberSequence          	| Unimplemented: requires NumberSequenceKeypoint 	|
+| NumberSequenceKeypoint  	| Unimplemented                                  	|
+| OverlapParams           	| Unimplemented: niche datatype                  	|
+| Path2DControlPoint      	| Unimplemented                                  	|
+| PathWaypoint            	| Unimplemented                                  	|
+| PhysicalProperties      	| Unimplemented                                  	|
+| Random                  	| Cannot Serialize/Deserialize                   	|
+| Ray                     	| Unimplemented                                  	|
+| RaycastParams           	| Unimplemented: niche datatype                  	|
+| RaycastResult           	| Cannot Serialize/Deserialize                   	|
+| RBXScriptConnection     	| Cannot Serialize/Deserialize                   	|
+| RBXScriptSignal         	| Cannot Serialize/Deserialize                   	|
+| RotationCurveKey        	| Unimplemented                                  	|
+| Secret                  	| Cannot Serialize/Deserialize                   	|
+| SharedTable             	| Cannot Serialize/Deserialize                   	|
+| thread                  	| Cannot Serialize/Deserialize                   	|
+
+*Datatypes last updated 04/12/2024, any datatypes added after this date are Unimplemented/Unknown.*
+
+Some additional things to know about the supported datatypes are that tables are treated as
+dictionaries and arrays. Arrays will always be cheaper than using a Dictionary, make sure that you
+don't have any "holes" in your arrays, otherwise it will be serialized as an Dictionary.
