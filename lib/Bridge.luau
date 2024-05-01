@@ -147,6 +147,18 @@ function Bridge:_sendPayloads(clientPayloads, serverPayload)
 			local _buffer = dictionary.serialize(serverPayload[channel])
 			local instanceMapChanges = self:_getInstanceMapChanges()
 
+			local package: buffer? | { [number]: any } = _buffer
+			if not package then
+				local newPackage = {}
+
+				-- Buffers as indices get converted to strings
+				for identifier, packets in serverPayload[channel] do
+					newPackage[Identifier.read(identifier)] = packets
+				end
+
+				package = newPackage
+			end
+
 			remote:FireServer(_buffer or serverPayload[channel], instanceMapChanges)
 		end
 	elseif self:_getContext() == "server" then
@@ -164,6 +176,18 @@ function Bridge:_sendPayloads(clientPayloads, serverPayload)
 
 				local _buffer = dictionary.serialize(payload[channel])
 				local instanceMapChanges = self:_getInstanceMapChanges()
+
+				local package: buffer? | { [number]: any } = _buffer
+				if not package then
+					local newPackage = {}
+
+					-- Buffers as indices get converted to strings
+					for identifier, packets in payload[channel] do
+						newPackage[Identifier.read(identifier)] = packets
+					end
+
+					package = newPackage
+				end
 
 				remote:FireClient(player, _buffer or payload[channel], instanceMapChanges)
 			end
@@ -298,13 +322,17 @@ function Bridge:_processIncoming(channel, sender, package, instanceMapChanges)
 			warn("Error when attempting to deserialize package")
 			return
 		end
-	else
+	elseif not payload then
 		warn("Invalid package sent over network.")
 		return
 	end
 
 	-- Unpack each packet and add it to the queue
-	for identifier, packets in payload do
+	for identifier, packets in payload :: { [any]: any } do
+		if type(identifier) == "string" then
+			identifier = Identifier.new(tonumber(identifier))
+		end
+
 		for _, data in packets do
 			local pos = #self._incomingQueue[channel] + 1
 
