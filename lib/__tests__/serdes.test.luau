@@ -61,8 +61,9 @@ describe("Ser/Des", function()
 				local serdes = require(module) :: any
 
 				local _buffer = serdes.serialize(typeToValue[module.Name])
-				local value = serdes.deserialize(_buffer)
+				expect(_buffer).toEqual(expect.any("buffer"))
 
+				local value = serdes.deserialize(_buffer)
 				expect(value).toEqual(typeToValue[module.Name])
 			end)
 		end
