@@ -166,4 +166,32 @@ describe("Bridge", function()
 		expect(clientBridge._incomingQueue.Reliable).toEqual({})
 		expect(wasFired).toBe(false)
 	end)
+
+	describe.only("Ser/Des Integration", function()
+		test("Should provide an Instance map when serializing Instances", function()
+			MockedBridge = require(BridgeModule) :: mockBridge.MockedBridge
+
+			local instance = Instance.new("Part")
+
+			table.insert(serverBridge._outgoingQueue["Reliable"], {
+				channel = "Reliable",
+				identifier = "Jest",
+				recipient = player,
+				data = { instance },
+			})
+
+			serverBridge:step()
+			clientBridge:step()
+
+			expect(clientBridge._instanceMap).toContain(instance)
+
+			local snapshot = clientBridge:snapshot()
+
+			expect(snapshot["Reliable"][1]).toEqual({
+				identifier = "Jest",
+				sender = "NET_SERVER",
+				data = { instance },
+			})
+		end)
+	end)
 end)
