@@ -333,6 +333,7 @@ function Bridge:_initialize()
 	self._incomingQueue = { Reliable = {}, Unreliable = {} } :: IncomingQueue
 	self._outgoingQueue = { Reliable = {}, Unreliable = {} } :: OutgoingQueue
 	self._snapshot = table.freeze({ Reliable = {}, Unreliable = {} }) :: IncomingQueue
+	self._instanceMap = instance.getInstanceMap()
 
 	local reliable, unreliable = self:_getRemotes()
 	self.reliableChannel = reliable
