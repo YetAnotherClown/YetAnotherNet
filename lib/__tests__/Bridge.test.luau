@@ -17,11 +17,15 @@ local mockPlayers = require(utils.mockPlayers)
 local mocks = script.Parent.Parent.__mocks__
 local mockBridge = require(mocks.mockBridge)
 
+local Identifier = require(script.Parent.Parent.Identifier)
+
 local MockedBridge
 
 local serverBridge
 local clientBridge
 local player
+
+local globalIdentifier = Identifier.new()
 
 function queueFakePackets(bridge: any, mockPlayer: any, ...)
 	local channel = "Reliable"
@@ -29,7 +33,7 @@ function queueFakePackets(bridge: any, mockPlayer: any, ...)
 	local queue = {
 		{
 			channel = "Reliable",
-			identifier = "Jest",
+			identifier = globalIdentifier,
 			recipient = mockPlayer,
 			data = { 1, 2, 3 },
 		},
@@ -64,7 +68,7 @@ describe("Bridge", function()
 
 		expect(snapshot["Reliable"][1]).toEqual({
 			data = { 1, 2, 3 },
-			identifier = "Jest",
+			identifier = globalIdentifier,
 			sender = "NET_SERVER",
 		})
 	end)
@@ -72,9 +76,11 @@ describe("Bridge", function()
 	test("When called, `_processOutgoingQueue` should properly package Client/Server payloads", function()
 		MockedBridge = require(BridgeModule) :: mockBridge.MockedBridge
 
+		local identifier = Identifier.new()
+
 		local fakeClientPacket = {
 			channel = "Reliable",
-			identifier = "PayloadTest",
+			identifier = identifier,
 			recipient = serverBridge.server,
 			data = { "a", "b", "c" },
 		}
@@ -86,7 +92,7 @@ describe("Bridge", function()
 
 		-- Check client payloads
 		expect(clientPayloads[player].Reliable).toEqual(expect.objectContaining({
-			Jest = {
+			[globalIdentifier] = {
 				{ 1, 2, 3 },
 			},
 		}))
@@ -99,9 +105,11 @@ describe("Bridge", function()
 
 	describe("Should send payloads to their appropriate Channel and Recipient on the Client", function()
 		test("Client -> Server", function()
+			local identifier = Identifier.new()
+
 			local packet = {
 				channel = "Reliable",
-				identifier = "OutgoingQueueTest",
+				identifier = identifier,
 				recipient = Bridge.server,
 				data = { "a", "b", "c" },
 			} :: Bridge.OutgoingPacket
@@ -124,9 +132,11 @@ describe("Bridge", function()
 		end)
 
 		test("Server -> Client", function()
+			local identifier = Identifier.new()
+
 			local packet = {
 				channel = "Reliable",
-				identifier = "OutgoingQueueTest",
+				identifier = identifier,
 				recipient = player,
 				data = { "a", "b", "c" },
 			} :: Bridge.OutgoingPacket
@@ -167,15 +177,17 @@ describe("Bridge", function()
 		expect(wasFired).toBe(false)
 	end)
 
-	describe.only("Ser/Des Integration", function()
+	describe("Ser/Des Integration", function()
 		test("Should provide an Instance map when serializing Instances", function()
 			MockedBridge = require(BridgeModule) :: mockBridge.MockedBridge
+
+			local identifier = Identifier.new()
 
 			local instance = Instance.new("Part")
 
 			table.insert(serverBridge._outgoingQueue["Reliable"], {
 				channel = "Reliable",
-				identifier = "Jest",
+				identifier = identifier,
 				recipient = player,
 				data = { instance },
 			})
@@ -188,7 +200,7 @@ describe("Bridge", function()
 			local snapshot = clientBridge:snapshot()
 
 			expect(snapshot["Reliable"][1]).toEqual({
-				identifier = "Jest",
+				identifier = identifier,
 				sender = "NET_SERVER",
 				data = { instance },
 			})
