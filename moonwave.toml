@@ -16,8 +16,8 @@ url = "https://yetanotherclown.github.io"
 baseUrl = "/YetAnotherNet"
 
 [[navbar.items]]
-href = "https://discord.gg/nKCV5fjEvH"
-label = "Roblox OSS Community"
+href = "https://github.com/YetAnotherClown/YetAnotherNet?tab=readme-ov-file#support-and-contribution"
+label = "Support"
 position = "right"
 
 [footer]
@@ -28,8 +28,8 @@ copyright = "Copyright © 2023 YetAnotherClown. Built with Moonwave and Docusaur
 title = "Links"
 
 [[footer.links.items]]
-label = "Roblox OSS Community"
-href = "https://discord.gg/nKCV5fjEvH"
+label = "Support"
+href = "https://github.com/YetAnotherClown/YetAnotherNet?tab=readme-ov-file#support-and-contribution"
 
 [[footer.links.items]]
 label = "YetAnotherClown on Github"
