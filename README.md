@@ -14,6 +14,7 @@
 - **Setup Guides**
     - [**Matter**]
     - [**Other**]
+- [**Support & Contribution**]
 - **Installation**
     - [**Wally**]
     - [**NPM**]
@@ -26,6 +27,7 @@
 [**Hooks**]: https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/hooks
 [**Matter**]: https://yetanotherclown.github.io/YetAnotherNet/docs/setup/matter
 [**Other**]: https://yetanotherclown.github.io/YetAnotherNet/docs/setup/other
+[**Support & Contribution**]: #support-and-contribution
 [**Wally**]: #wally
 [**NPM**]: #npm-for-roblox-typescript
 
@@ -142,6 +144,16 @@ end
 ```
 
 [Matter]: https://github.com/matter-ecs/matter
+
+---
+
+## Support and Contribution
+
+YetAnotherNet has a project thread in the Roblox OSS Community, which you can join with [this invite](https://discord.gg/nKCV5fjEvH). You can find our thread using [this link](https://discord.com/channels/385151591524597761/1179944163844825209).
+
+Please be mindful that the Roblox OSS Community is a professional workspace and not a general help desk, please keep questions and discussions about YetAnotherNet in our Project Thread and keep any other appropriate conversations in their respective channels.
+
+If you find any bugs, feel free to create an Issue or a Pull Request with an appropriate fix. I'm open to conversations about contributions in the Project Thread or in DMs on Discord, you can reach me with `@YetAnotherClown`!
 
 ---
 

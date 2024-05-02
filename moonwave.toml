@@ -16,8 +16,8 @@ url = "https://yetanotherclown.github.io"
 baseUrl = "/YetAnotherNet"
 
 [[navbar.items]]
-href = "https://discord.gg/gMWmuaZEY6"
-label = "Discord"
+href = "https://discord.gg/nKCV5fjEvH"
+label = "Roblox OSS Community"
 position = "right"
 
 [footer]
@@ -28,8 +28,8 @@ copyright = "Copyright © 2023 YetAnotherClown. Built with Moonwave and Docusaur
 title = "Links"
 
 [[footer.links.items]]
-label = "Clown's Circus Discord"
-href = "https://discord.gg/gMWmuaZEY6"
+label = "Roblox OSS Community"
+href = "https://discord.gg/nKCV5fjEvH"
 
 [[footer.links.items]]
 label = "YetAnotherClown on Github"
