@@ -412,6 +412,13 @@ end
 	@return RemoteEvent, UnreliableRemoveEvent
 ]=]
 function Bridge:_getRemotes()
+	-- Fix for typescript
+	if not script.Parent:FindFirstChild("Remotes") then
+		local folder = Instance.new("Folder")
+		folder.Name = "Remotes"
+		folder.Parent = script.Parent
+	end
+
 	local remotes = script.Parent.Remotes
 
 	local reliableRemote, unreliableRemote = remotes:FindFirstChild("Reliable"), remotes:FindFirstChild("Unreliable")
