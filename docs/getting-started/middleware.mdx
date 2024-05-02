@@ -55,18 +55,18 @@ const route: Route<[number, boolean, string]> = new Route({
 });
 
 // Sets a function to be ran on Incoming packets before they are received over the network
-route.addIncomingMiddleware(function (number: unknown, string: unknown, boolean: unknown) {
+route.addIncomingMiddleware(function (number, string, boolean) {
     // Do something, e.g., Validate Types
 
-    return $tuple(number, string, boolean)
-})
+    return $tuple(number, string, boolean);
+});
 
 // Sets a function to be ran on Outgoing packets before they are sent over the network
-route.addOutgoingMiddleware(function (number: number, string: string, boolean: boolean) {
+route.addOutgoingMiddleware(function (number, string, boolean) {
     // Do something
 
-    return $tuple(number, string, boolean)
-})
+    return $tuple(number, string, boolean);
+});
 ```
 
 To validate your types, you can return the values in order to allow it to be processed, or you can drop the packet by returning `undefined`. Dropped packets will never reach your code, meaning you can ensure that the types your code receives are always the types you expect.

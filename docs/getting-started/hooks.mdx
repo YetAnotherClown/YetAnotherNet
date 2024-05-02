@@ -32,10 +32,10 @@ Hooks allow you to integrate YetAnotherNet into any game architecture you want. 
 To create a hook, you can use ``Net.createHook({ route: Route })`` and pass in an array of your Routes, then you can call it whenever you want to process your packets.
 
 ```ts
+import { RunService } from "@rbxts/services";
+
 import Net from "@rbxts/yetanothernet";
 import routes from "shared/routes";
-
-const RunService = game.GetService("RunService");
 
 const hook = Net.createHook(routes);
 RunService.Heartbeat.Connect(hook);

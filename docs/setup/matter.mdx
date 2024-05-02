@@ -56,6 +56,8 @@ And now in the same script where you create your Matter Loop, you can run the ``
 function to schedule your Routes to run on Matter's Middleware.
 
 ```lua title="init.server.luau / init.client.luau"
+local RunService = game:GetService("RunService")
+
 local Matter = require("Matter.luau")
 local World = Matter.World
 local Loop = Matter.Loop
@@ -123,7 +125,7 @@ import { Route, Configuration } from "@rbxts/yetanothernet";
 const defaultConfiguration: Configuration = {
   Channel: "Reliable",
   Event: "default",
-}
+};
 
 // Replicate Matter Components
 const MatterReplication = new Route(defaultConfiguration);
@@ -134,14 +136,16 @@ const PlayerLoaded: Route<[boolean]> = new Route(defaultConfiguration);
 export = {
   MatterReplication: MatterReplication,
   PlayerLoaded: PlayerLoaded,
-}
+};
 ```
 
 And now in the same script where you create your Matter Loop, you can run the ``Net.start(Loop, { route: Route })``
 function to schedule your Routes to run on Matter's Middleware.
 
 ```ts title="main.server.ts / main.client.ts"
-import { Loop } from "@rbxts/matter";
+import { RunService } from "@rbxts/services";
+
+import { Loop, System } from "@rbxts/matter";
 
 import Net from "@rbxts/yetanothernet";
 import routes from "shared/routes";
@@ -149,16 +153,16 @@ import routes from "shared/routes";
 const loop = new Loop();
 
 // Schedules your Routes
-Net.start(loop, routes)
+Net.start(loop, routes);
 
 // Schedule systems
-const systems = {}
-loop.scheduleSystems(systems)
+const systems: System<[]>[] = [];
+loop.scheduleSystems(systems);
 
 // Begin the loop and make sure the ``Event`` key in your Routes configuration are added here
 loop.begin({
     default: RunService.Heartbeat
-})
+});
 ```
 
 Finally, in a Matter System we can use our ``routes.ts`` ModuleScript to access our Routes and
@@ -167,7 +171,7 @@ use them within our Systems.
 ```ts title="systems/exampleSystem.ts"
 import routes from "shared/routes";
 
-const PlayerLoaded = routes.PlayerLoaded
+const PlayerLoaded = routes.PlayerLoaded;
 
 function exampleSystem(world) {
     // Query through every networking call that frame on the Server
@@ -181,10 +185,14 @@ function exampleSystem(world) {
     }
 
     // Send data from the Client to the Server
-    PlayerLoaded.send(true)
+    PlayerLoaded.send(true);
 
     // Send data to a Client from the Server
-    PlayerLoaded.send(true):to(Player)
+    PlayerLoaded.send(true).to(Player);
+}
+
+export = {
+    system: exampleSystem
 }
 ```
 

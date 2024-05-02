@@ -30,10 +30,10 @@ You can integrate YetAnotherNet into whatever game architecture you want by crea
 
 Below is a simple example of creating custom scheduling behavior using ``Net.createHook({ route: Route })``,
 ```ts
+import { RunService } from "@rbxts/services";
+
 import Net from "@rbxts/yetanothernet";
 import routes from "shared/routes";
-
-const RunService = game.GetService("RunService");
 
 const hook = Net.createHook(routes);
 RunService.Heartbeat.Connect(hook);
