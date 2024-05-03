@@ -1,50 +1,50 @@
 {
-  "name": "AttackOfTheKillerRoombas",
-  "tree": {
-    "$className": "DataModel",
-    "Workspace": {
-      "$className": "Workspace",
-      "Terrain": {
-        "$path": "assets/terrain.rbxm"
-      },
-      "Level": {
-        "$path": "assets/level.rbxm"
-      }
-    },
-    "Lighting": {
-      "$className": "Lighting",
-      "$path": "assets/lighting.rbxm"
-    },
-    "ServerScriptService": {
-      "$className": "ServerScriptService",
-      "Game": {
-        "$path": "src/server"
-      }
-    },
-    "ReplicatedStorage": {
-      "$className": "ReplicatedStorage",
-      "Assets": {
-        "$path": "assets/assets.rbxm"
-      },
-      "Packages": {
-        "$className": "Folder",
-        "$path": "Packages"
-      },
-      "Shared": {
-        "$path": "src/shared"
-      },
-      "Client": {
-        "$path": "src/client"
-      }
-    },
-    "StarterPlayer": {
-      "$className": "StarterPlayer",
-      "StarterPlayerScripts": {
-        "$className": "StarterPlayerScripts",
-        "Game": {
-          "$path": "src/game.client.lua"
-        }
-      }
-    }
-  }
+	"name": "AttackOfTheKillerRoombas",
+	"tree": {
+		"$className": "DataModel",
+		"Workspace": {
+			"$className": "Workspace",
+			"Terrain": {
+				"$path": "assets/terrain.rbxm"
+			},
+			"Level": {
+				"$path": "assets/level.rbxm"
+			}
+		},
+		"Lighting": {
+			"$className": "Lighting",
+			"$path": "assets/lighting.rbxm"
+		},
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"Game": {
+				"$path": "src/server"
+			}
+		},
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"Assets": {
+				"$path": "assets/assets.rbxm"
+			},
+			"Packages": {
+				"$className": "Folder",
+				"$path": "Packages"
+			},
+			"Shared": {
+				"$path": "src/shared"
+			},
+			"Client": {
+				"$path": "src/client"
+			}
+		},
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"Game": {
+					"$path": "src/game.client.lua"
+				}
+			}
+		}
+	}
 }

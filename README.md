@@ -80,15 +80,19 @@ Tasks to complete before version 1.0.0 is released.
 - [X] Middleware
 - [X] Typescript Support
 - [X] Automatic Buffer Compression
-- [ ] Unit + Integration Tests w/ Jest 
+- [x] Unit + Integration Tests w/ Jest 
 - [ ] Rate limiting
 - [ ] Debugger
 
 Other Tasks
+- [ ] Support more [Unsupported Datatypes] in internal Ser/Des library
+- [ ] More extensive tests with Jest
 - [ ] Minimal Example
 - [ ] ECR Setup Guide
 - [ ] ECR Example
 - [ ] Docs Page for Technical Details
+
+[Unsupported Datatypes]: https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/buffer-compression#unsupported-datatypes
 
 ---
 
@@ -164,7 +168,7 @@ If you find any bugs, feel free to create an Issue or a Pull Request with an app
 Add YetAnotherNet to your project with [Wally] by adding the following to your ``wally.toml`` file:
 ```toml
 [dependencies]
-Net = "yetanotherclown/yetanothernet@0.7.0"
+Net = "yetanotherclown/yetanothernet@0.8.0"
 ```
 
 > [!NOTE]
