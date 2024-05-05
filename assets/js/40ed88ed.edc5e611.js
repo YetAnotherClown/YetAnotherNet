@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[473],{63891:e=>{e.exports=JSON.parse('{"sourceUrl":"https://github.com/YetAnotherClown/YetAnotherNet/blob/main","baseUrl":"/YetAnotherNet/","classOrder":["Net","Route","Loop","QueryResult","SendRequest"],"apiCategories":[]}')}}]);
