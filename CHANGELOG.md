@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Documentation for using Squash 2.0.0
 
+### Fixed
+
+- Instance Changes when sent over the network would turn into a Mixed Table, resulting in incorrect Instances being deserialized.
+
 ## [0.8.0] - 2024-05-02
 
 ### Added

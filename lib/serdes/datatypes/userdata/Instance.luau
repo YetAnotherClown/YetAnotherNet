@@ -3,10 +3,10 @@
 local BUFFER_SIZE = 4
 
 local nextIdentifer = 1
-local instanceMap = {}
+local instanceMap: { [number]: Instance } = {}
 
 local function setIdentifier(identifier: number, instance: Instance)
-	instanceMap[identifier] = instance
+	instanceMap[tonumber(identifier) :: number] = instance
 end
 
 local function getInstanceMap()
