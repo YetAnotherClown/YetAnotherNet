@@ -34,7 +34,7 @@ local isClient = RunService:IsClient()
 	@field Ratelimit number? -- Amount of allowed invocations a frame
 
 	:::note
-	As of v0.5.0, Ratelimiting is not implemented. This feature will come in future versions.
+	Ratelimiting is not implemented yet. This feature will come in future versions.
 	:::
 
 	### Channel
