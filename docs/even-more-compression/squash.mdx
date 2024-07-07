@@ -135,9 +135,9 @@ const route: Route<[number, boolean, string]> = new Route({
 });
 
 const tuple = Squash.tuple(
-    Squash.T(Squash.number(8)),
-    Squash.T(Squash.string()),
-    Squash.T(Squash.boolean())
+    Squash.number(8),
+    Squash.string(),
+    Squash.boolean()
 );
 
 // Decompress
