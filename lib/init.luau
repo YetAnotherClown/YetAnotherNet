@@ -29,9 +29,9 @@ local isClient = RunService:IsClient()
 --[=[
 	@interface Configuration
 	@within Route
-	@field Channel "Reliable" | "Unreliable" -- Default: Reliable
-	@field Event string -- The event to schedule the Route on in your Matter Loop -- Default: "default"
-	@field Ratelimit number -- Amount of allowed invocations a frame
+	@field Channel ("Reliable" | "Unreliable")? -- Default: Reliable
+	@field Event string? -- The event to schedule the Route on in your Matter Loop -- Default: "default"
+	@field Ratelimit number? -- Amount of allowed invocations a frame
 
 	:::note
 	As of v0.5.0, Ratelimiting is not implemented. This feature will come in future versions.
