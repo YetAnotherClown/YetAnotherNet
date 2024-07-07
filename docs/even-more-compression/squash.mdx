@@ -1,0 +1,164 @@
+---
+sidebar_position: 1
+title: "Squash [Luau/TS]"
+---
+
+# Squash
+
+[Squash](https://github.com/Data-Oriented-House/Squash) is a comprehensive SerDes library
+which provides more extensive compression and control over the Buffer Compression of your data than
+the internal SerDes library within YetAnotherNet.
+
+## Why Also Use Squash
+
+Why should you also use Squash when YetAnotherNet already has a SerDes library internally?
+Good Question.
+
+YetAnotherNet's SerDes library is completely dynamic, outputting a buffer with a format that can be read without any context.
+With Squash, you can explicitly define the data you send and compress it without the overhead of the Internal SerDes Library's dynamic nature.
+
+Here are some comparisons between the two from feeding them the same example data:
+
+| Data   	| YetAnotherNet (bytes) 	| Squash (bytes) 	|
+|--------	|-----------------------	|----------------	|
+| Array  	| 45                    	| 37             	|
+| Map    	| 66                    	| 40             	|
+| Record 	| 283                   	| 89             	|
+| Tuple  	| 88                    	| 31             	|
+
+*Last updated 07/07/2024, size of data is subject to change.*
+
+<details>
+    <summary>See Data used for comparisons</summary>
+
+    #### Array
+
+    ```lua
+        local array = {1, 2, 3, 4, 5.5, 6.6, -7.7, -8.9, 10.01}
+    ```
+
+    #### Map
+
+    ```lua
+        local map = {
+            [Vector2.new(1, 2)] = Vector3.new(1, 2, 3),
+            [Vector2.new(4, 29)] = Vector3.new(4, 29, 33),
+            [Vector2.new(72, 483)] = Vector3.new(72, 483, 555),
+        }
+    ```
+
+    #### Record
+
+    ```lua
+        local record = {
+            position = Vector2.new(287.3855, -13486.3),
+            health = 9,
+            name = "Cedrick",
+            poisoned = true,
+            items = {
+                { name = 'Lantern', count = 2 },
+                { name = 'Waterskin', count = 1 },
+                { name = 'Map', count = 4 },
+            },
+            inns = {
+                ['The Copper Cauldron'] = true,
+                Infirmary = true,
+                ['His Recess'] = true,
+            }
+        }
+    ```
+
+    #### Tuple
+
+    ```lua
+        local a, b, c, d = Vector3.new(123456789, 1, 0), CFrame.new(1, 2, 3), BrickColor.new(93), Enum.HumanoidStateType.Freefall
+    ```
+
+</details>
+
+These comparisons show the scale of the tradeoff YetAnotherNet took for Dynamic compression, not to mention Squash is very well made.
+YetAnotherNet primarily relies on Roblox's built-in compression of Buffers when sending over the network, so it isn't as bad as it seems.
+
+Luckily, you can use Squash with YetAnotherNet without any large overhead as it accepts buffers as valid types to send over the network!
+
+## How To Luau
+
+```lua
+local Squash = require("@packages/Squash")
+local YetAnotherNet = require("@packages/YetAnotherNet")
+
+local Route = YetAnotherNet.Route
+type Route<U...> = YetAnotherNet.Route<U...>
+
+local route: Route<number, string, boolean> = Route.new({})
+
+local tuple = Squash.tuple(
+    Squash.T(Squash.number(8)),
+    Squash.T(Squash.string()),
+    Squash.T(Squash.boolean())
+)
+
+-- Decompress
+route:addIncomingMiddleware(function(_buffer: unknown)
+	if type(_buffer) ~= "buffer" then
+		return nil -- Drop packet on failed type validation
+	end
+
+	local cursor = Squash.frombuffer(_buffer)
+	return tuple.des(cursor)
+end)
+
+-- Compress
+route:addOutgoingMiddleware(function(number, string, boolean)
+	local cursor = Squash.cursor()
+	tuple.ser(cursor, number, string, boolean)
+
+	return Squash.tobuffer(cursor)
+end)
+
+return {
+	route = route,
+}
+```
+
+## How To Typescript
+
+You can find the TypeScript Types for Squash on [npm](https://www.npmjs.com/package/@rbxts/squash).
+
+```ts
+import Squash from "@rbxts/squash";
+import Route from "@rbxts/yetanothernet";
+
+const route: Route<[number, boolean, string]> = new Route({
+    Channel: "Reliable",
+    Event: undefined,
+});
+
+const tuple = Squash.tuple(
+    Squash.T(Squash.number(8)),
+    Squash.T(Squash.string()),
+    Squash.T(Squash.boolean())
+);
+
+// Decompress
+route.addIncomingMiddleware(function (_buffer) {
+    if (!typeIs(_buffer, "buffer")) {
+        return undefined; // Drop packet on failed type validation
+    }
+
+	const cursor = Squash.frombuffer(_buffer);
+	return tuple.des(cursor);
+});
+
+// Compress
+route.addOutgoingMiddleware(function (number, string, boolean) {
+	const cursor = Squash.cursor();
+	tuple.ser(cursor, number, string, boolean);
+
+	return $tuple(Squash.tobuffer(cursor));
+});
+
+export = {
+	route: route,
+};
+```

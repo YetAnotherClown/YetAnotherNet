@@ -90,6 +90,7 @@ Other Tasks
 - [ ] Minimal Example
 - [ ] ECR Setup Guide
 - [ ] ECR Example
+- [ ] Flamework Binary Serializer Example
 - [ ] Docs Page for Technical Details
 
 [Unsupported Datatypes]: https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/buffer-compression#unsupported-datatypes
