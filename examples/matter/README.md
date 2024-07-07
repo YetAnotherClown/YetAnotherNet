@@ -16,7 +16,7 @@ with [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types)
 To build:
 
 - Clone this repo
-- Open the `example/matter` directory
+- Open the `examples/matter` directory
 - Run `wally install`
 - Run `rojo build example.project.json --output example.rbxl`
 
