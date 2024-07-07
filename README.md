@@ -55,7 +55,7 @@ One thing that separates YetAnotherNet from other networking libraries on Roblox
 With inspiration from [Bevy_Renet], a Networking crate for use with the Bevy ECS in Rust, and another networking library on Roblox, [BridgeNet2], YetAnotherNet pushes to provide similar functionality to these two libraries for ECS on Roblox.
 
 [Bevy_Renet]: https://github.com/lucaspoffo/renet/tree/master/bevy_renet
-[BridgeNet2]: https://ffrostflame.github.io/BridgeNet2/
+[BridgeNet2]: https://ffrostfall.github.io/BridgeNet2/
 
 #### Why go for Data-Driven Design?
 
