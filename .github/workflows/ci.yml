@@ -28,7 +28,7 @@ jobs:
               run: sed -i 's/# run-in-roblox/run-in-roblox/' foreman.toml
 
             - name: Install Wally packages
-              run: sh scripts/install-packages.sh
+              run: sh scripts/install-dependencies.sh
 
             - name: Analyze
               run: sh scripts/analyze.sh
