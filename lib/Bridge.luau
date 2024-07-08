@@ -1,11 +1,11 @@
 --!native
 local RunService = game:GetService("RunService")
 
-local serdes = require(script.Parent.serdes)
+local serdes = require("@serdes")
 local instance = serdes.Instance
 local dictionary = serdes.dictionary
 
-local Identifier = require(script.Parent.Identifier)
+local Identifier = require("@yetanothernet/Identifier")
 export type Identifier = Identifier.Identifier
 
 export type Channel = "Reliable" | "Unreliable"

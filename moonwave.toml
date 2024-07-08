@@ -1,7 +1,7 @@
 title = "YetAnotherNet"
 gitSourceBranch = "main"
 classOrder = [
-    "Net",
+    "YetAnotherNet",
     "Route",
     "Bridge",
     "QueryResult",
@@ -41,11 +41,11 @@ includeReadme = false
 
 [[home.features]]
 title = "Data-Driven"
-description = "Net promotes a Data-Driven structure as opposed to an Event-Driven one."
+description = "YetAnotherNet promotes a Data-Driven structure as opposed to an Event-Driven one."
 
 [[home.features]]
 title = "Optimized Bandwidth"
-description = "Net automatically structures your data to optimize bandwidth."
+description = "YetAnotherNet automatically structures your data to optimize bandwidth."
 
 [[home.features]]
 title = "Made for ECS"

@@ -20,11 +20,11 @@ Being initially made for the Matter ECS, YetAnotherNet provides a simple functio
 
 Firstly, create a ``routes.luau`` ModuleScript in ReplicatedStorage to strictly declare your Routes.
 
-```lua title="routes.luau"
-local Net = require("Net.luau")
+```lua title="shared/routes.luau"
+local YetAnotherNet = require("@shared/routes")
 
-local Route = Net.Route
-type Route<U...> = Net.Route<U...>;
+local Route = YetAnotherNet.Route
+type Route<U...> = YetAnotherNet.Route<U...>;
 
 local defaultConfiguration = {
   Channel = "Reliable",
@@ -41,10 +41,10 @@ type EntityPayload = {
 }
 
 -- Replicate Matter Components
-local MatterReplication: Net<EntityPayload> = Net.new(defaultConfiguration)
+local MatterReplication: Route<EntityPayload> = Route.new(defaultConfiguration)
 
 -- Signal that the Player has loaded
-local PlayerLoaded: Net<boolean> = Net.new(defaultConfiguration)
+local PlayerLoaded: Route<boolean> = Route.new(defaultConfiguration)
 
 return {
   MatterReplication = MatterReplication,
@@ -52,24 +52,24 @@ return {
 }
 ```
 
-And now in the same script where you create your Matter Loop, you can run the ``Net.start(Loop, { Route })``
+And now in the same script where you create your Matter Loop, you can run the ``YetAnotherNet.start(Loop, { Route })``
 function to schedule your Routes to run on Matter's Middleware.
 
 ```lua title="init.server.luau / init.client.luau"
 local RunService = game:GetService("RunService")
 
-local Matter = require("Matter.luau")
+local Matter = require("@packages/Matter")
 local World = Matter.World
 local Loop = Matter.Loop
 
-local Net = require("Net.luau")
-local routes = require("routes.luau")
+local YetAnotherNet = require("@packages/YetAnotherNet")
+local routes = require("@shared/routes")
 
 local world = World.new()
 local loop = Loop.new(world)
 
 -- Schedules your Routes
-Net.start(loop, routes)
+YetAnotherNet.start(loop, routes)
 
 local systems = {}
 for _, child in script.systems:GetChildren() do
@@ -78,7 +78,7 @@ for _, child in script.systems:GetChildren() do
     end
 end
 
-loop:scheduleSystems(systems) -- Schedule systems after running ``Net.start()``
+loop:scheduleSystems(systems) -- Schedule systems after running ``YetAnotherNet.start()``
 
 -- Begin the loop and make sure the ``Event`` key in your Routes configuration are added here
 loop:begin({
@@ -90,7 +90,7 @@ Finally, in a Matter System we can use our ``routes.luau`` ModuleScript to acces
 use them within our Systems.
 
 ```lua title="systems/exampleSystem.luau"
-local routes = require("routes.luau")
+local routes = require("@shared/routes")
 local PlayerLoaded = routes.PlayerLoaded
 
 local function exampleSystem(world)
@@ -115,7 +115,7 @@ end
 </TabItem>
 <TabItem value="ts" label="Typescript">
 
-Being initially made for the Matter ECS, Net provides a simple function for scheduling your Routes to run on your Matter Loop.
+Being initially made for the Matter ECS, YetAnotherNet provides a simple function for scheduling your Routes to run on your Matter Loop.
 
 Firstly, create a ``routes.ts`` ModuleScript in ReplicatedStorage to strictly declare your Routes.
 

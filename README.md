@@ -109,10 +109,10 @@ Other Tasks
 
 Basic Setup for Routes
 ```lua
-local Net = require("Net.luau")
+local YetAnotherNet = require("@packages/YetAnotherNet")
 
-local Route = Net.Route
-type Route<U...> = Net.Route<U...>;
+local Route = YetAnotherNet.Route
+type Route<U...> = YetAnotherNet.Route<U...>;
 
 -- You can specify the type(s) between the <> for Typechecking + Intellisense
 local ExampleRoute: Route<any> = Route.new()
@@ -126,7 +126,7 @@ return {
 
 Example of how to use YetAnotherNet in a [Matter] System
 ```lua
-local routes = require("routes.luau")
+local routes = require("@shared/routes")
 local ExampleRoute = routes.ExampleOne
 
 local function exampleSystem(world)
@@ -169,7 +169,7 @@ If you find any bugs, feel free to create an Issue or a Pull Request with an app
 Add YetAnotherNet to your project with [Wally] by adding the following to your ``wally.toml`` file:
 ```toml
 [dependencies]
-Net = "yetanotherclown/yetanothernet@0.8.0"
+YetAnotherNet = "yetanotherclown/yetanothernet@0.8.0"
 ```
 
 > [!NOTE]
@@ -192,7 +192,7 @@ npm i @rbxts/yetanothernet
 
 To build yourself with Rojo, use: 
 ```bash
-rojo build -o "Net.rbxm"
+./scripts/build.sh
 ```
 
 For more help, check out [the Rojo documentation].

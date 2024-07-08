@@ -1,4 +1,4 @@
-local Bridge = require(script.Parent.Bridge)
+local Bridge = require("@yetanothernet/Bridge")
 type Bridge = Bridge.Bridge
 
 type Recipient = Bridge.Recipient
@@ -10,7 +10,7 @@ type OutgoingQueue = Bridge.OutgoingQueue
 
 type NetServer = Bridge.NetServer
 
-local Identifier = require(script.Parent.Identifier)
+local Identifier = require("@yetanothernet/Identifier")
 export type Identifier = Identifier.Identifier
 
 local read = Identifier.read
@@ -19,7 +19,7 @@ local read = Identifier.read
 	@class QueryResult
 	@since v0.4.0
 
-	An iterable object returned as the result of [Net:query] that can filter snapshots
+	An iterable object returned as the result of [Route:query] that can filter snapshots
 	by Identifier and Senders.
 
 	:::note

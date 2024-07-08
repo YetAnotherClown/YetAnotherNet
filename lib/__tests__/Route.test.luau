@@ -1,7 +1,5 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local Net = require(script.Parent.Parent)
-local JestGlobals = require(ReplicatedStorage.DevPackages.JestGlobals)
+local Net = require("@yetanothernet")
+local JestGlobals = require("@dev-packages/JestGlobals")
 local beforeAll = JestGlobals.beforeAll
 local afterEach = JestGlobals.afterEach
 local beforeEach = JestGlobals.beforeEach
@@ -13,11 +11,8 @@ local jest = JestGlobals.jest
 local root = script.Parent.Parent
 local BridgeModule = root.Bridge
 
-local utils = root.__utils__
-local mockPlayers = require(utils.mockPlayers)
-
-local mocks = script.Parent.Parent.__mocks__
-local mockBridge = require(mocks.mockBridge)
+local mockPlayers = require("@yetanothernet/__utils__/mockPlayers")
+local mockBridge = require("@yetanothernet/__mocks__/mockBridge")
 
 local MockedBridge
 

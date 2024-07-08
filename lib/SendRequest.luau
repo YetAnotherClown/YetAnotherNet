@@ -1,6 +1,6 @@
 local RunService = game:GetService("RunService")
 
-local Bridge = require(script.Parent.Bridge)
+local Bridge = require("@yetanothernet/Bridge")
 type Bridge = Bridge.Bridge
 
 type Recipient = Bridge.Recipient
@@ -12,7 +12,7 @@ type OutgoingQueue = Bridge.OutgoingQueue
 
 type NetServer = Bridge.NetServer
 
-local Identifier = require(script.Parent.Identifier)
+local Identifier = require("@yetanothernet/Identifier")
 export type Identifier = Identifier.Identifier
 
 --[=[

@@ -1,24 +1,24 @@
 {
-  "name": "yan-test-place",
+  "name": "yetanothernet-development",
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
       "Packages": {
         "$className": "Folder",
-        "Net": {
-          "$path": "lib"
+        "YetAnotherNet": {
+          "$path": "dist/lib"
         }
       },
       "DevPackages": {
         "$path": "DevPackages"
       },
       "jest.config": {
-        "$path": "tests/jest.config.luau"
+        "$path": "dist/tests/jest.config.luau"
       }
     },
     "ServerScriptService": {
       "server": {
-        "$path": "tests/startJest.server.luau"
+        "$path": "dist/tests/startJest.server.luau"
       }
     }
   }

@@ -2,12 +2,14 @@
 
 set -e
 
-OUTPUT=yan-test-place.rbxl
+OUTPUT=yetanothernet-development.rbxl
 PORT=27182
 
 if [ ! -d ./DevPackages ]; then
     ./scripts/install-wally.sh
 fi
 
-rojo build test.project.json --output $OUTPUT
-run-in-roblox --place $OUTPUT --script ./tests/startJest.server.luau --port $PORT
+darklua process --config .darklua.json --watch lib/ dist/lib \
+    & darklua process --config .darklua.json --watch tests/ dist/tests \
+    & rojo build dev.project.json --output $OUTPUT \
+    & run-in-roblox --place $OUTPUT --script ./dist/tests/startJest.server.luau --port $PORT

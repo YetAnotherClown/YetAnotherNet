@@ -1,7 +1,7 @@
 --!native
 
-local cframe = require(script.Parent.CFrame)
-local vector3 = require(script.Parent.Vector3)
+local cframe = require("@serdes/datatypes/userdata/CFrame")
+local vector3 = require("@serdes/datatypes/userdata/Vector3")
 
 local BUFFER_SIZE = cframe.size + vector3.size
 

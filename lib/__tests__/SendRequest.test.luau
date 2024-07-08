@@ -1,12 +1,9 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local JestGlobals = require(ReplicatedStorage.DevPackages.JestGlobals)
-local Identifier = require(ReplicatedStorage.Packages.Net.Identifier)
+local JestGlobals = require("@dev-packages/JestGlobals")
 local describe = JestGlobals.describe
 local test = JestGlobals.test
 
-local root = script.Parent.Parent
-local SendRequest = require(root.SendRequest)
+local Identifier = require("@yetanothernet/Identifier")
+local SendRequest = require("@yetanothernet/SendRequest")
 
 describe("SendRequest", function()
 	test("When calling `to()`, should modify the recipient", function()

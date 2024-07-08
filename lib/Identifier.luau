@@ -1,4 +1,4 @@
-local identifier = require(script.Parent.serdes.datatypes.custom.identifier)
+local identifier = require("@serdes/datatypes/custom/identifier")
 export type Identifier = buffer
 
 local function new(uniquePosition: number?): buffer

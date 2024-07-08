@@ -10,16 +10,16 @@ import TabItem from '@theme/TabItem';
 <Tabs>
 <TabItem value="lua" label="Luau" default>
 
-You can integrate YetAnotherNet into whatever game architecture you want by creating a Hook using ``Net.createHook({ Route })`` which is identical to the ``Net.start(loop, { Route })`` function. This function will return another function which you can call whenever you want to process your Routes' queues and send/receive your Packets on the Server or Client.
+You can integrate YetAnotherNet into whatever game architecture you want by creating a Hook using ``YetAnotherNet.createHook({ Route })`` which is identical to the ``YetAnotherNet.start(loop, { Route })`` function. This function will return another function which you can call whenever you want to process your Routes' queues and send/receive your Packets on the Server or Client.
 
-Below is a simple example of creating custom scheduling behavior using ``Net.createHook({ Route })``,
+Below is a simple example of creating custom scheduling behavior using ``YetAnotherNet.createHook({ Route })``,
 ```lua
 local RunService = game:GetService("RunService")
 
-local Net = require("Net.luau")
-local routes = require("routes.luau")
+local YetAnotherNet = require("@packages/YetAnotherNet")
+local routes = require("@shared/routes")
 
-local hook = Net.createHook(routes)
+local hook = YetAnotherNet.createHook(routes)
 RunService.Heartbeat:Connect(hook)
 ```
 

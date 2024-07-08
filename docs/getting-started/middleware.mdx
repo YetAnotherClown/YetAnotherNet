@@ -15,10 +15,10 @@ Middleware is a powerful feature of YetAnotherNet that allows you to validate ty
 To create Middleware, you can specify a function in either `Route:addIncomingMiddleware()` or `Route:addOutgoingMiddleware()`.
 
 ```lua
-local Net = require("Net.luau")
+local YetAnotherNet = require("@packages/YetAnotherNet")
 
-local Route = Net.Route
-type Route<U...> = Net.Route<U...>;
+local Route = YetAnotherNet.Route
+type Route<U...> = YetAnotherNet.Route<U...>;
 
 local route: Route<number, string, boolean> = Route.new()
 

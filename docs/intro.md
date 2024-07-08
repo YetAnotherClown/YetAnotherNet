@@ -43,7 +43,7 @@ Since it's encouraged to use ECS with YetAnotherNet, though not required, we sug
 
 ```toml
 [dependencies]
-Net = "yetanotherclown/yetanothernet@0.8.0"
+YetAnotherNet = "yetanotherclown/yetanothernet@0.8.0"
 ```
 
 Note: Wally does not export types automatically, if you wish to use Strict Typing with YetAnotherNet, install [Wally Package Types](https://github.com/JohnnyMorganz/wally-package-types) with Aftman or Foreman.
