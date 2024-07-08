@@ -78,7 +78,11 @@ export type BridgeImpl = {
 		}?
 	) -> (),
 	_processOutgoingQueue: (self: Bridge) -> (ClientPayloads, ServerPayload),
-	_sendPayloads: (self: Bridge, clientPayloads: ClientPayloads, serverPayloads: ServerPayload) -> (),
+	_sendPayloads: (
+		self: Bridge,
+		clientPayloads: ClientPayloads,
+		serverPayloads: ServerPayload
+	) -> (),
 
 	_initialize: (self: Bridge) -> (),
 
@@ -133,7 +137,10 @@ end
 ]=]
 function Bridge:_sendPayloads(clientPayloads, serverPayload)
 	if self:_getContext() == "client" then
-		for channel, remote in pairs({ Reliable = self.reliableChannel, Unreliable = self.unreliableChannel }) do
+		for channel, remote in pairs({
+			Reliable = self.reliableChannel,
+			Unreliable = self.unreliableChannel,
+		}) do
 			local n = 0
 			for _ in serverPayload[channel] do
 				n += 1
@@ -163,7 +170,10 @@ function Bridge:_sendPayloads(clientPayloads, serverPayload)
 		end
 	elseif self:_getContext() == "server" then
 		for player, payload in clientPayloads do
-			for channel, remote in pairs({ Reliable = self.reliableChannel, Unreliable = self.unreliableChannel }) do
+			for channel, remote in pairs({
+				Reliable = self.reliableChannel,
+				Unreliable = self.unreliableChannel,
+			}) do
 				local n = 0
 				for _ in payload[channel] do
 					n += 1
@@ -211,7 +221,11 @@ local function addPacketToPayload(payload: ServerPayload, packet: OutgoingPacket
 	return
 end
 
-local function updateClientPayload(clientPayloads: ClientPayloads, player: Player, packet: OutgoingPacket)
+local function updateClientPayload(
+	clientPayloads: ClientPayloads,
+	player: Player,
+	packet: OutgoingPacket
+)
 	if not clientPayloads[player] then
 		clientPayloads[player] = {
 			Reliable = {},
@@ -421,7 +435,8 @@ function Bridge:_getRemotes()
 
 	local remotes = script.Parent.Remotes
 
-	local reliableRemote, unreliableRemote = remotes:FindFirstChild("Reliable"), remotes:FindFirstChild("Unreliable")
+	local reliableRemote, unreliableRemote =
+		remotes:FindFirstChild("Reliable"), remotes:FindFirstChild("Unreliable")
 	if reliableRemote and unreliableRemote then
 		return reliableRemote, unreliableRemote
 	end

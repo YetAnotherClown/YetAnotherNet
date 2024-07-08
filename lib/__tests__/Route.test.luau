@@ -31,7 +31,11 @@ describe("Route", function()
 
 		MockedBridge = require(BridgeModule) :: mockBridge.MockedBridge
 
-		local function createHook(routes: { Net.Route<...any> }, context: "server" | "client", player: any?)
+		local function createHook(
+			routes: { Net.Route<...any> },
+			context: "server" | "client",
+			player: any?
+		)
 			local bridge = MockedBridge.new(context, player)
 
 			return function()

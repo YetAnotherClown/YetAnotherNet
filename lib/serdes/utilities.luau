@@ -29,7 +29,9 @@ local function getSerDes(_type: string)
 		_type = "boolean"
 	end
 
-	local module = primitives:FindFirstChild(_type) or userdata:FindFirstChild(_type) or custom:FindFirstChild(_type)
+	local module = primitives:FindFirstChild(_type)
+		or userdata:FindFirstChild(_type)
+		or custom:FindFirstChild(_type)
 	if module then
 		return require(module) :: any
 	end

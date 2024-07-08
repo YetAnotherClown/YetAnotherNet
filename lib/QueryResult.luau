@@ -46,7 +46,11 @@ type QueryResultImpl<U...> = {
 
 	from: (self: QueryResult<U...>, ...(Player | NetServer)) -> QueryResult<U...>,
 
-	new: (snapshot: { IncomingPacket }, identifier: Identifier, senders: { Recipient }?) -> QueryResult<U...>,
+	new: (
+		snapshot: { IncomingPacket },
+		identifier: Identifier,
+		senders: { Recipient }?
+	) -> QueryResult<U...>,
 }
 
 export type QueryResult<U...> = typeof(setmetatable({}, {} :: QueryResultImpl<U...>))

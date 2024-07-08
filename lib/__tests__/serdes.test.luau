@@ -19,7 +19,8 @@ local typeToValue = {
 	number = 22,
 	string = "Hello, world!",
 	BrickColor = BrickColor.Yellow(),
-	CFrame = CFrame.new(Vector3.new(20, 40, 60)) * CFrame.fromEulerAnglesXYZ(math.rad(45), math.rad(90), math.rad(180)),
+	CFrame = CFrame.new(Vector3.new(20, 40, 60))
+		* CFrame.fromEulerAnglesXYZ(math.rad(45), math.rad(90), math.rad(180)),
 	Color3 = Color3.fromHex("54bbff"),
 	DateTime = DateTime.fromUnixTimestampMillis(1686894720000),
 	EnumItem = Enum.Genre.Scary,

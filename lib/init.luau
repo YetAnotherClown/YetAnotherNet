@@ -208,7 +208,9 @@ function Route:_queuePackets(bridge: Bridge)
 				if typeof(packet.recipient) == "table" then
 					for _, player in packet.recipient do
 						if not bridge:_isPlayer(player) then
-							warn("Attempt to send a table with a non-player instance as a recipient")
+							warn(
+								"Attempt to send a table with a non-player instance as a recipient"
+							)
 							continue
 						end
 					end
@@ -310,7 +312,10 @@ function Route.new(configuration: Configuration?)
 	self._configuration = configuration or {} :: Configuration
 
 	-- Validate Channel
-	if self._configuration.Channel and not table.find({ "Reliable", "Unreliable" }, self._configuration.Channel) then
+	if
+		self._configuration.Channel
+		and not table.find({ "Reliable", "Unreliable" }, self._configuration.Channel)
+	then
 		error("Channel should be Reliable or Unreliable.", 2)
 	end
 
