@@ -16,10 +16,16 @@ jobs:
             - name: Checkout Repository
               uses: actions/checkout@v3
 
+            - name: Remove run-in-roblox from foreman.toml
+              run: sed -i 's/run-in-roblox/# run-in-roblox/' foreman.toml
+
             - name: Install Foreman
               uses: Roblox/setup-foreman@v1
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Add run-in-roblox back to foreman.toml
+              run: sed -i 's/# run-in-roblox/run-in-roblox/' foreman.toml
 
             - name: Install Wally packages
               run: sh scripts/install-packages.sh
@@ -34,11 +40,17 @@ jobs:
             - name: Checkout Repository
               uses: actions/checkout@v3
 
+            - name: Remove run-in-roblox from foreman.toml
+              run: sed -i 's/run-in-roblox/# run-in-roblox/' foreman.toml
+
             - name: Install Foreman
               uses: Roblox/setup-foreman@v1
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
 
+            - name: Add run-in-roblox back to foreman.toml
+              run: sed -i 's/# run-in-roblox/run-in-roblox/' foreman.toml
+                
             - name: Lint
               run: sh scripts/lint.sh
 
