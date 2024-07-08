@@ -198,3 +198,7 @@ To build yourself with Rojo, use:
 For more help, check out [the Rojo documentation].
 
 [the Rojo documentation]: https://rojo.space/docs
+
+## Derived Works
+
+The Darklua setup and Github Workflows are inspired and built off of the work of **grilme99**'s [roblox-project-template](https://github.com/grilme99/roblox-project-template).
