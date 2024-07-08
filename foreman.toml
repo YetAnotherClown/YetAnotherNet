@@ -6,3 +6,4 @@ wally-package-types = { github = "JohnnyMorganz/wally-package-types", version = 
 run-in-roblox = { github = "franydev/run-in-roblox", version = "0.3.1" }
 luau-lsp = { github = "JohnnyMorganz/luau-lsp", version = "1.29.1" }
 stylua = { github = "JohnnyMorganz/StyLua", version = "0.20.0" }
+selene = { github = "Kampfkarren/Selene", version = "0.27.1"}
