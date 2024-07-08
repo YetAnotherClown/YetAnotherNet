@@ -1,1 +1,2 @@
 std = "selene_definitions"
+exclude = ["DevPackages", "dist/*", "globalTypes.d.lua"]
