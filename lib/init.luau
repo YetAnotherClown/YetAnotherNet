@@ -246,7 +246,8 @@ function Route:_updateSnapshot(bridge)
 		end
 
 		-- Implement middleware
-		local newData = { self._middleware.Incoming(table.unpack(packet.data)) }
+		local middleware = self._middleware.Incoming :: (...any?) -> ...any
+		local newData = { middleware(table.unpack(packet.data)) }
 		if #newData > 0 then
 			packet.data = newData
 		end
