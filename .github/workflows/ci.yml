@@ -54,4 +54,4 @@ jobs:
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   version: v0.20.0
-                  args: stylua lib/ tests/ --verify --config-path stylua.toml --check
+                  args: lib/ tests/ --verify --config-path stylua.toml --check
