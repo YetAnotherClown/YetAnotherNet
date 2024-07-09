@@ -9,12 +9,20 @@ for _, enum in Enum:GetEnums() do
 	end
 end
 
+local enumItemCache = {}
+
 local function serialize(enumItem: EnumItem): buffer
+	if enumItemCache[enumItem] then
+		return enumItemCache[enumItem]
+	end
+
 	local typeBuffer = buffer.fromstring(tostring(enumItem.EnumType))
 
 	local _buffer = buffer.create(1 + buffer.len(typeBuffer))
 	buffer.writei8(_buffer, 0, enumItem.Value)
 	buffer.copy(_buffer, 1, typeBuffer)
+
+	enumItemCache[enumItem] = _buffer
 
 	return _buffer
 end
