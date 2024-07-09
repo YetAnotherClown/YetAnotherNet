@@ -15,6 +15,9 @@ type NetServer = Bridge.NetServer
 local Identifier = require(script.Parent.Identifier)
 export type Identifier = Identifier.Identifier
 
+local isRunning = RunService:IsRunning()
+local isClient = RunService:IsClient()
+
 --[=[
 	@class SendRequest
 	@since v0.4.0
@@ -44,7 +47,7 @@ SendRequest.__index = SendRequest
 	@param recipient { Player } | Player | "NET_SERVER"
 ]=]
 function SendRequest:to(recipient: Recipient)
-	if RunService:IsRunning() and RunService:IsClient() then
+	if isRunning and isClient then
 		warn("You should not use the SendRequest:to() method on the Client")
 	end
 
