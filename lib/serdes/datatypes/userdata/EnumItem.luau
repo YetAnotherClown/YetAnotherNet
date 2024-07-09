@@ -1,5 +1,14 @@
 --!native
 
+local enumMap = {}
+for _, enum in Enum:GetEnums() do
+	enumMap[tostring(enum)] = {}
+
+	for _, enumItem in enum:GetEnumItems() do
+		enumMap[tostring(enum)][enumItem.Value] = enumItem
+	end
+end
+
 local function serialize(enumItem: EnumItem): buffer
 	local typeBuffer = buffer.fromstring(tostring(enumItem.EnumType))
 
@@ -16,17 +25,8 @@ local function deserialize(_buffer: buffer): EnumItem
 
 	local _type = buffer.tostring(typeBuffer)
 	local value = buffer.readi8(_buffer, 0)
-	local enumItem
 
-	for _, enum in Enum:GetEnums() do
-		for _, _enumItem in enum:GetEnumItems() do
-			if tostring(_enumItem.EnumType) == _type and _enumItem.Value == value then
-				enumItem = _enumItem
-			end
-		end
-	end
-
-	return enumItem
+	return enumMap[_type][value]
 end
 
 return {
