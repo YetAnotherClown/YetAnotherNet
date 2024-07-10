@@ -1,10 +1,7 @@
 local datatypes = script.Parent.datatypes
 
-local primitives = datatypes.primitive
-local userdata = datatypes.userdata
-local custom = datatypes.custom
-
 local idsToTypeMap
+local modulesMap
 
 local function getSerDesById(id: number)
 	if not idsToTypeMap then
@@ -29,11 +26,22 @@ local function getSerDes(_type: string)
 		_type = "boolean"
 	end
 
-	local module = primitives:FindFirstChild(_type)
-		or userdata:FindFirstChild(_type)
-		or custom:FindFirstChild(_type)
+	if not modulesMap then
+		modulesMap = {}
+
+		for _, module in datatypes:GetDescendants() do
+			if not module:IsA("ModuleScript") then
+				continue
+			end
+
+			local serdes = require(module) :: any
+			modulesMap[module.Name] = serdes
+		end
+	end
+
+	local module = modulesMap[_type]
 	if module then
-		return require(module) :: any
+		return module
 	end
 
 	warn(`Unexpected type {_type} passed`)
@@ -67,7 +75,7 @@ local function deserializeBuffer(_buffer: buffer, cursor: number): (any, number)
 end
 
 -- Source: https://github.com/jsdotlua/luau-polyfill/blob/main/modules/collections/src/Array/isArray.lua
-local function isArray(value: { [number]: any })
+local function isArray(value)
 	if next(value) == nil then
 		return true
 	end

@@ -2,9 +2,17 @@
 
 local BUFFER_SIZE = 2
 
+local brickColorCache = {}
+
 local function serialize(color: BrickColor): buffer
+	if brickColorCache[color.Number] then
+		return brickColorCache[color.Number]
+	end
+
 	local _buffer = buffer.create(BUFFER_SIZE)
 	buffer.writeu16(_buffer, 0, color.Number)
+
+	brickColorCache[color.Number] = _buffer
 
 	return _buffer
 end
