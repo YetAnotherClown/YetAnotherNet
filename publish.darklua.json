@@ -21,6 +21,7 @@
       "location": "start",
       "text": "Copyright (c) YetAnotherClown, MIT License\nThe source code can be found at: https://github.com/YetAnotherClown/YetAnotherNet"
     },
+    "remove_debug_profiling",
     "compute_expression",
     "remove_unused_if_branch",
     "remove_unused_while",

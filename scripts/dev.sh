@@ -8,5 +8,5 @@ fi
 
 rojo serve dev.project.json \
     & rojo sourcemap default.project.json -o sourcemap.json --watch \
-    & darklua process --config .darklua.json --watch lib/ dist/lib \
-    & darklua process --config .darklua.json --watch tests/ dist/tests
+    & darklua process --config dev.darklua.json --watch lib/ dist/lib \
+    & darklua process --config dev.darklua.json --watch tests/ dist/tests
