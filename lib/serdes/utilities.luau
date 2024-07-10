@@ -1,3 +1,5 @@
+--!native
+
 local datatypes = script.Parent.datatypes
 
 local idsToTypeMap
