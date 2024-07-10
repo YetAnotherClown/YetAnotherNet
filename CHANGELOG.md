@@ -11,9 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Documentation for using Squash 2.0.0
 
+### Changed
+
+- All files have been migrated to `.luau` and GitHub Linguist to Luau
+- Updated note on Ratelimiting in Documentation
+- `SendRequest:to()` no longer calls `RunService:IsClient()` and `RunService:IsRunning()` every invocation
+- BrickColor, EnumItem, and boolean serde is now cached
+
 ### Fixed
 
-- Instance Changes when sent over the network would turn into a Mixed Table, resulting in incorrect Instances being deserialized.
+- Instance Changes when sent over the network would turn into a Mixed Table, resulting in incorrect Instances being deserialized
+- `./examples` directly was named incorrectly as `./example` which resulted in broken links
+- Documentation for `Configuration` now specifies what is optional
+- Links to BridgeNet2 were outdated and resulted in 404 pages
+- `getSerDes` function is no longer a bottleneck for serialization and now runs roughly 2x more efficiently
+- EnumItem serde no longer iterates through all Enums and EnumItems, resulting in it running roughly 4.5x more efficiently
+- `deserializeBuffer` function did not utilize Native Code Generation
 
 ## [0.8.0] - 2024-05-02
 
