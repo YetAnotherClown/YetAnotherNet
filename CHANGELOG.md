@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Documentation for using Squash 2.0.0
+- Setup Darklua and rules
+- Add `.vscode` settings for luau-lsp
+- Add Lint script
+- Add GitHub CI Workflow
+- Mention [roblox-project-template](https://github.com/grilme99/roblox-project-template) in README.md
+- Add release scripts for Wally and NPM
+- Added a [CONTRIBUTING.md](https://github.com/YetAnotherClown/YetAnotherNet/blob/main/CONTRIBUTING.md) guide
 
 ### Changed
 
@@ -17,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated note on Ratelimiting in Documentation
 - `SendRequest:to()` no longer calls `RunService:IsClient()` and `RunService:IsRunning()` every invocation
 - BrickColor, EnumItem, and boolean serde is now cached
+- Changed order and added issue links to the Setup section in Documentation
+- Renamed shell scripts
+- Switched to String (alias/path) Requires
+- Update Stylua configuration and apply changes
+- Set exclusions in `selene.toml`
+- Exclude docs in `tsconfig.json`
+- Changed what is included in Wally and NPM package releases
 
 ### Fixed
 
@@ -27,6 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `getSerDes` function is no longer a bottleneck for serialization and now runs roughly 2x more efficiently
 - EnumItem serde no longer iterates through all Enums and EnumItems, resulting in it running roughly 4.5x more efficiently
 - `deserializeBuffer` function did not utilize Native Code Generation
+- Fixed a type error with incoming middleware in internal code
+
 
 ## [0.8.0] - 2024-05-02
 
