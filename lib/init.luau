@@ -63,8 +63,8 @@ type RouteImpl<U...> = {
 	_currentPlayers: { Player },
 	_snapshot: IncomingQueue,
 	_middleware: {
-		Incoming: ((...any?) -> U...)?,
-		Outgoing: ((U...) -> ...any?)?,
+		Incoming: ((...any) -> ...any)?,
+		Outgoing: ((...any) -> ...any)?,
 	},
 
 	__index: RouteImpl<U...>,
@@ -72,8 +72,8 @@ type RouteImpl<U...> = {
 
 	_queuePackets: (Route<U...>, Bridge) -> (),
 	_updateSnapshot: (Route<U...>, Bridge) -> (),
-	addIncomingMiddleware: (self: Route<U...>, middleware: (...any?) -> U...?) -> (),
-	addOutgoingMiddleware: (self: Route<U...>, middleware: (U...) -> ...any?) -> (),
+	addIncomingMiddleware: (self: Route<U...>, middleware: (...any) -> ...any) -> (),
+	addOutgoingMiddleware: (self: Route<U...>, middleware: (...any) -> ...any) -> (),
 	send: (self: Route<U...>, U...) -> SendRequest,
 	query: (self: Route<U...>) -> QueryResult<U...>,
 

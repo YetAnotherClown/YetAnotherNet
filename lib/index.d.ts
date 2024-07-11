@@ -69,7 +69,7 @@ declare namespace Net {
          * See [Middleware](https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/middleware) for more information.
          * @param middleware - A function that transforms your data
          */
-        public addIncomingMiddleware(middleware: (...rawData: Array<unknown>) => LuaTuple<T> | undefined): void
+        public addIncomingMiddleware(middleware: (...rawData: Array<unknown>) => LuaTuple<T> | LuaTuple<any> | undefined): void
 
         /**
          * Sets a function to be ran on Outgoing packets before they are sent over the network.
@@ -79,7 +79,7 @@ declare namespace Net {
          * See [Middleware](https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/middleware) for more information.
          * @param middleware - A function that transforms your data
          */
-        public addOutgoingMiddleware(middleware: (...rawData: T) => LuaTuple<any> | undefined): void
+        public addOutgoingMiddleware(middleware: (...rawData: T | any) => LuaTuple<any> | undefined): void
     }
 
     /**
