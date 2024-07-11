@@ -7,9 +7,11 @@ darklua process --config publish.darklua.json lib/ dist/lib
 
 cp README.md dist/README.md
 cp LICENSE dist/LICENSE
-cp build.project.json dist/default.project.json
 cp wally.toml dist/wally.toml
 cp wally.lock dist/wally.lock
+
+cp build.project.json dist/default.project.json
+sed -i 's/dist\/lib/lib/' dist/default.project.json
 
 cd ./dist
 

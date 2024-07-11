@@ -8,6 +8,7 @@ darklua process --config publish.darklua.json lib/ dist/lib
 cd ./dist
 
 cp ../package.json package.json
+cp ../typescript.project.json typescript.project.json
 cp ../README.md README.md
 cp ../LICENSE LICENSE
 cp ../lib/index.d.ts ./lib/index.d.ts
