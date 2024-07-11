@@ -154,11 +154,18 @@ end
 
 ## Support and Contribution
 
-YetAnotherNet has a project thread in the Roblox OSS Community, which you can join with [this invite](https://discord.gg/nKCV5fjEvH). You can find our thread using [this link](https://discord.com/channels/385151591524597761/1179944163844825209).
+### Discord
 
-Please be mindful that the Roblox OSS Community is a professional workspace and not a general help desk, please keep questions and discussions about YetAnotherNet in our Project Thread and keep any other appropriate conversations in their respective channels.
+We have a Project Thread in the [Roblox OSS Community Server](https://quenty.org/oss/conduct), please read the Code of Conduct on that link before joining.
+You can find the Project thread under the [#Projects](https://discord.com/channels/385151591524597761/1019724676265676930) threads channel titled as "YetAnotherNet," or you can follow [this link](https://discord.com/channels/385151591524597761/1179944163844825209).
 
-If you find any bugs, feel free to create an Issue or a Pull Request with an appropriate fix. I'm open to conversations about contributions in the Project Thread or in DMs on Discord, you can reach me with `@YetAnotherClown`!
+**Please be mindful that the Roblox OSS Community is a professional workspace and not a general help desk, please keep questions and discussions about YetAnotherNet in our Project Thread and keep any other appropriate conversations in their respective channels.**
+
+Please also be patient when awaiting a response in the thread, I will get to it when I can.
+
+### Contributing
+
+See the [CONTRIBUTING.md](CONTRIBUTING.md) file for a detailed guide on contributing. If you need any assistance, don't hesitate to ping me in the project thread or on GitHub.
 
 ---
 
