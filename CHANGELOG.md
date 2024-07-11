@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2024-07-11
+
 ### Added
 
 - Documentation for using Squash 2.0.0
@@ -31,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set exclusions in `selene.toml`
 - Exclude docs in `tsconfig.json`
 - Changed what is included in Wally and NPM package releases
+- Luau types for Middleware are no longer strict due to inaccuracy of the type system
+- Typescript types for Middleware have been improved to allow for more use cases
 
 ### Fixed
 
