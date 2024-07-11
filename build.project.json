@@ -1,0 +1,10 @@
+{
+  "name": "yetanothernet",
+  "tree": {
+    "$path": "dist/lib",
+    "Remotes": {
+      "$className": "Folder",
+      "$ignoreUnknownInstances": true
+    }
+  }
+}

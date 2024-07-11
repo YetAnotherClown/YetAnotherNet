@@ -1,7 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
-local JestGlobals = require(ReplicatedStorage.DevPackages.JestGlobals)
+local JestGlobals = require("@dev-packages/JestGlobals")
 local expect = JestGlobals.expect
 local describe = JestGlobals.describe
 local test = JestGlobals.test
@@ -20,7 +19,8 @@ local typeToValue = {
 	number = 22,
 	string = "Hello, world!",
 	BrickColor = BrickColor.Yellow(),
-	CFrame = CFrame.new(Vector3.new(20, 40, 60)) * CFrame.fromEulerAnglesXYZ(math.rad(45), math.rad(90), math.rad(180)),
+	CFrame = CFrame.new(Vector3.new(20, 40, 60))
+		* CFrame.fromEulerAnglesXYZ(math.rad(45), math.rad(90), math.rad(180)),
 	Color3 = Color3.fromHex("54bbff"),
 	DateTime = DateTime.fromUnixTimestampMillis(1686894720000),
 	EnumItem = Enum.Genre.Scary,
@@ -78,7 +78,7 @@ describe("Ser/Des", function()
 		-- RaycastResults have no constructor, meaning we can't deserialize it
 		local raycastResult = Workspace:Raycast(Vector3.zero, Vector3.new(0, 5, 0))
 
-		local serdes = require(root.serdes.datatypes.custom.array)
+		local serdes = require("@serdes/datatypes/custom/array")
 		local array: { any } = {
 			1,
 			true,
@@ -92,7 +92,7 @@ describe("Ser/Des", function()
 	end)
 
 	test("Array should be able to serialize/deserialize empty arrays", function()
-		local serdes = require(root.serdes.datatypes.custom.array)
+		local serdes = require("@serdes/datatypes/custom/array")
 		local array = {}
 
 		local _buffer = serdes.serialize(array)
@@ -111,7 +111,7 @@ describe("Ser/Des", function()
 		-- RaycastResults have no constructor, meaning we can't deserialize it
 		local raycastResult = Workspace:Raycast(Vector3.zero, Vector3.new(0, 5, 0))
 
-		local serdes = require(root.serdes.datatypes.custom.dictionary)
+		local serdes = require("@serdes/datatypes/custom/dictionary")
 		local dictionary = {
 			a = 1,
 			b = true,

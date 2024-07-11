@@ -1,0 +1,69 @@
+name: CI
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    analyze:
+        name: Analyze
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
+
+            - name: Remove run-in-roblox from foreman.toml
+              run: sed -i 's/run-in-roblox/# run-in-roblox/' foreman.toml
+
+            - name: Install Foreman
+              uses: Roblox/setup-foreman@v1
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Add run-in-roblox back to foreman.toml
+              run: sed -i 's/# run-in-roblox/run-in-roblox/' foreman.toml
+
+            - name: Install Wally packages
+              run: sh scripts/install-dependencies.sh
+
+            - name: Analyze
+              run: sh scripts/analyze.sh
+
+    lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
+
+            - name: Remove run-in-roblox from foreman.toml
+              run: sed -i 's/run-in-roblox/# run-in-roblox/' foreman.toml
+
+            - name: Install Foreman
+              uses: Roblox/setup-foreman@v1
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Add run-in-roblox back to foreman.toml
+              run: sed -i 's/# run-in-roblox/run-in-roblox/' foreman.toml
+                
+            - name: Lint
+              run: sh scripts/lint.sh
+
+    style:
+        name: Styling
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Check code style
+              uses: JohnnyMorganz/stylua-action@v2
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  version: v0.20.0
+                  args: lib/ tests/ --verify --config-path stylua.toml --check

@@ -24,5 +24,8 @@
         "baseUrl": "lib",
         "incremental": true,
         "tsBuildInfoFile": "out/tsconfig.tsbuildinfo"
-    }
+    },
+    "exclude": [
+        "docs"
+    ]
 }

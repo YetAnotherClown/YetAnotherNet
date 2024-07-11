@@ -1,8 +1,6 @@
 --!native
 
-local root = script.Parent.Parent.Parent
-
-local utilities = require(root.utilities)
+local utilities = require("@serdes/utilities")
 local deserializeBuffer = utilities.deserializeBuffer
 local getSerDes = utilities.getSerDes
 local isArray = utilities.isArray

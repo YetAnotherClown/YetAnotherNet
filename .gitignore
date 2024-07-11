@@ -8,7 +8,8 @@
 /build
 /node_modules
 /out
-.vscode
+/dist
 sourcemap.json
 package-lock.json
 wally.lock
+globalTypes.d.lua

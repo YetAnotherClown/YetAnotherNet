@@ -77,7 +77,7 @@ local function deserializeBuffer(_buffer: buffer, cursor: number): (any, number)
 end
 
 -- Source: https://github.com/jsdotlua/luau-polyfill/blob/main/modules/collections/src/Array/isArray.lua
-local function isArray(value)
+local function isArray(value: { [number]: any })
 	if next(value) == nil then
 		return true
 	end

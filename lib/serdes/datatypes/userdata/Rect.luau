@@ -1,6 +1,6 @@
 --!native
 
-local vector2 = require(script.Parent.Vector2)
+local vector2 = require("@serdes/datatypes/userdata/Vector2")
 
 local BUFFER_SIZE = vector2.size * 2
 

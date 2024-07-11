@@ -1,18 +1,13 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local JestGlobals = require(ReplicatedStorage.DevPackages.JestGlobals)
+local JestGlobals = require("@dev-packages/JestGlobals")
 local describe = JestGlobals.describe
 local expect = JestGlobals.expect
 local test = JestGlobals.test
 local it = JestGlobals.it
 
-local root = script.Parent.Parent
-local QueryResult = require(root.QueryResult)
+local Identifier = require("@yetanothernet/Identifier")
+local QueryResult = require("@yetanothernet/QueryResult")
 
-local utils = root.__utils__
-local mockPlayers = require(utils.mockPlayers)
-
-local Identifier = require(root.Identifier)
+local mockPlayers = require("@yetanothernet/__utils__/mockPlayers")
 
 local identifier = Identifier.new()
 

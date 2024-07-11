@@ -1,10 +1,25 @@
 {
-  "name": "net",
+  "name": "yetanothernet-development",
   "tree": {
-    "$path": "lib",
-    "Remotes": {
-      "$className": "Folder",
-      "$ignoreUnknownInstances": true
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Packages": {
+        "$className": "Folder",
+        "YetAnotherNet": {
+          "$path": "lib"
+        }
+      },
+      "DevPackages": {
+        "$path": "DevPackages"
+      },
+      "jest.config": {
+        "$path": "tests/jest.config.luau"
+      }
+    },
+    "ServerScriptService": {
+      "server": {
+        "$path": "tests/startJest.server.luau"
+      }
     }
   }
 }

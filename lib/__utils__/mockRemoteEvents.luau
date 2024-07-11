@@ -1,8 +1,6 @@
 --!nocheck
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local DevPackages = ReplicatedStorage.DevPackages
 
-local Signal = require(DevPackages.Signal)
+local Signal = require("@dev-packages/Signal")
 
 local clientRemotes = {}
 local serverRemotes = {}
@@ -10,8 +8,7 @@ local serverRemotes = {}
 local ClientRemoteEvent = {}
 ClientRemoteEvent.__index = ClientRemoteEvent
 
-local utils = script.Parent
-local mockPlayers = require(utils.mockPlayers)
+local mockPlayers = require("@yetanothernet/__utils__/mockPlayers")
 
 function ClientRemoteEvent:FireServer(...: any)
 	local container = serverRemotes[self._identifier]

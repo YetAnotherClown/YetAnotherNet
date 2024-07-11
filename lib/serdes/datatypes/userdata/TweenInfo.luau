@@ -1,11 +1,9 @@
 --!native
 
-local root = script.Parent.Parent.Parent
-
-local enumItem = require(root.datatypes.userdata.EnumItem)
-local number = require(root.datatypes.primitive.number)
-local boolean = require(root.datatypes.primitive.boolean)
-local _string = require(root.datatypes.primitive.string)
+local enumItem = require("@serdes/datatypes/userdata/EnumItem")
+local number = require("@serdes/datatypes/primitive/number")
+local boolean = require("@serdes/datatypes/primitive/boolean")
+local _string = require("@serdes/datatypes/primitive/string")
 
 local PARTIAL_BUFFER_SIZE = (number.size * 3) + boolean.size
 
@@ -17,7 +15,9 @@ local function serialize(tweenInfo: TweenInfo): buffer
 	local easingDirection = enumItem.serialize(tweenInfo.EasingDirection)
 	local easingStyle = enumItem.serialize(tweenInfo.EasingStyle)
 
-	local _buffer = buffer.create(PARTIAL_BUFFER_SIZE + 8 + buffer.len(easingDirection) + buffer.len(easingStyle))
+	local _buffer = buffer.create(
+		PARTIAL_BUFFER_SIZE + 8 + buffer.len(easingDirection) + buffer.len(easingStyle)
+	)
 
 	buffer.copy(_buffer, 0, time, 0, number.size)
 	buffer.copy(_buffer, number.size, delayTime, 0, number.size)

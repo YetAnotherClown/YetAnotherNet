@@ -1,6 +1,6 @@
 --!native
 
-local udim = require(script.Parent.UDim)
+local udim = require("@serdes/datatypes/userdata/UDim")
 
 local BUFFER_SIZE = udim.size * 2
 

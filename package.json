@@ -22,7 +22,7 @@
 	"license": "MIT",
 	"typings": "lib/index.d.ts",
 	"files": [
-		"lib/"
+		"lib/!(__*__)"
 	],
 	"publishConfig": {
 		"access": "public"

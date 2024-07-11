@@ -28,10 +28,10 @@ There are a few ways you can configure your Routes:
   <TabItem value="event" label="Event">
     <p>
     The <code lang="lua">Event</code> field is only used when you're using the Matter ECS.<br />
-    This is used internally in the <code lang="lua">Net.start(loop, 	&#123; routes &#125;)</code> hook to schedule your Routes.
+    This is used internally in the <code lang="lua">YetAnotherNet.start(loop, 	&#123; routes &#125;)</code> hook to schedule your Routes.
     </p>
     <p>
-    You can safely ignore this field if you do not use the <code lang="lua">Net.start(loop, 	&#123; routes &#125;)</code> hook.
+    You can safely ignore this field if you do not use the <code lang="lua">YetAnotherNet.start(loop, 	&#123; routes &#125;)</code> hook.
     </p>
   </TabItem>
 </Tabs>
@@ -46,10 +46,10 @@ Routes can be Type-checked to provide intellisense and auto-completion by provid
 <TabItem value="lua" label="Luau" default>
 
 ```lua
-local Net = require("Net.luau")
+local YetAnotherNet = require("@packages/YetAnotherNet")
 
-local Route = Net.Route
-type Route<U...> = Net.Route<U...>;
+local Route = YetAnotherNet.Route
+type Route<U...> = YetAnotherNet.Route<U...>;
 
 local route: Route<number, string, boolean> = Route.new()
 
@@ -103,10 +103,10 @@ This will enable auto-completion and type-checking when working with your Routes
 You can use `Route:send(...data)` to send data over the Route. This data will be processed next frame, which is when you'll be able to query it on the receiving end.
 
 ```lua
-local Net = require("Net.luau")
+local YetAnotherNet = require("@packages/YetAnotherNet")
 
-local Route = Net.Route
-type Route<U...> = Net.Route<U...>;
+local Route = YetAnotherNet.Route
+type Route<U...> = YetAnotherNet.Route<U...>;
 
 local route: Route<number, string, boolean> = Route.new()
 
@@ -118,7 +118,7 @@ for pos, num, str, bool in route:query() do
   -- Do something
 end
 
-local Route: Net<number, string, boolean> = Net.new()
+local Route: Route<number, string, boolean> = Route.new()
 
 Route:send(5, true, "Hello, world!")
 ```
@@ -154,10 +154,10 @@ By default, `Route.send()` will send the Packet of data to all Clients when used
 Querying is simple, you can query for Packets by using `Route:query()` which will return an iterator that will output `position, sender, ...data` in your for loop.
 
 ```lua
-local Net = require("Net.luau")
+local YetAnotherNet = require("@packages/YetAnotherNet")
 
-local Route = Net.Route
-type Route<U...> = Net.Route<U...>;
+local Route = YetAnotherNet.Route
+type Route<U...> = YetAnotherNet.Route<U...>;
 
 local Route: Route<number, string, boolean> = Route.new()
 
@@ -167,7 +167,7 @@ end
 ```
 
 When you call the `query` method, it will take a snapshot of all Packets from the previous frame and filter it for you, such as only returning Packets from the Route the method was called on.
-Or, you can also filter out senders by calling `Route:query():from(...sender)` on the QueryResult and putting any values of type `{ Player } | Player | Net.server` in the arguments.
+Or, you can also filter out senders by calling `Route:query():from(...sender)` on the QueryResult and putting any values of type `{ Player } | Player | YetAnotherNet.server` in the arguments.
 
 </TabItem>
 <TabItem value="ts" label="Typescript">

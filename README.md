@@ -109,10 +109,10 @@ Other Tasks
 
 Basic Setup for Routes
 ```lua
-local Net = require("Net.luau")
+local YetAnotherNet = require("@packages/YetAnotherNet")
 
-local Route = Net.Route
-type Route<U...> = Net.Route<U...>;
+local Route = YetAnotherNet.Route
+type Route<U...> = YetAnotherNet.Route<U...>;
 
 -- You can specify the type(s) between the <> for Typechecking + Intellisense
 local ExampleRoute: Route<any> = Route.new()
@@ -126,7 +126,7 @@ return {
 
 Example of how to use YetAnotherNet in a [Matter] System
 ```lua
-local routes = require("routes.luau")
+local routes = require("@shared/routes")
 local ExampleRoute = routes.ExampleOne
 
 local function exampleSystem(world)
@@ -154,11 +154,18 @@ end
 
 ## Support and Contribution
 
-YetAnotherNet has a project thread in the Roblox OSS Community, which you can join with [this invite](https://discord.gg/nKCV5fjEvH). You can find our thread using [this link](https://discord.com/channels/385151591524597761/1179944163844825209).
+### Discord
 
-Please be mindful that the Roblox OSS Community is a professional workspace and not a general help desk, please keep questions and discussions about YetAnotherNet in our Project Thread and keep any other appropriate conversations in their respective channels.
+We have a Project Thread in the [Roblox OSS Community Server](https://quenty.org/oss/conduct), please read the Code of Conduct on that link before joining.
+You can find the Project thread under the [#Projects](https://discord.com/channels/385151591524597761/1019724676265676930) threads channel titled as "YetAnotherNet," or you can follow [this link](https://discord.com/channels/385151591524597761/1179944163844825209).
 
-If you find any bugs, feel free to create an Issue or a Pull Request with an appropriate fix. I'm open to conversations about contributions in the Project Thread or in DMs on Discord, you can reach me with `@YetAnotherClown`!
+**Please be mindful that the Roblox OSS Community is a professional workspace and not a general help desk, please keep questions and discussions about YetAnotherNet in our Project Thread and keep any other appropriate conversations in their respective channels.**
+
+Please also be patient when awaiting a response in the thread, I will get to it when I can.
+
+### Contributing
+
+See the [CONTRIBUTING.md](CONTRIBUTING.md) file for a detailed guide on contributing. If you need any assistance, don't hesitate to ping me in the project thread or on GitHub.
 
 ---
 
@@ -169,7 +176,7 @@ If you find any bugs, feel free to create an Issue or a Pull Request with an app
 Add YetAnotherNet to your project with [Wally] by adding the following to your ``wally.toml`` file:
 ```toml
 [dependencies]
-Net = "yetanotherclown/yetanothernet@0.8.0"
+YetAnotherNet = "yetanotherclown/yetanothernet@0.8.0"
 ```
 
 > [!NOTE]
@@ -192,9 +199,13 @@ npm i @rbxts/yetanothernet
 
 To build yourself with Rojo, use: 
 ```bash
-rojo build -o "Net.rbxm"
+./scripts/build.sh
 ```
 
 For more help, check out [the Rojo documentation].
 
 [the Rojo documentation]: https://rojo.space/docs
+
+## Derived Works
+
+The Darklua setup and Github Workflows are inspired and built off of the work of **grilme99**'s [roblox-project-template](https://github.com/grilme99/roblox-project-template).

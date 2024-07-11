@@ -1,11 +1,9 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local JestGlobals = require(ReplicatedStorage.DevPackages.JestGlobals)
+local JestGlobals = require("@dev-packages/JestGlobals")
 local describe = JestGlobals.describe
 local expect = JestGlobals.expect
 local it = JestGlobals.it
 
-local Identifier = require(script.Parent.Parent.Identifier)
+local Identifier = require("@yetanothernet/Identifier")
 
 describe("Identifier", function()
 	it("Should return unique strings", function()

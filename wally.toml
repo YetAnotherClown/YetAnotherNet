@@ -6,8 +6,10 @@ license = "MIT"
 authors = ["YetAnotherClown"]
 realm = "shared"
 registry = "https://github.com/UpliftGames/wally-index"
-exclude = ["**"]
-include = ["lib", "lib/*", "default.project.json", "wally.toml", "wally.lock"]
+
+# publish-wally.sh will clone to /dist and run wally publish in that directory
+exclude = ["tests", "tests/*", "lib/__*__", "lib/__*__/*", "package.json", "*.tgz", "*.zip"]
+include = ["wally.lock"]
 
 [dev-dependencies]
 Jest = "jsdotlua/jest@3.6.1-rc.2"

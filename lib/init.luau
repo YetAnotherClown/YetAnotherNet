@@ -1,7 +1,7 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
-local Bridge = require(script.Bridge)
+local Bridge = require("@yetanothernet/Bridge")
 type Bridge = Bridge.Bridge
 
 type Recipient = Bridge.Recipient
@@ -13,15 +13,15 @@ type OutgoingQueue = Bridge.OutgoingQueue
 
 type NetServer = Bridge.NetServer
 
-local Identifier = require(script.Identifier)
+local Identifier = require("@yetanothernet/Identifier")
 export type Identifier = Identifier.Identifier
 
 local read = Identifier.read
 
-local QueryResult = require(script.QueryResult)
+local QueryResult = require("@yetanothernet/QueryResult")
 export type QueryResult<U...> = QueryResult.QueryResult<U...>
 
-local SendRequest = require(script.SendRequest)
+local SendRequest = require("@yetanothernet/SendRequest")
 export type SendRequest = SendRequest.SendRequest
 
 local isClient = RunService:IsClient()
@@ -200,7 +200,7 @@ function Route:_queuePackets(bridge: Bridge)
 		-- Typecheck recipients
 		if bridge:_getContext() == "client" then
 			if packet.recipient ~= Bridge.server then
-				warn("Clients can only send to Net.Server")
+				warn("Clients can only send to YetAnotherNet.Server")
 				continue
 			end
 		elseif bridge:_getContext() == "server" then
@@ -208,7 +208,9 @@ function Route:_queuePackets(bridge: Bridge)
 				if typeof(packet.recipient) == "table" then
 					for _, player in packet.recipient do
 						if not bridge:_isPlayer(player) then
-							warn("Attempt to send a table with a non-player instance as a recipient")
+							warn(
+								"Attempt to send a table with a non-player instance as a recipient"
+							)
 							continue
 						end
 					end
@@ -244,7 +246,8 @@ function Route:_updateSnapshot(bridge)
 		end
 
 		-- Implement middleware
-		local newData = { self._middleware.Incoming(table.unpack(packet.data)) }
+		local middleware = self._middleware.Incoming :: (...any?) -> ...any
+		local newData = { middleware(table.unpack(packet.data)) }
 		if #newData > 0 then
 			packet.data = newData
 		end
@@ -310,7 +313,10 @@ function Route.new(configuration: Configuration?)
 	self._configuration = configuration or {} :: Configuration
 
 	-- Validate Channel
-	if self._configuration.Channel and not table.find({ "Reliable", "Unreliable" }, self._configuration.Channel) then
+	if
+		self._configuration.Channel
+		and not table.find({ "Reliable", "Unreliable" }, self._configuration.Channel)
+	then
 		error("Channel should be Reliable or Unreliable.", 2)
 	end
 
@@ -345,7 +351,7 @@ end
 	A [Matter Loop](https://matter-ecs.github.io/matter/api/Loop).
 
 	For technical details, if you were to use a custom Loop object or try to integrate this Net Library in a ECS other than Matter,
-	the ``Net.start(loop, { Route })`` function uses a similar implementation to ``Net.createHook({ Net })`` internally.
+	the ``YetAnotherNet.start(loop, { Route })`` function uses a similar implementation to ``YetAnotherNet.createHook({ Route })`` internally.
 
 	For more information on this, see [Net.createHook].
 ]=]
@@ -421,11 +427,11 @@ end
 
 	For example, to run scheduling on the Heartbeat:
 	```lua
-	local hook = Net.createHook({ Route })
+	local hook = YetAnotherNet.createHook({ Route })
 	RunService.Heartbeat:Connect(hook)
 	```
 
-	@param routes { Net } -- A table of your Routes
+	@param routes { Route } -- A table of your Routes
 	@return () -> ()
 ]=]
 function createHook(routes)

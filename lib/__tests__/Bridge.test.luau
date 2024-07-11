@@ -1,7 +1,5 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local JestGlobals = require(ReplicatedStorage.DevPackages.JestGlobals)
-local Bridge = require(ReplicatedStorage.Packages.Net.Bridge)
+local JestGlobals = require("@dev-packages/JestGlobals")
+local Bridge = require("@yetanothernet/Bridge")
 local beforeAll = JestGlobals.beforeAll
 local describe = JestGlobals.describe
 local expect = JestGlobals.expect
@@ -11,13 +9,10 @@ local jest = JestGlobals.jest
 local root = script.Parent.Parent
 local BridgeModule = root.Bridge
 
-local utils = root.__utils__
-local mockPlayers = require(utils.mockPlayers)
+local mockPlayers = require("@yetanothernet/__utils__/mockPlayers")
+local mockBridge = require("@yetanothernet/__mocks__/mockBridge")
 
-local mocks = script.Parent.Parent.__mocks__
-local mockBridge = require(mocks.mockBridge)
-
-local Identifier = require(script.Parent.Parent.Identifier)
+local Identifier = require("@yetanothernet/Identifier")
 
 local MockedBridge
 
@@ -73,91 +68,98 @@ describe("Bridge", function()
 		})
 	end)
 
-	test("When called, `_processOutgoingQueue` should properly package Client/Server payloads", function()
-		MockedBridge = require(BridgeModule) :: mockBridge.MockedBridge
+	test(
+		"When called, `_processOutgoingQueue` should properly package Client/Server payloads",
+		function()
+			MockedBridge = require(BridgeModule) :: mockBridge.MockedBridge
 
-		local identifier = Identifier.new()
-
-		local fakeClientPacket = {
-			channel = "Reliable",
-			identifier = identifier,
-			recipient = serverBridge.server,
-			data = { "a", "b", "c" },
-		}
-
-		-- Fill the outgoingQueue with fake packets
-		queueFakePackets(serverBridge, player, fakeClientPacket)
-
-		local clientPayloads: { [any]: any }, serverPayloads = serverBridge:_processOutgoingQueue()
-
-		-- Check client payloads
-		expect(clientPayloads[player].Reliable).toEqual(expect.objectContaining({
-			[globalIdentifier] = {
-				{ 1, 2, 3 },
-			},
-		}))
-
-		-- Check server payloads
-		expect(serverPayloads.Reliable).toEqual(expect.objectContaining({
-			[fakeClientPacket.identifier] = { fakeClientPacket.data },
-		}))
-	end)
-
-	describe("Should send payloads to their appropriate Channel and Recipient on the Client", function()
-		test("Client -> Server", function()
 			local identifier = Identifier.new()
 
-			local packet = {
+			local fakeClientPacket = {
 				channel = "Reliable",
 				identifier = identifier,
-				recipient = Bridge.server,
+				recipient = serverBridge.server,
 				data = { "a", "b", "c" },
-			} :: Bridge.OutgoingPacket
+			}
 
-			-- Add to the queue
-			table.insert(clientBridge._outgoingQueue.Reliable, packet)
+			-- Fill the outgoingQueue with fake packets
+			queueFakePackets(serverBridge, player, fakeClientPacket)
 
-			-- Process and send payloads
-			local clientPayloads, serverPayloads = clientBridge:_processOutgoingQueue()
-			clientBridge:_sendPayloads(clientPayloads, serverPayloads)
+			local clientPayloads: { [any]: any }, serverPayloads =
+				serverBridge:_processOutgoingQueue()
 
-			-- Find the packet in the queue
-			expect(serverBridge._incomingQueue.Reliable).toEqual(expect.arrayContaining({
-				{
-					identifier = packet.identifier,
-					sender = player,
-					data = packet.data,
+			-- Check client payloads
+			expect(clientPayloads[player].Reliable).toEqual(expect.objectContaining({
+				[globalIdentifier] = {
+					{ 1, 2, 3 },
 				},
 			}))
-		end)
 
-		test("Server -> Client", function()
-			local identifier = Identifier.new()
-
-			local packet = {
-				channel = "Reliable",
-				identifier = identifier,
-				recipient = player,
-				data = { "a", "b", "c" },
-			} :: Bridge.OutgoingPacket
-
-			-- Add to the queue
-			table.insert(serverBridge._outgoingQueue.Reliable, packet)
-
-			-- Process and send payloads
-			local clientPayloads, serverPayloads = serverBridge:_processOutgoingQueue()
-			serverBridge:_sendPayloads(clientPayloads, serverPayloads)
-
-			-- Find the packet in the queue
-			expect(clientBridge._incomingQueue.Reliable).toEqual(expect.arrayContaining({
-				{
-					identifier = packet.identifier,
-					sender = serverBridge.server,
-					data = packet.data,
-				},
+			-- Check server payloads
+			expect(serverPayloads.Reliable).toEqual(expect.objectContaining({
+				[fakeClientPacket.identifier] = { fakeClientPacket.data },
 			}))
-		end)
-	end)
+		end
+	)
+
+	describe(
+		"Should send payloads to their appropriate Channel and Recipient on the Client",
+		function()
+			test("Client -> Server", function()
+				local identifier = Identifier.new()
+
+				local packet = {
+					channel = "Reliable",
+					identifier = identifier,
+					recipient = Bridge.server,
+					data = { "a", "b", "c" },
+				} :: Bridge.OutgoingPacket
+
+				-- Add to the queue
+				table.insert(clientBridge._outgoingQueue.Reliable, packet)
+
+				-- Process and send payloads
+				local clientPayloads, serverPayloads = clientBridge:_processOutgoingQueue()
+				clientBridge:_sendPayloads(clientPayloads, serverPayloads)
+
+				-- Find the packet in the queue
+				expect(serverBridge._incomingQueue.Reliable).toEqual(expect.arrayContaining({
+					{
+						identifier = packet.identifier,
+						sender = player,
+						data = packet.data,
+					},
+				}))
+			end)
+
+			test("Server -> Client", function()
+				local identifier = Identifier.new()
+
+				local packet = {
+					channel = "Reliable",
+					identifier = identifier,
+					recipient = player,
+					data = { "a", "b", "c" },
+				} :: Bridge.OutgoingPacket
+
+				-- Add to the queue
+				table.insert(serverBridge._outgoingQueue.Reliable, packet)
+
+				-- Process and send payloads
+				local clientPayloads, serverPayloads = serverBridge:_processOutgoingQueue()
+				serverBridge:_sendPayloads(clientPayloads, serverPayloads)
+
+				-- Find the packet in the queue
+				expect(clientBridge._incomingQueue.Reliable).toEqual(expect.arrayContaining({
+					{
+						identifier = packet.identifier,
+						sender = serverBridge.server,
+						data = packet.data,
+					},
+				}))
+			end)
+		end
+	)
 
 	test("Should not send empty payloads", function()
 		-- Clear queue
