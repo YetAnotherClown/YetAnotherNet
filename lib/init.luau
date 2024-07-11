@@ -152,6 +152,9 @@ end
 	``{ Player }``, ``Player``, or ``Route.Server``.
 
 	See [Sending Data](/docs/getting-started/routes#sending) for more information.
+
+	@param ... U...
+	@return SendRequest
 ]=]
 function Route:send(...)
 	local packet = {} :: OutgoingPacket
@@ -266,6 +269,9 @@ end
 	after calling ``Route:send()`` on the Server and before calling ``Route:query()`` on the Client.
 
 	See [Middleware](/docs/getting-started/middleware) for more information.
+
+	@param (...any) -> (...any?)
+	@return ()
 ]=]
 function Route:addIncomingMiddleware(middleware)
 	if not middleware or typeof(middleware) ~= "function" then
@@ -284,6 +290,9 @@ end
 	after calling ``Route:send()`` on the Server and before the Client ever receives the Packet.
 
 	See [Middleware](/docs/getting-started/middleware) for more information.
+
+	@param (...any) -> (...any?)
+	@return ()
 ]=]
 function Route:addOutgoingMiddleware(middleware)
 	if not middleware or typeof(middleware) ~= "function" then
@@ -357,7 +366,7 @@ end
 ]=]
 
 --[=[
-	@within Net
+	@within YetAnotherNet
 
 	Initializes your Routes by adding middleware to your Matter Loop.
 	This ensures that your Routes run between each frame.
@@ -418,7 +427,7 @@ function start(loop, routes)
 end
 
 --[=[
-	@within Net
+	@within YetAnotherNet
 
 	This function allows you to run Net scheduling code on your own events.
 
@@ -448,15 +457,15 @@ function createHook(routes)
 end
 
 --- @prop server "Net_Server"
---- @within Net
+--- @within YetAnotherNet
 --- A unique identifier used for to identify the Server when sending/querying.
 
 --- @prop Route Route
---- @within Net
+--- @within YetAnotherNet
 --- A uniquely identified Object responsible for handling queries and send requests.
 
 --[=[
-	@class Net
+	@class YetAnotherNet
 
 	YetAnotherNet is a networking library for Roblox, or rather its a library that wraps around Roblox's RemoteEvents to solve certain issues and provide new API for networking on Roblox.
 
@@ -472,7 +481,7 @@ end
 	- Data-driven Design
 
 	You can learn more about how YetAnotherNet works and how to use it by visiting [Getting Started with Routes](/docs/getting-started/routes).
-	Or, you can keep reading to learn more about the technical details and design choices that went into creating Net in the [Introduction](/docs/intro).
+	Or, you can keep reading to learn more about the technical details and design choices that went into creating YetAnotherNet in the [Introduction](/docs/intro).
 ]=]
 return table.freeze({
 	server = Bridge.server :: NetServer,
