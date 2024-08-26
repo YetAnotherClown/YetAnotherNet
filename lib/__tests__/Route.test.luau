@@ -41,7 +41,7 @@ describe("Route", function()
 		)
 			local bridge = MockedBridge.new(context, player)
 
-			local function beginFrame()
+			local function beginFrameFn()
 				bridge:beginFrame()
 
 				for _, route in routes do
@@ -49,7 +49,7 @@ describe("Route", function()
 				end
 			end
 
-			local function endFrame()
+			local function endFrameFn()
 				for _, route in routes do
 					route:_queuePackets(bridge)
 				end
@@ -57,7 +57,7 @@ describe("Route", function()
 				bridge:endFrame()
 			end
 
-			return beginFrame, endFrame
+			return beginFrameFn, endFrameFn
 		end
 
 		-- Setup server
