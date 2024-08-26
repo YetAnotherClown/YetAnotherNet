@@ -80,24 +80,31 @@ function QueryResult:__iter()
 	local senders = self._senders
 	local identifier = self._identifier
 
-	local snapshot = self._snapshot
-	local i = 0
+	local filteredSnapshot = {}
 
-	return function()
-		-- Tick for new packet
-		i += 1
-
-		local packet = snapshot[i]
+	for i = 1, #self._snapshot do
+		local packet = self._snapshot[i]
 		if not packet then
-			return
+			continue
 		end
 
-		-- Return all packets if no Senders are supplied, or filter by Senders
 		local filterSenders = #senders > 0
 		local isSenderAllowed = if filterSenders then table.find(senders, packet.sender) else true
 
-		-- Don't return packet if filtered
 		if read(packet.identifier) ~= read(identifier) or not isSenderAllowed then
+			continue
+		end
+
+		table.insert(filteredSnapshot, packet)
+	end
+
+	local i = 0
+
+	return function()
+		i += 1
+
+		local packet = filteredSnapshot[i]
+		if not packet then
 			return
 		end
 
