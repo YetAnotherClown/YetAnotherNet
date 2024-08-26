@@ -89,4 +89,39 @@ describe("QueryResult", function()
 			expect(num3).toEqual(3)
 		end
 	end)
+
+	it("Should not terminate iteration unexpectedly", function()
+		local snapshot = {
+			{
+				data = { 1, 2, 3 },
+				identifier = identifier,
+				sender = "NET_SERVER" :: "NET_SERVER",
+			},
+			{
+				data = { "a", "b", "c" },
+				identifier = Identifier.new(),
+				sender = "NET_SERVER" :: "NET_SERVER",
+			},
+			{
+				data = { 4, 6, 7 },
+				identifier = identifier,
+				sender = "NET_SERVER" :: "NET_SERVER",
+			},
+		} :: { { data: { any }, identifier: buffer, sender: any } }
+
+		local result = QueryResult.new(snapshot, identifier)
+
+		local n = 0
+		for i, sender, num1, num2, num3 in result do
+			expect(i).toEqual(expect.any("number"))
+			expect(sender).toEqual("NET_SERVER")
+			expect(num1).toEqual(expect.any("number"))
+			expect(num2).toEqual(expect.any("number"))
+			expect(num3).toEqual(expect.any("number"))
+
+			n += 1
+		end
+
+		expect(n).toEqual(2)
+	end)
 end)
