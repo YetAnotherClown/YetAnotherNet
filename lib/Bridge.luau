@@ -64,7 +64,8 @@ export type BridgeImpl = {
 	_outgoingQueue: OutgoingQueue,
 	_snapshot: IncomingQueue,
 
-	step: (self: Bridge) -> (),
+	beginFrame: (self: Bridge) -> (),
+	endFrame: (self: Bridge) -> (),
 	snapshot: (self: Bridge) -> IncomingQueue,
 
 	_getInstanceMapChanges: (self: Bridge) -> { [number]: Instance }?,
@@ -291,23 +292,58 @@ function Bridge:snapshot()
 end
 
 --[=[
-	@method step
+	@method beginFrame
 	@within Bridge
-	
-	This will empty the IncomingQueue and produce a new Snapshot of it, then
-	it will process the OutgoingQueue and send the payloads over the network.
 
+	The IncomingQueue is a queue that collects all the incoming data from a frame,
+	the use of this function creates a new snapshot of it and then empties the queue.
+	This snapshot is what your Routes will use to read the data that was sent in the last frame.
+
+	:::note
+	Assuming all scheduling code and the use of `send` and `query` are running on the Heartbeat,
+	this will not actually cause any delay for when you recieve your data, as Replication Events are sent
+	after the Heartbeat.
+	See [Schedular Priority](https://create.roblox.com/docs/studio/microprofiler/task-scheduler#scheduler-priority)
+	for more information.
+	:::
+
+	:::warning
 	You should only use this function if creating custom scheduling behavior
 	similar to the Hooks API, which you should use instead of trying to achieve
 	this behavior using the Bridge itself.
+	:::
 ]=]
-function Bridge:step()
+function Bridge:beginFrame()
 	self._snapshot = table.freeze(self._incomingQueue)
 	self._incomingQueue = {
 		Reliable = {},
 		Unreliable = {},
 	}
+end
 
+--[=[
+	@method endFrame
+	@within Bridge
+	
+	The OutgoingQueue collects all the outgoing data from a frame, when you do
+	`Route:send()` the data is not immediately sent over the network, it is instead
+	batched and sent over the network at the end of the frame.
+
+	:::note
+	Assuming all scheduling code and the use of `send` and `query` are running on the Heartbeat,
+	this will not actually cause any delay for when you recieve your data, as Replication Events are sent
+	after the Heartbeat.
+	See [Schedular Priority](https://create.roblox.com/docs/studio/microprofiler/task-scheduler#scheduler-priority)
+	for more information.
+	:::
+
+	:::warning
+	You should only use this function if creating custom scheduling behavior
+	similar to the Hooks API, which you should use instead of trying to achieve
+	this behavior using the Bridge itself.
+	:::
+]=]
+function Bridge:endFrame()
 	local clientPayloads, serverPayloads = self:_processOutgoingQueue()
 	self:_sendPayloads(clientPayloads, serverPayloads)
 end

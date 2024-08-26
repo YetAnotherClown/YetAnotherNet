@@ -56,8 +56,10 @@ describe("Bridge", function()
 
 		queueFakePackets(serverBridge, player)
 
-		serverBridge:step()
-		clientBridge:step()
+		serverBridge:endFrame()
+		clientBridge:endFrame()
+		serverBridge:beginFrame()
+		clientBridge:beginFrame()
 
 		local snapshot = clientBridge:snapshot()
 
@@ -163,7 +165,8 @@ describe("Bridge", function()
 
 	test("Should not send empty payloads", function()
 		-- Clear queue
-		clientBridge:step()
+		clientBridge:endFrame()
+		clientBridge:beginFrame()
 
 		-- Track whether or not the RemoteEvent was fired
 		local wasFired = false
@@ -194,8 +197,10 @@ describe("Bridge", function()
 				data = { instance },
 			})
 
-			serverBridge:step()
-			clientBridge:step()
+			serverBridge:endFrame()
+			clientBridge:endFrame()
+			serverBridge:beginFrame()
+			clientBridge:beginFrame()
 
 			expect(clientBridge._instanceMap).toContain(instance)
 

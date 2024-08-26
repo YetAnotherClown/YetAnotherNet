@@ -19,8 +19,19 @@ local RunService = game:GetService("RunService")
 local YetAnotherNet = require("@packages/YetAnotherNet")
 local routes = require("@shared/routes")
 
-local hook = YetAnotherNet.createHook(routes)
-RunService.Heartbeat:Connect(hook)
+local myRoute = routes.myRoute
+
+local beginFrame, endFrame = YetAnotherNet.createHook({ Route })
+RunService.Heartbeat:Connect(function()
+	beginFrame()
+
+	myRoute:send(...)
+	for i, player, data in myRoute:query() do
+		-- Do something
+	end
+
+	endFrame()
+end)
 ```
 
 </TabItem>
@@ -35,8 +46,19 @@ import { RunService } from "@rbxts/services";
 import Net from "@rbxts/yetanothernet";
 import routes from "shared/routes";
 
-const hook = Net.createHook(routes);
-RunService.Heartbeat.Connect(hook);
+const myRoute = routes.myRoute;
+
+const beginFrame, endFrame = Net.createHook(routes);
+RunService.Heartbeat.Connect(() => {
+    beginFrame();
+
+    myRoute.send(...)
+    for (const [pos, sender, ...] of myRoute.query()) {
+        // Do something
+    }
+
+    endFrame();
+});
 ```
 
 </TabItem>

@@ -429,31 +429,51 @@ end
 --[=[
 	@within YetAnotherNet
 
-	This function allows you to run Net scheduling code on your own events.
+	This function allows you to run the scheduling code on your own events.
 
-	When you provide a table of Routes, this function will return another function
-	you can call which will step each Route and process it's Packet Queue.
+	Because scheduling should be ran at the beginning and end of each frame,
+	this will return two functions which you can use to call the scheduling
+	code for the beginning and end of a frame. 
 
 	For example, to run scheduling on the Heartbeat:
 	```lua
-	local hook = YetAnotherNet.createHook({ Route })
-	RunService.Heartbeat:Connect(hook)
+	local beginFrame, endFrame = YetAnotherNet.createHook({ Route })
+	RunService.Heartbeat:Connect(function()
+		beginFrame()
+
+		Route:send(...)
+		for i, player, data in Route:query() do
+			-- Do something
+		end
+
+		endFrame()
+	end)
 	```
 
-	@param routes { Route } -- A table of your Routes
-	@return () -> ()
+	@param routes { Route } -- A table of Routes to run with these hooks
+	@return () -> () -- Begin frame hook
+	@return () -> () -- End frame hook
 ]=]
 function createHook(routes)
 	local bridge = Bridge.new()
 
-	return function()
+	local function beginFrame()
+		bridge:beginFrame()
+
 		for _, route in routes do
 			route:_updateSnapshot(bridge)
+		end
+	end
+
+	local function endFrame()
+		for _, route in routes do
 			route:_queuePackets(bridge)
 		end
 
-		bridge:step()
+		bridge:endFrame()
 	end
+
+	return beginFrame, endFrame
 end
 
 --- @prop server "Net_Server"

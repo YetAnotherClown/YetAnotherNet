@@ -17,13 +17,16 @@ local mockBridge = require("@yetanothernet/__mocks__/mockBridge")
 local MockedBridge
 
 local serverRoute
-local serverHook
+local serverBeginFrame
+local serverEndFrame
 
 local clientRoute
-local clientHook
+local clientBeginFrame
+local clientEndFrame
 local mockPlayer
 
-local processHooks
+local beginFrame
+local endFrame
 
 describe("Route", function()
 	beforeAll(function()
@@ -38,14 +41,23 @@ describe("Route", function()
 		)
 			local bridge = MockedBridge.new(context, player)
 
-			return function()
+			local function beginFrame()
+				bridge:beginFrame()
+
 				for _, route in routes do
 					route:_updateSnapshot(bridge)
+				end
+			end
+
+			local function endFrame()
+				for _, route in routes do
 					route:_queuePackets(bridge)
 				end
 
-				bridge:step()
+				bridge:endFrame()
 			end
+
+			return beginFrame, endFrame
 		end
 
 		-- Setup server
@@ -54,7 +66,7 @@ describe("Route", function()
 			Channel = "Reliable",
 		}) :: Net.Route<number, boolean, string>
 
-		serverHook = createHook({ serverRoute }, "server")
+		serverBeginFrame, serverEndFrame = createHook({ serverRoute }, "server")
 
 		-- Setup client
 
@@ -65,26 +77,27 @@ describe("Route", function()
 		}) :: Net.Route<number, boolean, string>
 		clientRoute["_identifier"] = serverRoute["_identifier"]
 
-		clientHook = createHook({ clientRoute }, "client", mockPlayer)
+		clientBeginFrame, clientEndFrame = createHook({ clientRoute }, "client", mockPlayer)
 
-		processHooks = function()
-			serverHook()
-			clientHook()
+		beginFrame = function()
+			serverBeginFrame()
+			clientBeginFrame()
+		end
 
-			-- To account for data being deferred by one frame
-			serverHook()
-			clientHook()
+		endFrame = function()
+			serverEndFrame()
+			clientEndFrame()
 		end
 	end)
 
 	-- Schedule cleanup
 	beforeEach(function()
-		processHooks()
+		beginFrame()
 	end)
 
 	-- Schedule cleanup
 	afterEach(function()
-		processHooks()
+		endFrame()
 	end)
 
 	test("When calling `:send()`, it should properly queue the packets to it's bridge", function()
@@ -101,7 +114,9 @@ describe("Route", function()
 	test("When calling `:query()`, it should return a valid QueryResult", function()
 		local sendRequest = serverRoute:send(1, true, "Hello, world")
 		sendRequest:to(mockPlayer)
-		processHooks()
+
+		endFrame()
+		beginFrame()
 
 		local queryResult = clientRoute:query()
 
@@ -128,7 +143,8 @@ describe("Route", function()
 		local sendRequest = serverRoute:send(false :: any, "Oops" :: any, 1 :: any)
 		sendRequest:to(mockPlayer)
 
-		processHooks()
+		endFrame()
+		beginFrame()
 
 		local queryResult = clientRoute:query()
 
@@ -155,7 +171,8 @@ describe("Route", function()
 		local sendRequest = serverRoute:send(false :: any, "Oops" :: any, 1 :: any)
 		sendRequest:to(mockPlayer)
 
-		processHooks()
+		endFrame()
+		beginFrame()
 
 		local queryResult = clientRoute:query()
 
