@@ -400,7 +400,6 @@ function start(loop, routes)
 		bridges[event] = Bridge.new()
 	end
 
-	-- Performs queue tasks after each frame finishes
 	loop:addMiddleware(function(nextFn, eventName)
 		local function networkingMiddleware()
 			local bridge = bridges[eventName]
@@ -409,15 +408,18 @@ function start(loop, routes)
 				return
 			end
 
+			bridge:beginFrame()
+
 			for _, route in events[eventName] do
 				route:_updateSnapshot(bridge)
-				route:_queuePackets(bridge)
 			end
 
-			-- Middleware runs before/after each frame,
-			bridge:step()
-
 			nextFn()
+
+			for _, route in events[eventName] do
+				route:_queuePackets(bridge)
+			end
+			bridge:endFrame()
 		end
 
 		return networkingMiddleware
