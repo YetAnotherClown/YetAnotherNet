@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Bridge:step()` has been replaced by `Bridge:beginFrame` and `Bridge:endFrame` which separates the logic behind the Incoming and Outgoing queues
 - `YetAnotherNet.createHook()` now returns two functions, a `beginFrame` and a `endFrame` function which separates scheduling logic
 
+### Fixed
+
+- QueryResult filter stops iteration, causing packets to not be queried
+
 ## [0.9.0] - 2024-07-11
 
 ### Added
