@@ -49,7 +49,7 @@ import routes from "shared/routes";
 
 const myRoute = routes.myRoute;
 
-const beginFrame, endFrame = Net.createHook(routes);
+const [beginFrame, endFrame] = Net.createHook(routes);
 RunService.Heartbeat.Connect(() => {
     beginFrame();
 
