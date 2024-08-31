@@ -183,4 +183,27 @@ describe("Route", function()
 			data = { 1, true, "Hello, world" } :: { any },
 		})
 	end)
+
+	test("Should process connections", function()
+		local seenConnection = false
+
+		Net.createConnection(clientRoute, function(i, sender, num, bool, str)
+			expect(i).toEqual(1)
+			expect(sender).toEqual("NET_SERVER")
+			expect(num).toEqual(1)
+			expect(bool).toEqual(true)
+			expect(str).toEqual("Hello, world")
+
+			seenConnection = true
+		end)
+
+		local sendRequest = serverRoute:send(1, true, "Hello, world")
+		sendRequest:to(mockPlayer)
+
+		endFrame()
+		beginFrame()
+
+		clientRoute:_processConnections()
+		expect(seenConnection).toEqual(true)
+	end)
 end)

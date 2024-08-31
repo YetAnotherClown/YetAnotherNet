@@ -6,6 +6,7 @@ classOrder = [
     "Bridge",
     "QueryResult",
     "SendRequest",
+    "Connection",
     "Loop",
 ]
 

@@ -24,6 +24,9 @@ export type QueryResult<U...> = QueryResult.QueryResult<U...>
 local SendRequest = require("@yetanothernet/SendRequest")
 export type SendRequest = SendRequest.SendRequest
 
+local Connection = require("@yetanothernet/Connection")
+export type Connection = Connection.Connection
+
 local isClient = RunService:IsClient()
 
 --[=[
@@ -62,6 +65,7 @@ type RouteImpl<U...> = {
 	_outgoingQueue: { OutgoingPacket },
 	_currentPlayers: { Player },
 	_snapshot: IncomingQueue,
+	_connections: { Connection },
 	_middleware: {
 		Incoming: ((...any) -> ...any)?,
 		Outgoing: ((...any) -> ...any)?,
@@ -72,6 +76,7 @@ type RouteImpl<U...> = {
 
 	_queuePackets: (Route<U...>, Bridge) -> (),
 	_updateSnapshot: (Route<U...>, Bridge) -> (),
+	_processConnections: (Route<U...>) -> (),
 	addIncomingMiddleware: (self: Route<U...>, middleware: (...any) -> ...any) -> (),
 	addOutgoingMiddleware: (self: Route<U...>, middleware: (...any) -> ...any) -> (),
 	send: (self: Route<U...>, U...) -> SendRequest,
@@ -260,6 +265,42 @@ function Route:_updateSnapshot(bridge)
 	self._currentPlayers = Players:GetPlayers()
 end
 
+local function processConnection<U...>(
+	route: Route<U...>,
+	i: number?,
+	sender: (NetServer | Player)?,
+	...: U...
+)
+	if not i or not sender or select("#", i, sender, ...) == 0 then
+		return true
+	end
+
+	for _, connection in route._connections do
+		if not connection.connected then
+			continue
+		end
+
+		connection._callback(i, sender, ...)
+	end
+
+	return false
+end
+
+--[=[
+	@method _processConnections()
+	@within Route
+	@private
+]=]
+function Route:_processConnections()
+	local iterFn = self:query():__iter()
+
+	local terminated = false
+
+	repeat
+		terminated = processConnection(self, iterFn())
+	until terminated
+end
+
 --[=[
 	@method addIncomingMiddleware
 	@within Route
@@ -345,6 +386,7 @@ function Route.new(configuration: Configuration?)
 	}
 	self._identifier = Identifier.new()
 	self._outgoingQueue = {}
+	self._connections = {}
 	self._currentPlayers = Players:GetPlayers()
 	self._snapshot = {
 		Reliable = {},
@@ -478,6 +520,42 @@ function createHook(routes)
 	return beginFrame, endFrame
 end
 
+--[=[
+	@within YetAnotherNet
+
+	Creates a connection to allow you to use Routes as if they were Signals.
+
+	This method of reading data from Routes should be considered second-class.
+	The use of [Route:query] in a loop will always be first-class.
+
+	Connections will always be called on the end of frame when using [YetAnotherNet.createHook]
+	or [YetAnotherNet.start], but will be called in the order they are recieved on the client.
+
+	It is only suggested that you use these if you are working outside of a loop or outside
+	of an ECS system.
+
+	```lua
+	local connection = YetAnotherNet.createConnection(Route, function(i, sender, ...)
+		print(i, sender, ...)
+	end)
+
+	connection:disconnect()
+	connection:reconnect()
+	```
+
+	@param route Route -- The Route to observe
+	@return Connection -- A Connection object
+]=]
+function createConnection<U...>(
+	route: Route<U...>,
+	callback: (i: number, sender: NetServer | Player, U...) -> ()
+)
+	local connection = Connection.new(callback)
+	table.insert(route._connections, connection)
+
+	return connection
+end
+
 --- @prop server "Net_Server"
 --- @within YetAnotherNet
 --- A unique identifier used for to identify the Server when sending/querying.
@@ -509,6 +587,7 @@ return table.freeze({
 	server = Bridge.server :: NetServer,
 	Route = Route,
 
+	createConnection = createConnection,
 	createHook = createHook,
 	start = start,
 })
