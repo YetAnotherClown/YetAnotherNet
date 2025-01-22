@@ -176,7 +176,7 @@ See the [CONTRIBUTING.md](CONTRIBUTING.md) file for a detailed guide on contribu
 Add YetAnotherNet to your project with [Wally] by adding the following to your ``wally.toml`` file:
 ```toml
 [dependencies]
-YetAnotherNet = "yetanotherclown/yetanothernet@0.10.0-alpha.2"
+YetAnotherNet = "yetanotherclown/yetanothernet@0.10.0-alpha.3"
 ```
 
 > [!NOTE]
