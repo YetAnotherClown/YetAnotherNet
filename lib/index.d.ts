@@ -45,7 +45,7 @@ declare namespace Net {
 	};
 
 	class Route<T extends Array<any>> {
-		public constructor(configuration: Configuration | null);
+		public constructor(configuration?: Configuration);
 
 		/**
 		 * Sends data to all clients or to specific recipients from the Route's identifier.
