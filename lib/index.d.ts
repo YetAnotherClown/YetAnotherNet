@@ -1,5 +1,12 @@
 type Recipient = "NET_SERVER" | Player | [Player];
 
+declare class Connection {
+	public readonly connected: boolean;
+
+	public disconnect(): void;
+	public reconnect(): void;
+}
+
 /**
  * Allows for modification of queued packets before they're sent.
  */
@@ -141,6 +148,27 @@ declare namespace Net {
 	 * @param routes - An array of your routes
 	 */
 	function createHook(routes: { [index: string]: Route<any> }): LuaTuple<[() => void, () => void]>;
+
+	/**
+	 * Creates a connection to allow you to use Routes as if they were Signals.
+	 *
+	 * This method of reading data from Routes should be considered second-class.
+	 * The use of Route.query() in a loop will always be first-class.
+	 *
+	 * Connections will always be called on the end of frame when using YetAnotherNet.createHook()
+	 * or YetAnotherNet.start(), but will be called in the order they are received on the client.
+	 *
+	 * It is only suggested that you use these if you are working outside of a loop or outside
+	 * of an ECS system.
+	 *
+	 * @param route - The Route to observe
+	 * @param callback - The callback to run
+	 * @returns Connection
+	 */
+	function createConnection<T extends Array<any>>(
+		route: Route<T>,
+		callback: (i: number, sender: Player | "NET_SERVER", ...data: T) => void
+	): Connection;
 }
 
 export = Net;
