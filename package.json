@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/yetanothernet",
-  "version": "0.10.0-alpha.3",
+  "version": "0.10.0-alpha.4",
   "description": "A Networking Library, inspired by BridgeNet2 & Bevy_Renet, made for ECS.",
   "homepage": "https://yetanotherclown.github.io/YetAnotherNet/",
   "repository": {
