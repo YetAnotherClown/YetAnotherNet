@@ -1,4 +1,4 @@
-type Recipient = "NET_SERVER" | Player | [Player];
+type Recipient = "NET_SERVER" | Player | Player[];
 
 declare class Connection {
 	public readonly connected: boolean;
