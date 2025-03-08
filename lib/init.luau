@@ -58,8 +58,12 @@ export type Configuration = {
 
 	See the [Intro](/docs/intro) to get started.
 ]=]
-type RouteImpl<U...> = {
+export type RouteImpl<U...> = {
+	__index: RouteImpl<U...>,
+	__iter: (self: Route<U...>) -> QueryResult<U...>,
+
 	server: NetServer,
+
 	_identifier: Identifier,
 	_configuration: Configuration,
 	_outgoingQueue: { OutgoingPacket },
@@ -71,32 +75,20 @@ type RouteImpl<U...> = {
 		Outgoing: ((...any) -> ...any)?,
 	},
 
-	__index: RouteImpl<U...>,
-	__iter: (self: Route<U...>) -> QueryResult<U...>,
+	addIncomingMiddleware: (self: Route<U...>, middleware: (...any) -> ...any) -> (),
+	addOutgoingMiddleware: (self: Route<U...>, middleware: (...any) -> ...any) -> (),
 
 	_queuePackets: (Route<U...>, Bridge) -> (),
 	_updateSnapshot: (Route<U...>, Bridge) -> (),
 	_processConnections: (Route<U...>) -> (),
-	addIncomingMiddleware: (self: Route<U...>, middleware: (...any) -> ...any) -> (),
-	addOutgoingMiddleware: (self: Route<U...>, middleware: (...any) -> ...any) -> (),
-	send: (self: Route<U...>, U...) -> SendRequest,
+
 	query: (self: Route<U...>) -> QueryResult<U...>,
+	send: (self: Route<U...>, U...) -> SendRequest,
 
-	start: (loop: any, { Route<U...> }) -> (),
-	createHook: ({ Route<U...> }) -> () -> (),
-
-	new: (Configuration) -> Route<U...>,
+	new: (Configuration?) -> Route<U...>,
 }
 
-export type Route<U...> = typeof(setmetatable(
-	{} :: {
-		_configuration: Configuration,
-		_outgoingQueue: { OutgoingPacket },
-		_snapshot: IncomingQueue,
-		_currentPlayers: { Player },
-	},
-	{} :: RouteImpl<U...>
-))
+type Route<U...> = typeof(setmetatable({} :: RouteImpl<U...>, {} :: RouteImpl<U...>))
 
 local Route: RouteImpl<...any> = {} :: RouteImpl<...any>
 Route.__index = Route
@@ -174,7 +166,7 @@ function Route:send(...)
 	SendRequest._position = #self._outgoingQueue
 	setmetatable(sendRequest, SendRequest)
 
-	return sendRequest
+	return sendRequest :: any
 end
 
 --[=[
@@ -393,7 +385,7 @@ function Route.new(configuration: Configuration?)
 		Unreliable = {},
 	}
 
-	return self
+	return self :: any
 end
 
 --[=[

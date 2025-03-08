@@ -15,6 +15,30 @@ export type Identifier = Identifier.Identifier
 
 local read = Identifier.read
 
+type ClientQueryResult<U...> = {
+	__index: ClientQueryResult<U...>,
+	__iter: (self: ClientQueryResult<U...>) -> () -> (number, U...),
+
+	_snapshot: { IncomingPacket },
+	_identifier: Identifier,
+	_senders: { NetServer },
+
+	iter: (self: ClientQueryResult<U...>) -> () -> (number, U...),
+}
+
+type ServerQueryResult<U...> = {
+	__index: ServerQueryResult<U...>,
+	__iter: (self: ServerQueryResult<U...>) -> () -> (number, Player, U...),
+
+	_snapshot: { IncomingPacket },
+	_identifier: Identifier,
+	_senders: { Player },
+	_view: "server",
+
+	iter: (self: ServerQueryResult<U...>) -> () -> (number, Player, U...),
+	from: (self: QueryResult<U...>, ...Player) -> QueryResult<U...>,
+}
+
 --[=[
 	@class QueryResult
 	@since v0.4.0
@@ -37,14 +61,19 @@ local read = Identifier.read
 	See [Querying Data](/docs/getting-started/routes#querying) for more information.
 ]=]
 type QueryResultImpl<U...> = {
+	__index: QueryResultImpl<U...>,
+	__iter: (self: QueryResult<U...>) -> () -> (number, Player | NetServer, U...),
+
 	_snapshot: { IncomingPacket },
 	_identifier: Identifier,
 	_senders: { Player | NetServer },
+	_view: "client"?,
 
-	__index: QueryResultImpl<U...>,
-	__iter: (self: QueryResult<U...>) -> () -> (number?, (Player | NetServer)?, U...),
-
+	iter: (self: QueryResult<U...>) -> () -> (number, Player | NetServer, U...),
 	from: (self: QueryResult<U...>, ...(Player | NetServer)) -> QueryResult<U...>,
+
+	client: (self: QueryResult<U...>) -> ClientQueryResult<U...>,
+	server: (self: QueryResult<U...>) -> ServerQueryResult<U...>,
 
 	new: (
 		snapshot: { IncomingPacket },
@@ -53,7 +82,10 @@ type QueryResultImpl<U...> = {
 	) -> QueryResult<U...>,
 }
 
-export type QueryResult<U...> = typeof(setmetatable({}, {} :: QueryResultImpl<U...>))
+export type QueryResult<U...> = typeof(setmetatable(
+	{} :: QueryResultImpl<U...>,
+	{} :: QueryResultImpl<U...>
+))
 
 local QueryResult: QueryResultImpl<...any> = {} :: QueryResultImpl<...any>
 QueryResult.__index = QueryResult
@@ -82,6 +114,8 @@ function QueryResult:__iter()
 
 	local filteredSnapshot = {}
 
+	local view = self._view
+
 	for i = 1, #self._snapshot do
 		local packet = self._snapshot[i]
 		if not packet then
@@ -100,7 +134,7 @@ function QueryResult:__iter()
 
 	local i = 0
 
-	return function()
+	return function(): ...any
 		i += 1
 
 		local packet = filteredSnapshot[i]
@@ -108,8 +142,28 @@ function QueryResult:__iter()
 			return
 		end
 
+		if view == "client" then
+			return i, unpack(packet.data)
+		end
+
 		return i, packet.sender, unpack(packet.data)
 	end
+end
+
+--[=[
+	@method iter
+	@within QueryResult
+	
+	An iterator method for typechecking.
+
+	```lua
+	for i, sender, ... in route:query():iter() do
+		-- ...
+	end
+	```
+]=]
+function QueryResult:iter()
+	return self:__iter()
 end
 
 --[=[
@@ -140,6 +194,40 @@ function QueryResult:from(...)
 end
 
 --[=[
+	@method client
+	@within QueryResult
+	
+	Switches the query to a client view, for typechecking.
+	The client view will not return a `sender` when iterating.
+
+	```lua
+	for i, ... in route:query():client():iter() do
+		-- ...
+	end
+	```
+]=]
+function QueryResult:client()
+	self._view = "client"
+	return self :: any
+end
+
+--[=[
+	@method server
+	@within QueryResult
+	
+	Switches the query to a server view, for typechecking.
+
+	```lua
+	for i, player, ... in route:query():server():iter() do
+		-- ...
+	end
+	```
+]=]
+function QueryResult:server()
+	return self :: any
+end
+
+--[=[
 	@function new
 	@within QueryResult
 	@private
@@ -153,7 +241,7 @@ function QueryResult.new(snapshot, identifier, senders)
 		_snapshot = snapshot,
 		_identifier = identifier,
 		_senders = senders or {},
-	}, QueryResult)
+	}, QueryResult) :: any
 end
 
 return QueryResult

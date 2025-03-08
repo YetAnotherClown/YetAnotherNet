@@ -25,15 +25,15 @@ local isClient = RunService:IsClient()
 	Allows for modification of queued packets before they're sent.
 ]=]
 type SendRequestImpl = {
+	__index: SendRequestImpl,
+
 	_outgoingQueue: { OutgoingPacket },
 	_position: number,
-
-	__index: SendRequestImpl,
 
 	to: (self: SendRequest, recipient: Recipient) -> (),
 }
 
-export type SendRequest = typeof(setmetatable({}, {} :: SendRequestImpl))
+export type SendRequest = typeof(setmetatable({} :: SendRequestImpl, {} :: SendRequestImpl))
 
 local SendRequest: SendRequestImpl = {} :: SendRequestImpl
 SendRequest.__index = SendRequest

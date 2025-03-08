@@ -10,10 +10,7 @@ type ConnectionImpl = {
 	new: <U...>(callback: (U...) -> ()) -> Connection,
 }
 
-export type Connection = typeof(setmetatable({
-	-- selene: allow(unused_variable)
-	_callback = function(...) end,
-}, {} :: ConnectionImpl))
+export type Connection = typeof(setmetatable({} :: ConnectionImpl, {} :: ConnectionImpl))
 
 --[=[
     @class Connection
@@ -60,7 +57,7 @@ function Connection.new<U...>(callback: (U...) -> ())
 		task.spawn(callback, ...)
 	end
 
-	return self
+	return self :: any
 end
 
 return Connection
