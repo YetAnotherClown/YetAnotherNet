@@ -20,6 +20,44 @@ declare class SendRequest {
 }
 
 type Query<T extends Array<any>> = IterableFunction<LuaTuple<[number, Player | "NET_SERVER", ...T]>>;
+type ServerQuery<T extends Array<any>> = IterableFunction<LuaTuple<[number, Player, ...T]>>;
+type ClientQuery<T extends Array<any>> = IterableFunction<LuaTuple<[number, ...T]>>;
+
+/**
+ * An iterable object returned as the result of `Route.query().client()`.
+ *
+ * @example
+ * ```ts
+ * for (const [position, ...T] in Route.query().client()) {
+ *     // Do something
+ * }
+ * ```
+ *
+ * See [Querying Data](https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/routes#querying) for more information.
+ */
+type ClientQueryResult<T extends Array<any>> = ClientQuery<T>;
+
+/**
+ * An iterable object returned as the result of `Route.query().server()` that can filter snapshots
+ * by Players.
+ *
+ * @example
+ * ```ts
+ * for (const [position, player, ...T] in Route.query().server()) {
+ *     // Do something
+ * }
+ * ```
+ *
+ * See [Querying Data](https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/routes#querying) for more information.
+ */
+type ServerQueryResult<T extends Array<any>> = ServerQuery<T> & {
+	/**
+	 * Filters Packets from the QueryResult's Snapshot based on the provided Senders.
+	 *
+	 * @param recipients - The Recipients of the Packet
+	 */
+	from(...recipients: Array<Player>): ServerQueryResult<T>;
+};
 
 /**
  * An iterable object returned as the result of `Route.query()` that can filter snapshots
@@ -41,6 +79,19 @@ type QueryResult<T extends Array<any>> = Query<T> & {
 	 * @param recipient - The Recipients of the Packet
 	 */
 	from(...recipient: Array<Recipient>): QueryResult<T>;
+	/**
+	 * Switches the query to a client view, for typechecking.
+	 * The client view will not return a `sender` when iterating.
+	 *
+	 * @returns ClientQueryResult
+	 */
+	client(): ClientQueryResult<T>;
+	/**
+	 * Switches the query to a server view, for typechecking.
+	 *
+	 * @returns ServerQueryResult
+	 */
+	server(): ServerQuery<T>;
 };
 
 declare namespace Net {
