@@ -446,6 +446,7 @@ function start(loop, routes)
 
 			for _, route in events[eventName] do
 				route:_updateSnapshot(bridge)
+				route:_processConnections()
 			end
 
 			nextFn()
@@ -498,6 +499,7 @@ function createHook(routes)
 
 		for _, route in routes do
 			route:_updateSnapshot(bridge)
+			route:_processConnections()
 		end
 	end
 
