@@ -58,7 +58,7 @@ export type Configuration = {
 
 	See the [Intro](/docs/intro) to get started.
 ]=]
-export type RouteImpl<U...> = {
+type RouteImpl<U...> = {
 	__index: RouteImpl<U...>,
 	__iter: (self: Route<U...>) -> QueryResult<U...>,
 
@@ -88,7 +88,7 @@ export type RouteImpl<U...> = {
 	new: (Configuration?) -> Route<U...>,
 }
 
-type Route<U...> = typeof(setmetatable({} :: RouteImpl<U...>, {} :: RouteImpl<U...>))
+export type Route<U...> = typeof(setmetatable({} :: RouteImpl<U...>, {} :: RouteImpl<U...>))
 
 local Route: RouteImpl<...any> = {} :: RouteImpl<...any>
 Route.__index = Route
