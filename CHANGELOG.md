@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `server` and `client` view to rbxts types
 
+### Fixed
+
+- Wrong export for Route type (2025-03-11)
+
 ## [0.10.0-alpha.4] - 2025-03-08
 
 ### Added
