@@ -48,7 +48,7 @@ or discuss other relevant topics regarding the project.
 
 ### Issues
 
-GitHub issues are used for submitting bug reports, requesting or submitting ideas for features or changes, etc.
+GitHub issues are used for submitting bug reports. We are not accepting feature or change ideas/requests.
 
 #### Bug Reports
 
@@ -57,6 +57,9 @@ in your description you should detail the steps to reproduce the bug, providing 
 Make sure not to submit a duplicate report for the same bug, check the issues tab in GitHub first.
 
 ### Pull Requests
+
+> [!WARNING]
+> Do not make any feature changes/additions. YetAnotherNet is deprecated and is not accepting any.
 
 GitHub Pull Requests are for when you've made an addition, change, or removal from the codebase or documentation.
 
