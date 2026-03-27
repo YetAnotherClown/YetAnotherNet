@@ -2,11 +2,22 @@
     <img alt="YetAnotherNet — A Data-Driven Networking Library, inspired by Bevy_Renet & BridgeNet2, made for ECS." src=".moonwave/static/Banner.svg">
 </div>
 
+> [!CAUTION]
+> YetAnotherNet is now **deprecated**, it is *not recommended* for use in new projects.
+>
+> I suggest using [Blink](https://github.com/1Axen/blink) as an alternative. It is in every way *better* than YetAnotherNet,
+> only requiring a little more setup, but worth it nonetheless. It also works great for ECS.
+>
+> YetAnotherNet is being deprecated now with hopes of archiving it in the future. I no longer have reason nor interest to work on and maintain it.
+> Because it is actively used, YetAnotherNet will effectively go into a "maintenance mode." There will be no feature updates, only bug fixes.
+>
+> If you currently use YetAnotherNet in your projects, I suggest switching to Blink. Or, you are free to fork YetAnotherNet, add the features you want, etc.
+> However, I do not believe this is a worthwhile project for anyone to maintain in the long-term.
+
 ## Quick Start
 
 - [**Documentation**]
 - [**Basic Use**]
-- [**To-do**]
 - **Getting Started**
     - [**Routes**]
     - [**Middleware**]
@@ -66,34 +77,6 @@ Event-driven design is sensitive to ordering, this makes it difficult to know wh
 Since it's encouraged to use ECS with YetAnotherNet, though not required, we suggest reading [Matter — Why ECS?] by Evaera.
 
 [Matter — Why ECS?]: https://matter-ecs.github.io/matter/docs/WhyECS
-
----
-
-## To-do
-
-Tasks to complete before version 1.0.0 is released.
-
-- [x] Basic Functionality
-- [x] Stable Core API
-- [x] Strict Typing
-- [x] Unreliable Channel
-- [X] Middleware
-- [X] Typescript Support
-- [X] Automatic Buffer Compression
-- [x] Unit + Integration Tests w/ Jest 
-- [ ] Rate limiting
-- [ ] Debugger
-
-Other Tasks
-- [ ] Support more [Unsupported Datatypes] in internal Ser/Des library
-- [ ] More extensive tests with Jest
-- [ ] Minimal Example
-- [ ] ECR Setup Guide
-- [ ] ECR Example
-- [ ] Flamework Binary Serializer Example
-- [ ] Docs Page for Technical Details
-
-[Unsupported Datatypes]: https://yetanotherclown.github.io/YetAnotherNet/docs/getting-started/buffer-compression#unsupported-datatypes
 
 ---
 
